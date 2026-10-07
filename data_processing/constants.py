@@ -1,0 +1,2 @@
+DOCUMENT_NAME = "Bộ luật Lao động"
+DOCUMENT_NUMBER = "125/VBHN-VPQH"

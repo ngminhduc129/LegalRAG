@@ -1,0 +1,8 @@
+# Evaluation Configuration
+
+retrieval_k: [1, 3, 5, 10, 20]
+metrics: ["recall", "precision", "mrr", "ndcg"]
+generation_metrics: ["correctness", "faithfulness", "citation_accuracy", "completeness", "hallucination_rate"]
+
+test_set_path: "data/qa/test.jsonl"
+dev_set_path: "data/qa/dev.jsonl"

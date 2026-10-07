@@ -1,0 +1,6 @@
+# Experiment Configuration
+
+seed: 42
+run_id: "auto"
+output_dir: "experiments/runs"
+log_level: "INFO"

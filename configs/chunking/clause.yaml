@@ -1,0 +1,5 @@
+# Clause Chunking Configuration
+
+enabled: true
+document_id: "labor_code_2019"
+output_dir: "data/chunks/clause"

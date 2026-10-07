@@ -1,0 +1,15 @@
+# Legal RAG - Development Requirements
+
+# Core requirements
+-r requirements.txt
+
+# Development tools
+pytest>=7.4
+pytest-cov>=4.1
+pytest-mock>=3.11
+ruff>=0.1
+black>=23.0
+mypy>=1.4
+pre-commit>=3.3
+jupyter>=1.0
+ipykernel>=6.25

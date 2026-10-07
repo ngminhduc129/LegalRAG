@@ -1,0 +1,8 @@
+# Dense Retrieval Configuration
+
+enabled: true
+model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+device: "cuda"
+batch_size: 32
+
+index_path: "data/indexes/dense/dense_index.pkl"

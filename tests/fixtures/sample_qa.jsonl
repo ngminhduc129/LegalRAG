@@ -1,0 +1,3 @@
+{"query": "Phạm vi điều chỉnh của Bộ luật Lao động là gì?", "relevant_articles": ["Điều 1"], "relevant_clauses": ["Điều 1 Khoản 1", "Điều 1 Khoản 2"], "difficulty": "easy", "category": "scope"}
+{"query": "Đối tượng áp dụng của Bộ luật Lao động bao gồm ai?", "relevant_articles": ["Điều 1", "Điều 2"], "relevant_clauses": ["Điều 1 Khoản 2", "Điều 2 Khoản 1"], "difficulty": "easy", "category": "scope"}
+{"query": "Người lao động phải từ bao nhiêu tuổi?", "relevant_articles": ["Điều 2"], "relevant_clauses": ["Điều 2 Khoản 1"], "difficulty": "medium", "category": "definition"}

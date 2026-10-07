@@ -1,0 +1,114 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "legal-rag"
+version = "0.1.0"
+description = "Vietnamese Labor Law Legal RAG System"
+readme = "README.md"
+authors = [{name = "LegalRAG Team"}]
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.0",
+    "pydantic-yaml>=1.7",
+    "pyyaml>=6.0",
+    "typer>=0.9",
+    "rich>=13.0",
+    "loguru>=0.7",
+    "python-dotenv>=1.0",
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
+    "rank-bm25>=0.2",
+    "sentence-transformers>=2.2",
+    "torch>=2.0",
+    "transformers>=4.30",
+    "underthesea>=6.0",
+    "pymupdf>=1.23",
+    "pdfplumber>=0.10",
+    "pandas>=2.0",
+    "openpyxl>=3.1",
+    "tqdm>=4.65",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "pytest-mock>=3.11",
+    "ruff>=0.1",
+    "black>=23.0",
+    "mypy>=1.4",
+    "pre-commit>=3.3",
+    "jupyter>=1.0",
+    "ipykernel>=6.25",
+]
+gpu = [
+    "faiss-gpu>=1.7",
+]
+cpu = [
+    "faiss-cpu>=1.7",
+]
+
+[project.scripts]
+legal-rag = "legal_rag.cli.main:app"
+parse = "legal_rag.cli.parse:app"
+chunk = "legal_rag.cli.chunk:app"
+index = "legal_rag.cli.index:app"
+retrieve = "legal_rag.cli.retrieve:app"
+generate = "legal_rag.cli.generate:app"
+evaluate = "legal_rag.cli.evaluate:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["legal_rag*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM", "T20"]
+ignore = ["E501", "B008"]
+src = ["src"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+namespace_packages = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow tests",
+    "gpu: Requires GPU",
+]
+
+[tool.coverage.run]
+source = ["src/legal_rag"]
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

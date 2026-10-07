@@ -1,0 +1,6 @@
+# Reranker Configuration
+
+enabled: false
+model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+top_k: 50
+batch_size: 32

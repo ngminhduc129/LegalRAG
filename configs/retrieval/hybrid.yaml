@@ -1,0 +1,11 @@
+# Hybrid Retrieval Configuration
+
+enabled: true
+fusion_method: "rrf"
+rrf_k: 60
+weight_bm25: 0.5
+weight_dense: 0.5
+fetch_k: 50
+
+bm25_index_path: "data/indexes/bm25/bm25_index.pkl"
+dense_index_path: "data/indexes/dense/dense_index.pkl"

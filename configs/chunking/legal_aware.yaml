@@ -1,0 +1,12 @@
+# Legal-aware Chunking Configuration
+
+enabled: true
+preserve_hierarchy: true
+chunk_types:
+  - "article_intro"
+  - "clause"
+  - "clause_intro"
+  - "point"
+
+document_id: "labor_code_2019"
+output_dir: "data/chunks/legal_aware"

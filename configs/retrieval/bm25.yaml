@@ -1,0 +1,8 @@
+# BM25 Retrieval Configuration
+
+enabled: true
+tokenizer: "underthesea"
+k1: 1.5
+b: 0.75
+
+index_path: "data/indexes/bm25/bm25_index.pkl"

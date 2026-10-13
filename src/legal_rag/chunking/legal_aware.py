@@ -30,6 +30,13 @@ def join_text(parts: List[str]) -> str:
     return "\n".join(p.strip() for p in parts if p and p.strip()).strip()
 
 
+def _safe_id_part(value: Optional[str]) -> str:
+    """Convert a value to a safe ID part, handling None."""
+    if value is None:
+        return "none"
+    return value.replace(" ", "_").replace("/", "_").lower()
+
+
 def make_chunk(
     chapter: Optional[str],
     chapter_title: Optional[str],
@@ -44,10 +51,12 @@ def make_chunk(
     page_end: int,
     chunk_type: str,
     document_id: str = "labor_code_2019",
+    parent_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Create a standardized chunk record."""
+    chunk_id = f"{document_id}_{_safe_id_part(article)}_{_safe_id_part(clause)}_{_safe_id_part(point)}_{chunk_type}"
     return {
-        "chunk_id": f"{document_id}_{article}_{clause}_{point}_{chunk_type}".replace(" ", "_").replace("/", "_").lower(),
+        "chunk_id": chunk_id,
         "document_id": document_id,
         "document_name": DOCUMENT_NAME,
         "document_number": DOCUMENT_NUMBER,
@@ -63,6 +72,7 @@ def make_chunk(
         "content": content.strip(),
         "page_start": page_start,
         "page_end": page_end,
+        "parent_id": parent_id,
     }
 
 
@@ -72,294 +82,106 @@ def make_chunk(
 
 class LegalAwareChunker(BaseChunker):
     """
-    Legal-aware chunker that preserves Vietnamese legal hierarchy.
+    Legal-aware chunker that transforms parser output into final chunks.
 
-    Chunk types:
+    Consumes corpus chunks from LegalStructureParser (already parsed with hierarchy)
+    and adds: chunk_id, document_id, parent_id, preamble extraction.
+
+    Chunk types (output):
+    - preamble: Content before first article
     - article_intro: Article preamble/introductory text
     - clause: Full clause (no sub-points)
     - clause_intro: Clause preamble before points
-    - point: Individual point within a clause
+    - point: Individual point within a clause (includes clause_intro context)
     """
 
     def __init__(self, document_id: str = "labor_code_2019"):
         self.document_id = document_id
-        self.chunks = []
 
-        # State
-        self.chapter: Optional[str] = None
-        self.chapter_title: Optional[str] = None
-        self.section: Optional[str] = None
-        self.section_title: Optional[str] = None
-        self.article: Optional[str] = None
-        self.article_title: Optional[str] = None
-        self.article_page: Optional[int] = None
+    def chunk(self, corpus_chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Transform parser output chunks into final chunks with IDs and parent links.
 
-        self.article_intro: List[str] = []
-        self.article_intro_pages: List[int] = []
+        Args:
+            corpus_chunks: List of chunks from LegalStructureParser with fields:
+                document_name, document_number, chapter, chapter_title,
+                section, section_title, article, article_title, clause, point,
+                chunk_type, content, page_start, page_end
 
-        self.clause: Optional[str] = None
-        self.clause_parts: List[str] = []
-        self.clause_pages: List[int] = []
-        self.clause_intro: List[str] = []
-        self.clause_intro_pages: List[int] = []
-        self.clause_has_points: bool = False
+        Returns:
+            List of transformed chunks with added chunk_id, document_id, parent_id
+        """
+        if not corpus_chunks:
+            return []
 
-        self.point: Optional[str] = None
-        self.point_parts: List[str] = []
-        self.point_pages: List[int] = []
+        # Find first article chunk to identify preamble
+        first_article_idx = None
+        for i, chunk in enumerate(corpus_chunks):
+            if chunk.get("article") is not None:
+                first_article_idx = i
+                break
 
-    def _emit_article_intro(self):
-        content = join_text(self.article_intro)
-        if content and self.article is not None:
-            pages = self.article_intro_pages
-            self.chunks.append(make_chunk(
-                chapter=self.chapter,
-                chapter_title=self.chapter_title,
-                section=self.section,
-                section_title=self.section_title,
-                article=self.article,
-                article_title=self.article_title,
-                clause=None,
-                point=None,
-                content=content,
-                page_start=min(pages),
-                page_end=max(pages),
-                chunk_type="article_intro",
-                document_id=self.document_id,
-            ))
-        self.article_intro = []
-        self.article_intro_pages = []
+        # Extract preamble: all chunks before first article
+        preamble_chunks = corpus_chunks[:first_article_idx] if first_article_idx is not None else corpus_chunks
+        article_chunks = corpus_chunks[first_article_idx:] if first_article_idx is not None else []
 
-    def _emit_clause_intro(self):
-        content = join_text(self.clause_intro)
-        if content and self.article is not None:
-            pages = self.clause_intro_pages
-            self.chunks.append(make_chunk(
-                chapter=self.chapter,
-                chapter_title=self.chapter_title,
-                section=self.section,
-                section_title=self.section_title,
-                article=self.article,
-                article_title=self.article_title,
-                clause=self.clause,
-                point=None,
-                content=content,
-                page_start=min(pages),
-                page_end=max(pages),
-                chunk_type="clause_intro",
-                document_id=self.document_id,
-            ))
-        self.clause_intro = []
-        self.clause_intro_pages = []
+        result_chunks = []
 
-    def _emit_clause(self):
-        if self.clause is not None and not self.clause_has_points:
-            content = join_text(self.clause_parts)
-            if content:
-                pages = self.clause_pages
-                self.chunks.append(make_chunk(
-                    chapter=self.chapter,
-                    chapter_title=self.chapter_title,
-                    section=self.section,
-                    section_title=self.section_title,
-                    article=self.article,
-                    article_title=self.article_title,
-                    clause=self.clause,
+        # 1. Emit preamble (merge all pre-article chunks into one)
+        if preamble_chunks:
+            preamble_content = "\n".join(c["content"] for c in preamble_chunks if c.get("content"))
+            if preamble_content.strip():
+                pages = [c["page_start"] for c in preamble_chunks] + [c["page_end"] for c in preamble_chunks]
+                result_chunks.append(make_chunk(
+                    chapter=None,
+                    chapter_title=None,
+                    section=None,
+                    section_title=None,
+                    article=None,
+                    article_title=None,
+                    clause=None,
                     point=None,
-                    content=content,
+                    content=preamble_content,
                     page_start=min(pages),
                     page_end=max(pages),
-                    chunk_type="clause",
+                    chunk_type="preamble",
                     document_id=self.document_id,
                 ))
-        elif self.clause is not None and self.clause_has_points:
-            self._emit_clause_intro()
 
-        self.clause = None
-        self.clause_parts = []
-        self.clause_pages = []
-        self.clause_intro = []
-        self.clause_intro_pages = []
-        self.clause_has_points = False
-        self.point = None
-        self.point_parts = []
-        self.point_pages = []
+        # 2. Process article chunks - add IDs and parent links
+        # Build clause_intro parent_id map for point linking
+        clause_intro_map = {}  # (article, clause) -> chunk_id of clause_intro
 
-    def _emit_point(self):
-        if self.point is not None:
-            content = join_text(self.point_parts)
-            if content and self.article is not None:
-                pages = self.point_pages
-                self.chunks.append(make_chunk(
-                    chapter=self.chapter,
-                    chapter_title=self.chapter_title,
-                    section=self.section,
-                    section_title=self.section_title,
-                    article=self.article,
-                    article_title=self.article_title,
-                    clause=self.clause,
-                    point=self.point,
-                    content=content,
-                    page_start=min(pages),
-                    page_end=max(pages),
-                    chunk_type="point",
-                    document_id=self.document_id,
-                ))
-        self.point = None
-        self.point_parts = []
-        self.point_pages = []
+        for chunk in article_chunks:
+            # Generate stable chunk_id with document_id
+            chunk_id = f"{self.document_id}_{_safe_id_part(chunk.get('article'))}_{_safe_id_part(chunk.get('clause'))}_{_safe_id_part(chunk.get('point'))}_{chunk['chunk_type']}"
 
-    def _close_article(self):
-        self._emit_point()
-        self._emit_clause()
-        self._emit_article_intro()
-        self.article = None
-        self.article_title = None
-        self.article_page = None
+            # Determine parent_id for points
+            parent_id = None
+            if chunk["chunk_type"] == "point" and chunk.get("clause") and chunk.get("article"):
+                parent_key = (chunk["article"], chunk["clause"])
+                parent_id = clause_intro_map.get(parent_key)
 
-    def _is_same_article(self, candidate_article: str, candidate_title: str) -> bool:
-        """Check if this is a duplicate article header (e.g., at page break)."""
-        return (
-            self.article is not None
-            and self.article == candidate_article
-            and (
-                self.article_title is None
-                or not candidate_title
-                or self.article_title.strip().casefold() == candidate_title.strip().casefold()
-            )
-        )
+            # Store clause_intro chunk_id for point linking
+            if chunk["chunk_type"] == "clause_intro" and chunk.get("clause") and chunk.get("article"):
+                clause_intro_map[(chunk["article"], chunk["clause"])] = chunk_id
 
-    def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Parse lines into legal-aware chunks."""
-        self.chunks = []
-        self.chapter = None
-        self.chapter_title = None
-        self.section = None
-        self.section_title = None
-        self.article = None
-        self.article_title = None
-        self.article_page = None
-        self.article_intro = []
-        self.article_intro_pages = []
-        self.clause = None
-        self.clause_parts = []
-        self.clause_pages = []
-        self.clause_intro = []
-        self.clause_intro_pages = []
-        self.clause_has_points = False
-        self.point = None
-        self.point_parts = []
-        self.point_pages = []
+            # Build transformed chunk
+            transformed = {
+                **chunk,
+                "chunk_id": chunk_id,
+                "document_id": self.document_id,
+                "parent_id": parent_id,
+            }
+            result_chunks.append(transformed)
 
-        i = 0
-        while i < len(lines):
-            item = lines[i]
-            text = item["text"]
-            page = item["page"]
-
-            # CHAPTER
-            chapter_match = CHAPTER_RE.match(text)
-            if chapter_match:
-                self._close_article()
-                self.chapter = f"Chương {chapter_match.group(1)}"
-                self.chapter_title = None
-                if i + 1 < len(lines):
-                    next_text = lines[i + 1]["text"]
-                    if not any(p.match(next_text) for p in [CHAPTER_RE, SECTION_RE, ARTICLE_RE, CLAUSE_RE]):
-                        self.chapter_title = next_text
-                        i += 1
-                i += 1
-                continue
-
-            # SECTION
-            section_match = SECTION_RE.match(text)
-            if section_match:
-                self._close_article()
-                self.section = f"Mục {section_match.group(1)}"
-                self.section_title = None
-                if i + 1 < len(lines):
-                    next_text = lines[i + 1]["text"]
-                    if not any(p.match(next_text) for p in [CHAPTER_RE, SECTION_RE, ARTICLE_RE, CLAUSE_RE]):
-                        self.section_title = next_text
-                        i += 1
-                i += 1
-                continue
-
-            # ARTICLE
-            article_match = ARTICLE_RE.match(text)
-            if article_match:
-                article_number = article_match.group(1)
-                article_title_text = article_match.group(2).strip()
-                candidate_article = f"Điều {article_number}"
-
-                if self._is_same_article(candidate_article, article_title_text):
-                    i += 1
-                    continue
-
-                self._close_article()
-                self.article = candidate_article
-                self.article_title = article_title_text or None
-                self.article_page = page
-                i += 1
-                continue
-
-            # Skip content before first article
-            if self.article is None:
-                i += 1
-                continue
-
-            # CLAUSE
-            clause_match = CLAUSE_RE.match(text)
-            if clause_match:
-                # Emit article_intro if this is the first clause of the article
-                if self.article_intro and self.clause is None:
-                    self._emit_article_intro()
-
-                self._emit_point()
-                self._emit_clause()
-                self.clause = clause_match.group(1)
-                self.clause_parts = [clause_match.group(2)]
-                self.clause_pages = [page]
-                self.clause_has_points = False
-                i += 1
-                continue
-
-            # POINT
-            point_match = POINT_RE.match(text)
-            if point_match and self.clause is not None:
-                if not self.clause_has_points:
-                    self.clause_intro = list(self.clause_parts)
-                    self.clause_intro_pages = list(self.clause_pages)
-                    self.clause_parts = []
-                    self.clause_pages = []
-                    self.clause_has_points = True
-                self._emit_point()
-                self.point = point_match.group(1).lower()
-                self.point_parts = [point_match.group(2)]
-                self.point_pages = [page]
-                i += 1
-                continue
-
-            # CONTENT
-            if self.point is not None:
-                self.point_parts.append(text)
-                self.point_pages.append(page)
-            elif self.clause is not None:
-                self.clause_parts.append(text)
-                self.clause_pages.append(page)
-            else:
-                self.article_intro.append(text)
-                self.article_intro_pages.append(page)
-
-            i += 1
-
-        self._close_article()
-        return self.chunks
+        return result_chunks
 
     def chunk_from_pdf(self, pdf_path: Path) -> List[Dict[str, Any]]:
-        """Parse PDF directly into chunks."""
-        lines = extract_pdf_lines(pdf_path)
-        return self.chunk(lines)
+        """Parse PDF directly into chunks (uses full parse pipeline)."""
+        from legal_rag.corpus.extractor import parse_corpus
+        corpus_chunks = parse_corpus(pdf_path)
+        return self.chunk(corpus_chunks)
 
 
 # =========================================================
@@ -367,65 +189,87 @@ class LegalAwareChunker(BaseChunker):
 # =========================================================
 
 class FixedSizeChunker(BaseChunker):
-    """Fixed-size chunking with overlap (baseline CH01)."""
+    """Fixed-size chunking with overlap (baseline CH01).
+
+    Uses word-based chunking (split by whitespace), not token-based.
+    chunk_size and overlap are in words.
+    """
 
     def __init__(
         self,
         chunk_size: int = 500,
         overlap: int = 50,
         document_id: str = "labor_code_2019",
+        preserve_metadata: bool = False,
     ):
         self.chunk_size = chunk_size
         self.overlap = overlap
         self.document_id = document_id
+        self.preserve_metadata = preserve_metadata
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Chunk from lines (joins all text first)."""
         text = "\n".join(line["text"] for line in lines)
-        return self._chunk_text(text)
+        return self._chunk_text(text, lines if self.preserve_metadata else None)
 
     def chunk_from_pdf(self, pdf_path: Path) -> List[Dict[str, Any]]:
         """Parse PDF directly into chunks."""
         lines = extract_pdf_lines(pdf_path)
         text = "\n".join(line["text"] for line in lines)
-        return self._chunk_text(text)
+        return self._chunk_text(text, lines if self.preserve_metadata else None)
 
-    def _chunk_text(self, text: str) -> List[Dict[str, Any]]:
+    def _chunk_text(self, text: str, lines: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
         words = text.split()
         chunks = []
-        for i in range(0, len(words), self.chunk_size - self.overlap):
+        step = self.chunk_size - self.overlap
+        for i in range(0, len(words), step):
             chunk_words = words[i:i + self.chunk_size]
             if not chunk_words:
                 break
             chunk_text = " ".join(chunk_words)
-            chunks.append({
-                "chunk_id": f"{self.document_id}_fixed_{i // (self.chunk_size - self.overlap)}",
+            chunk_data = {
+                "chunk_id": f"{self.document_id}_fixed_{i // step}",
                 "document_id": self.document_id,
                 "content": chunk_text,
                 "chunk_type": "fixed_size",
-                "chunk_index": i // (self.chunk_size - self.overlap),
+                "chunk_index": i // step,
                 "chunk_size": self.chunk_size,
                 "overlap": self.overlap,
-            })
+                "unit": "words",
+            }
+            # Optionally add metadata from first line in chunk range
+            if lines and self.preserve_metadata:
+                # Find approximate page range for this chunk
+                char_pos = len(" ".join(words[:i]))
+                chunk_char_len = len(chunk_text)
+                # Simple heuristic: assign page from first line
+                chunk_data["page_start"] = lines[0]["page"] if lines else 1
+                chunk_data["page_end"] = lines[-1]["page"] if lines else 1
+            chunks.append(chunk_data)
         return chunks
 
 
 class ParagraphChunker(BaseChunker):
-    """Paragraph-based chunking (baseline CH02)."""
+    """Paragraph-based chunking (baseline CH02).
+
+    Splits text by double newline. Note: input lines from PDF extraction
+    are already split by single newlines, so paragraphs are reconstructed
+    by joining with single newline then splitting on double newline.
+    """
 
     def __init__(self, document_id: str = "labor_code_2019"):
         self.document_id = document_id
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         text = "\n".join(line["text"] for line in lines)
-        return self._chunk_text(text)
+        return self._chunk_text(text, lines)
 
     def chunk_from_pdf(self, pdf_path: Path) -> List[Dict[str, Any]]:
         lines = extract_pdf_lines(pdf_path)
         text = "\n".join(line["text"] for line in lines)
-        return self._chunk_text(text)
+        return self._chunk_text(text, lines)
 
-    def _chunk_text(self, text: str) -> List[Dict[str, Any]]:
+    def _chunk_text(self, text: str, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
         chunks = []
         for i, para in enumerate(paragraphs):
@@ -435,29 +279,98 @@ class ParagraphChunker(BaseChunker):
                 "content": para,
                 "chunk_type": "paragraph",
                 "paragraph_index": i,
+                "page_start": lines[0]["page"] if lines else 1,
+                "page_end": lines[-1]["page"] if lines else 1,
             })
         return chunks
 
 
 class ArticleChunker(BaseChunker):
-    """Article-level chunking - each article as one chunk (baseline CH03)."""
+    """Article-level chunking - each article as one chunk (baseline CH03).
+
+    Accepts both lines format (from PDF) and corpus format (from parser).
+    """
 
     def __init__(self, document_id: str = "labor_code_2019"):
         self.document_id = document_id
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        # Group lines by article
+        # Detect format: corpus chunks have 'content' and 'article' fields
+        if lines and "content" in lines[0] and "article" in lines[0]:
+            return self._chunk_corpus(lines)
+        return self._chunk_lines(lines)
+
+    def _chunk_corpus(self, corpus_chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Group corpus chunks by article."""
+        articles = {}
+        for chunk in corpus_chunks:
+            article = chunk.get("article")
+            if not article:
+                continue
+            if article not in articles:
+                articles[article] = {
+                    "chunks": [],
+                    "title": chunk.get("article_title", ""),
+                    "pages": set(),
+                    "chapter": chunk.get("chapter"),
+                    "section": chunk.get("section"),
+                }
+            articles[article]["chunks"].append(chunk)
+            articles[article]["pages"].add(chunk.get("page_start", 1))
+            articles[article]["pages"].add(chunk.get("page_end", 1))
+
+        chunks = []
+        for i, (article, data) in enumerate(articles.items()):
+            content = "\n".join(c["content"] for c in data["chunks"] if c.get("content"))
+            pages = sorted(data["pages"])
+            chunks.append({
+                "chunk_id": f"{self.document_id}_article_{i}",
+                "document_id": self.document_id,
+                "chapter": data.get("chapter"),
+                "section": data.get("section"),
+                "article": article,
+                "article_title": data["title"],
+                "content": content,
+                "chunk_type": "article",
+                "page_start": min(pages) if pages else 1,
+                "page_end": max(pages) if pages else 1,
+            })
+        return chunks
+
+    def _chunk_lines(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        # Original lines-based implementation
         articles = {}
         current_article = None
+        current_chapter = None
+        current_section = None
         for line in lines:
-            match = ARTICLE_RE.match(line["text"])
-            if match:
-                current_article = f"Điều {match.group(1)}"
+            text = line["text"]
+            page = line["page"]
+            
+            chapter_match = CHAPTER_RE.match(text)
+            if chapter_match:
+                current_chapter = f"Chương {chapter_match.group(1)}"
+                continue
+            
+            section_match = SECTION_RE.match(text)
+            if section_match:
+                current_section = f"Mục {section_match.group(1)}"
+                continue
+            
+            article_match = ARTICLE_RE.match(text)
+            if article_match:
+                current_article = f"Điều {article_match.group(1)}"
                 if current_article not in articles:
-                    articles[current_article] = {"lines": [], "title": match.group(2).strip(), "pages": set()}
+                    articles[current_article] = {
+                        "lines": [], 
+                        "title": article_match.group(2).strip(), 
+                        "pages": set(),
+                        "chapter": current_chapter,
+                        "section": current_section,
+                    }
             if current_article:
-                articles[current_article]["lines"].append(line["text"])
-                articles[current_article]["pages"].add(line["page"])
+                articles[current_article]["lines"].append(text)
+                articles[current_article]["pages"].add(page)
 
         chunks = []
         for i, (article, data) in enumerate(articles.items()):
@@ -466,6 +379,8 @@ class ArticleChunker(BaseChunker):
             chunks.append({
                 "chunk_id": f"{self.document_id}_article_{i}",
                 "document_id": self.document_id,
+                "chapter": data.get("chapter"),
+                "section": data.get("section"),
                 "article": article,
                 "article_title": data["title"],
                 "content": content,
@@ -481,15 +396,64 @@ class ArticleChunker(BaseChunker):
 
 
 class ClauseChunker(BaseChunker):
-    """Clause-level chunking - each clause as one chunk (baseline CH04)."""
+    """Clause-level chunking - each clause as one chunk (baseline CH04).
+
+    Accepts both lines format (from PDF) and corpus format (from parser).
+    """
 
     def __init__(self, document_id: str = "labor_code_2019"):
         self.document_id = document_id
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        # Detect format: corpus chunks have 'content' and 'clause' fields
+        if lines and "content" in lines[0] and "clause" in lines[0]:
+            return self._chunk_corpus(lines)
+        return self._chunk_lines(lines)
+
+    def _chunk_corpus(self, corpus_chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Group corpus chunks by (article, clause)."""
+        clauses = {}
+        for chunk in corpus_chunks:
+            article = chunk.get("article")
+            clause = chunk.get("clause")
+            if not article or clause is None:
+                continue
+            key = (article, clause)
+            if key not in clauses:
+                clauses[key] = {
+                    "chunks": [],
+                    "pages": set(),
+                    "chapter": chunk.get("chapter"),
+                    "section": chunk.get("section"),
+                }
+            clauses[key]["chunks"].append(chunk)
+            clauses[key]["pages"].add(chunk.get("page_start", 1))
+            clauses[key]["pages"].add(chunk.get("page_end", 1))
+
+        chunks = []
+        for i, ((article, clause), data) in enumerate(clauses.items()):
+            content = "\n".join(c["content"] for c in data["chunks"] if c.get("content"))
+            pages = sorted(data["pages"])
+            chunks.append({
+                "chunk_id": f"{self.document_id}_clause_{i}",
+                "document_id": self.document_id,
+                "chapter": data.get("chapter"),
+                "section": data.get("section"),
+                "article": article,
+                "clause": clause,
+                "content": content,
+                "chunk_type": "clause",
+                "page_start": min(pages) if pages else 1,
+                "page_end": max(pages) if pages else 1,
+            })
+        return chunks
+
+    def _chunk_lines(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         chunks = []
         current_article = None
         current_clause = None
+        current_chapter = None
+        current_section = None
         clause_parts = []
         clause_pages = []
         clause_idx = 0
@@ -498,16 +462,32 @@ class ClauseChunker(BaseChunker):
             text = line["text"]
             page = line["page"]
 
+            chapter_match = CHAPTER_RE.match(text)
+            if chapter_match:
+                current_chapter = f"Chương {chapter_match.group(1)}"
+                continue
+
+            section_match = SECTION_RE.match(text)
+            if section_match:
+                current_section = f"Mục {section_match.group(1)}"
+                continue
+
             article_match = ARTICLE_RE.match(text)
             if article_match:
-                current_article = f"Điều {article_match.group(1)}"
+                new_article = f"Điều {article_match.group(1)}"
+                # Save current clause and article before resetting, to emit pending clause with correct article
+                pending_clause = current_clause
+                pending_article = current_article
+                current_article = new_article
                 current_clause = None
-                if clause_parts:
+                if clause_parts and pending_article:
                     chunks.append({
                         "chunk_id": f"{self.document_id}_clause_{clause_idx}",
                         "document_id": self.document_id,
-                        "article": current_article,
-                        "clause": current_clause,
+                        "chapter": current_chapter,
+                        "section": current_section,
+                        "article": pending_article,
+                        "clause": pending_clause,
                         "content": "\n".join(clause_parts),
                         "chunk_type": "clause",
                         "page_start": min(clause_pages),
@@ -524,6 +504,8 @@ class ClauseChunker(BaseChunker):
                     chunks.append({
                         "chunk_id": f"{self.document_id}_clause_{clause_idx}",
                         "document_id": self.document_id,
+                        "chapter": current_chapter,
+                        "section": current_section,
                         "article": current_article,
                         "clause": current_clause,
                         "content": "\n".join(clause_parts),
@@ -542,10 +524,12 @@ class ClauseChunker(BaseChunker):
                 clause_pages.append(page)
 
         # Last clause
-        if clause_parts:
+        if clause_parts and current_article:
             chunks.append({
                 "chunk_id": f"{self.document_id}_clause_{clause_idx}",
                 "document_id": self.document_id,
+                "chapter": current_chapter,
+                "section": current_section,
                 "article": current_article,
                 "clause": current_clause,
                 "content": "\n".join(clause_parts),

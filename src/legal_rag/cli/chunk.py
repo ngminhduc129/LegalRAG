@@ -10,6 +10,24 @@ app = typer.Typer(name="chunk", help="Run chunking strategies on parsed corpus")
 console = Console()
 
 
+def corpus_to_lines(corpus_chunks: list) -> list:
+    """Convert parser-output corpus chunks to lines format for baseline chunkers.
+    
+    Baseline chunkers expect: [{"text": str, "page": int}, ...]
+    Corpus chunks have full metadata with 'content' field.
+    """
+    lines = []
+    for chunk in corpus_chunks:
+        content = chunk.get("content", "")
+        page = chunk.get("page_start", 1)
+        # Split content by newlines to simulate lines
+        for line_text in content.split("\n"):
+            line_text = line_text.strip()
+            if line_text:
+                lines.append({"text": line_text, "page": page})
+    return lines
+
+
 @app.command()
 def legal_aware(
     input_path: Path = typer.Argument(
@@ -38,23 +56,22 @@ def legal_aware(
 
     console.print(f"[bold]Legal-aware chunking:[/bold] {input_path}")
 
-    # Load corpus
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
         task = progress.add_task("Loading corpus...", total=None)
-        chunks = []
+        corpus_chunks = []
         with input_path.open("r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
-                    chunks.append(json.loads(line))
-        progress.update(task, description=f"Loaded {len(chunks)} items")
+                    corpus_chunks.append(json.loads(line))
+        progress.update(task, description=f"Loaded {len(corpus_chunks)} corpus chunks")
 
-        task2 = progress.add_task("Chunking...", total=None)
+        task2 = progress.add_task("Transforming chunks...", total=None)
         chunker = LegalAwareChunker(document_id=document_id)
-        result_chunks = chunker.chunk(chunks)
+        result_chunks = chunker.chunk(corpus_chunks)
         progress.update(task2, description=f"Created {len(result_chunks)} chunks")
 
         task3 = progress.add_task("Saving...", total=None)
@@ -116,12 +133,15 @@ def fixed_size(
         console=console,
     ) as progress:
         task = progress.add_task("Loading corpus...", total=None)
-        chunks = []
+        corpus_chunks = []
         with input_path.open("r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
-                    chunks.append(json.loads(line))
-        progress.update(task, description=f"Loaded {len(chunks)} items")
+                    corpus_chunks.append(json.loads(line))
+        progress.update(task, description=f"Loaded {len(corpus_chunks)} corpus chunks")
+
+        # Convert to lines format for baseline chunker
+        lines = corpus_to_lines(corpus_chunks)
 
         task2 = progress.add_task("Chunking...", total=None)
         chunker = FixedSizeChunker(
@@ -129,7 +149,7 @@ def fixed_size(
             overlap=overlap,
             document_id=document_id,
         )
-        result_chunks = chunker.chunk(chunks)
+        result_chunks = chunker.chunk(lines)
         progress.update(task2, description=f"Created {len(result_chunks)} chunks")
 
         task3 = progress.add_task("Saving...", total=None)
@@ -179,16 +199,19 @@ def paragraph(
         console=console,
     ) as progress:
         task = progress.add_task("Loading corpus...", total=None)
-        chunks = []
+        corpus_chunks = []
         with input_path.open("r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
-                    chunks.append(json.loads(line))
-        progress.update(task, description=f"Loaded {len(chunks)} items")
+                    corpus_chunks.append(json.loads(line))
+        progress.update(task, description=f"Loaded {len(corpus_chunks)} corpus chunks")
+
+        # Convert to lines format for baseline chunker
+        lines = corpus_to_lines(corpus_chunks)
 
         task2 = progress.add_task("Chunking...", total=None)
         chunker = ParagraphChunker(document_id=document_id)
-        result_chunks = chunker.chunk(chunks)
+        result_chunks = chunker.chunk(lines)
         progress.update(task2, description=f"Created {len(result_chunks)} chunks")
 
         task3 = progress.add_task("Saving...", total=None)
@@ -238,16 +261,17 @@ def article(
         console=console,
     ) as progress:
         task = progress.add_task("Loading corpus...", total=None)
-        chunks = []
+        corpus_chunks = []
         with input_path.open("r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
-                    chunks.append(json.loads(line))
-        progress.update(task, description=f"Loaded {len(chunks)} items")
+                    corpus_chunks.append(json.loads(line))
+        progress.update(task, description=f"Loaded {len(corpus_chunks)} corpus chunks")
 
+        # Pass corpus directly - ArticleChunker handles corpus format
         task2 = progress.add_task("Chunking...", total=None)
         chunker = ArticleChunker(document_id=document_id)
-        result_chunks = chunker.chunk(chunks)
+        result_chunks = chunker.chunk(corpus_chunks)
         progress.update(task2, description=f"Created {len(result_chunks)} chunks")
 
         task3 = progress.add_task("Saving...", total=None)
@@ -297,16 +321,17 @@ def clause(
         console=console,
     ) as progress:
         task = progress.add_task("Loading corpus...", total=None)
-        chunks = []
+        corpus_chunks = []
         with input_path.open("r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
-                    chunks.append(json.loads(line))
-        progress.update(task, description=f"Loaded {len(chunks)} items")
+                    corpus_chunks.append(json.loads(line))
+        progress.update(task, description=f"Loaded {len(corpus_chunks)} corpus chunks")
 
+        # Pass corpus directly - ClauseChunker handles corpus format
         task2 = progress.add_task("Chunking...", total=None)
         chunker = ClauseChunker(document_id=document_id)
-        result_chunks = chunker.chunk(chunks)
+        result_chunks = chunker.chunk(corpus_chunks)
         progress.update(task2, description=f"Created {len(result_chunks)} chunks")
 
         task3 = progress.add_task("Saving...", total=None)
@@ -360,25 +385,28 @@ def all_baselines(
         console=console,
     ) as progress:
         task = progress.add_task("Loading corpus...", total=None)
-        chunks = []
+        corpus_chunks = []
         with input_path.open("r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
-                    chunks.append(json.loads(line))
-        progress.update(task, description=f"Loaded {len(chunks)} items")
+                    corpus_chunks.append(json.loads(line))
+        progress.update(task, description=f"Loaded {len(corpus_chunks)} corpus chunks")
+
+        # FixedSize and Paragraph need lines format; Article and Clause accept corpus format
+        lines = corpus_to_lines(corpus_chunks)
 
         strategies = [
-            ("fixed_300", FixedSizeChunker(chunk_size=300, overlap=60, document_id=document_id), "data/chunks/fixed_300"),
-            ("fixed_500", FixedSizeChunker(chunk_size=500, overlap=100, document_id=document_id), "data/chunks/fixed_500"),
-            ("fixed_800", FixedSizeChunker(chunk_size=800, overlap=160, document_id=document_id), "data/chunks/fixed_800"),
-            ("paragraph", ParagraphChunker(document_id=document_id), "data/chunks/paragraph"),
-            ("article", ArticleChunker(document_id=document_id), "data/chunks/article"),
-            ("clause", ClauseChunker(document_id=document_id), "data/chunks/clause"),
+            ("fixed_300", FixedSizeChunker(chunk_size=300, overlap=60, document_id=document_id), lines, "data/chunks/fixed_300"),
+            ("fixed_500", FixedSizeChunker(chunk_size=500, overlap=100, document_id=document_id), lines, "data/chunks/fixed_500"),
+            ("fixed_800", FixedSizeChunker(chunk_size=800, overlap=160, document_id=document_id), lines, "data/chunks/fixed_800"),
+            ("paragraph", ParagraphChunker(document_id=document_id), lines, "data/chunks/paragraph"),
+            ("article", ArticleChunker(document_id=document_id), corpus_chunks, "data/chunks/article"),
+            ("clause", ClauseChunker(document_id=document_id), corpus_chunks, "data/chunks/clause"),
         ]
 
-        for name, chunker, out_dir in strategies:
+        for name, chunker, input_data, out_dir in strategies:
             task2 = progress.add_task(f"Chunking {name}...", total=None)
-            result_chunks = chunker.chunk(chunks)
+            result_chunks = chunker.chunk(input_data)
             progress.update(task2, description=f"Created {len(result_chunks)} chunks for {name}")
 
             task3 = progress.add_task(f"Saving {name}...", total=None)

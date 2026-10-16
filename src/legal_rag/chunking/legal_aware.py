@@ -148,10 +148,22 @@ class LegalAwareChunker(BaseChunker):
                     document_id=self.document_id,
                 ))
 
-        # 2. Process article chunks - add IDs and parent links
-        # Build clause_intro parent_id map for point linking
+        # 2. Process article chunks - add IDs and parent links.
+        # Two passes: clause_intro chunks are emitted AFTER their points by
+        # the parser, so a single forward pass can never link them.
+        # Pass 1: collect all clause_intro chunk_ids keyed by (article, clause).
         clause_intro_map = {}  # (article, clause) -> chunk_id of clause_intro
+        for chunk in article_chunks:
+            if chunk["chunk_type"] == "clause_intro" and chunk.get("clause") and chunk.get("article"):
+                chunk_id = f"{self.document_id}_{_safe_id_part(chunk.get('article'))}_{_safe_id_part(chunk.get('clause'))}_{_safe_id_part(chunk.get('point'))}_{chunk['chunk_type']}"
+                clause_intro_map.setdefault((chunk["article"], chunk["clause"]), chunk_id)
 
+        # Pass 2: emit chunks with parent links resolved.
+        # Quoted amendments (e.g. Dieu 219 quoting other laws' own
+        # khoản/điểm numbering) can repeat a structure key with DIFFERENT
+        # content. chunk_ids must stay unique for traceability, so repeats
+        # get an occurrence suffix.
+        seen_ids = set()
         for chunk in article_chunks:
             # Generate stable chunk_id with document_id
             chunk_id = f"{self.document_id}_{_safe_id_part(chunk.get('article'))}_{_safe_id_part(chunk.get('clause'))}_{_safe_id_part(chunk.get('point'))}_{chunk['chunk_type']}"
@@ -162,9 +174,14 @@ class LegalAwareChunker(BaseChunker):
                 parent_key = (chunk["article"], chunk["clause"])
                 parent_id = clause_intro_map.get(parent_key)
 
-            # Store clause_intro chunk_id for point linking
-            if chunk["chunk_type"] == "clause_intro" and chunk.get("clause") and chunk.get("article"):
-                clause_intro_map[(chunk["article"], chunk["clause"])] = chunk_id
+            # Ensure chunk_id uniqueness across quoted-numbering repeats.
+            occurrence = 1
+            unique_id = chunk_id
+            while unique_id in seen_ids:
+                occurrence += 1
+                unique_id = f"{chunk_id}__occ{occurrence}"
+            seen_ids.add(unique_id)
+            chunk_id = unique_id
 
             # Build transformed chunk
             transformed = {
@@ -252,37 +269,80 @@ class FixedSizeChunker(BaseChunker):
 class ParagraphChunker(BaseChunker):
     """Paragraph-based chunking (baseline CH02).
 
-    Splits text by double newline. Note: input lines from PDF extraction
-    are already split by single newlines, so paragraphs are reconstructed
-    by joining with single newline then splitting on double newline.
+    Groups consecutive PDF lines into paragraphs: a paragraph boundary is
+    placed after any line ending with sentence-terminal punctuation
+    (., ;, :, ?, !, possibly followed by a closing quote). PDF extraction
+    provides no blank lines, so splitting on double newline (the previous
+    implementation) always yielded a single chunk for the whole document.
     """
+
+    # A line ending with one of these (after stripping closing quotes/
+    # brackets) terminates the current paragraph.
+    TERMINAL_ENDINGS = (".", ";", ":", "?", "!", "…")
+    TRAILING_CLOSERS = "\"'”’»)]}"
 
     def __init__(self, document_id: str = "labor_code_2019"):
         self.document_id = document_id
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        text = "\n".join(line["text"] for line in lines)
-        return self._chunk_text(text, lines)
+        text_lines = [
+            (line["text"], line.get("page", 1))
+            for line in lines
+            if line.get("text") and line["text"].strip()
+        ]
+        return self._chunk_lines(text_lines)
 
     def chunk_from_pdf(self, pdf_path: Path) -> List[Dict[str, Any]]:
         lines = extract_pdf_lines(pdf_path)
-        text = "\n".join(line["text"] for line in lines)
-        return self._chunk_text(text, lines)
+        text_lines = [
+            (line["text"], line.get("page", 1))
+            for line in lines
+            if line.get("text") and line["text"].strip()
+        ]
+        return self._chunk_lines(text_lines)
+
+    def _ends_paragraph(self, line: str) -> bool:
+        stripped = line.strip().rstrip(self.TRAILING_CLOSERS).strip()
+        return bool(stripped) and stripped[-1] in self.TERMINAL_ENDINGS
+
+    def _chunk_lines(self, text_lines: List[tuple]) -> List[Dict[str, Any]]:
+        chunks = []
+        buf: List[str] = []
+        pages: List[int] = []
+        for text, page in text_lines:
+            buf.append(text.strip())
+            pages.append(page)
+            if self._ends_paragraph(text):
+                chunks.append(self._make_chunk(chunks, buf, pages))
+                buf = []
+                pages = []
+        if buf:
+            chunks.append(self._make_chunk(chunks, buf, pages))
+        # Re-number sequentially
+        for i, chunk in enumerate(chunks):
+            chunk["chunk_id"] = f"{self.document_id}_para_{i}"
+            chunk["paragraph_index"] = i
+        return chunks
+
+    def _make_chunk(self, chunks: List[Dict[str, Any]], buf: List[str], pages: List[int]) -> Dict[str, Any]:
+        return {
+            "chunk_id": "",
+            "document_id": self.document_id,
+            "content": "\n".join(buf),
+            "chunk_type": "paragraph",
+            "paragraph_index": len(chunks),
+            "page_start": min(pages) if pages else 1,
+            "page_end": max(pages) if pages else 1,
+        }
 
     def _chunk_text(self, text: str, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
-        chunks = []
-        for i, para in enumerate(paragraphs):
-            chunks.append({
-                "chunk_id": f"{self.document_id}_para_{i}",
-                "document_id": self.document_id,
-                "content": para,
-                "chunk_type": "paragraph",
-                "paragraph_index": i,
-                "page_start": lines[0]["page"] if lines else 1,
-                "page_end": lines[-1]["page"] if lines else 1,
-            })
-        return chunks
+        # Kept for backward compatibility; delegates to line-based chunking.
+        text_lines = [
+            (line["text"], line.get("page", 1))
+            for line in (lines or [])
+            if line.get("text") and line["text"].strip()
+        ]
+        return self._chunk_lines(text_lines)
 
 
 class ArticleChunker(BaseChunker):

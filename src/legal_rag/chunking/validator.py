@@ -90,8 +90,13 @@ def ends_mid_sentence(content: str) -> bool:
     content = content.strip()
     if not content:
         return False
-    last_char = content[-1]
-    if last_char in ".!?":
+    # Strip closing quotes/brackets before checking the final character.
+    # Legal chunks legitimately end with ';' (enumeration points) or ':'
+    # (clause intros), so those are accepted as complete endings.
+    stripped = content.rstrip("\"'“”‘’«»()[]{}").strip()
+    if not stripped:
+        return False
+    if stripped[-1] in ".!?;:…":
         return False
     if re.fullmatch(r"\d{1,3}", content.strip().splitlines()[-1].strip()):
         return False
@@ -139,7 +144,7 @@ class PostParseValidator:
 
         article_numbers = set()
         article_to_chunks = defaultdict(list)
-        seen_structure = set()
+        seen_structure = {}
 
         for idx, chunk in enumerate(chunks):
             chunk["_chunk_id"] = idx + 1
@@ -173,16 +178,28 @@ class PostParseValidator:
                 chunk.get("chunk_type")
             )
             if struct_key in seen_structure:
-                self.issues.append(ValidationIssue(
-                    severity="WARNING",
-                    code="DUPLICATE_STRUCTURE_KEY",
-                    message=f"Duplicate structure key: {struct_key}",
-                    chunk_id=idx + 1,
-                    article=article,
-                    clause=chunk.get("clause"),
-                    point=chunk.get("point"),
-                ))
-            seen_structure.add(struct_key)
+                if seen_structure[struct_key] == chunk.get("content", ""):
+                    self.issues.append(ValidationIssue(
+                        severity="WARNING",
+                        code="DUPLICATE_STRUCTURE_KEY",
+                        message=f"Duplicate structure key with identical content: {struct_key}",
+                        chunk_id=idx + 1,
+                        article=article,
+                        clause=chunk.get("clause"),
+                        point=chunk.get("point"),
+                    ))
+                else:
+                    self.issues.append(ValidationIssue(
+                        severity="INFO",
+                        code="SHARED_STRUCTURE_KEY",
+                        message=f"Shared structure key with different content (quoted numbering): {struct_key}",
+                        chunk_id=idx + 1,
+                        article=article,
+                        clause=chunk.get("clause"),
+                        point=chunk.get("point"),
+                    ))
+            else:
+                seen_structure[struct_key] = chunk.get("content", "")
 
         expected = set(range(1, self.EXPECTED_ARTICLE_COUNT + 1))
         missing = expected - article_numbers
@@ -292,22 +309,22 @@ class PostParseValidator:
                     article=article,
                 ))
 
-            clause_nums = []
+            clause_nums = set()
             for c in article_chunks:
                 if c.get("clause"):
                     try:
-                        clause_nums.append(int(c["clause"]))
+                        clause_nums.add(int(c["clause"]))
                     except ValueError:
                         pass
 
             if clause_nums:
-                clause_nums.sort()
-                for i, n in enumerate(clause_nums):
-                    if i > 0 and n != clause_nums[i-1] + 1:
+                ordered = sorted(clause_nums)
+                for i, n in enumerate(ordered):
+                    if i > 0 and n != ordered[i-1] + 1:
                         self.issues.append(ValidationIssue(
                             severity="WARNING",
                             code="CLAUSE_NUMBER_GAP",
-                            message=f"Clause number gap: {clause_nums[i-1]} -> {n}",
+                            message=f"Clause number gap: {ordered[i-1]} -> {n}",
                             chunk_id=c["_chunk_id"],
                             article=article,
                             clause=str(n),

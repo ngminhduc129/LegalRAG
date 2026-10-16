@@ -1,0 +1,116 @@
+# OCR rerun report — pages 85-86 of VBHN-125 (mojibake region)
+
+- run_id: ocr_p85_86_20261016
+- source: data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf (86 pages)
+- render: PyMuPDF get_pixmap dpi=300 (p85: 2481x3509, p86: 2346x3509)
+- engine: PaddleOCR 3.7.0, lang=vi (models: PP-OCRv6_medium_det + PP-OCRv6_medium_rec)
+- time: p85 329.5s, p86 322.7s (CPU)
+- lines: p85=36, p86=44
+- confidence: p85 avg=0.976 min=0.916; p86 avg=0.959 min=0.579
+
+## Page 85 OCR text (36 lines)
+
+85
+này khi nghi vic có đ 20 năm đóng bo him xã hi tr lên, b suy gim kh
+năng lao đng t 61% tr lên đưc hưng lưong hưu vói mc thp hơn so vi
+ngưi đ điu kin hưng lưong hưu quy đnh ti đim a và đim b khon 2 Điu
+54 ca Lut này khi thuc mt trong các trưòng hp sau đây:
+a) Có tui thp hơn ti đa 10 tui so vi tui ngh hưu quy đnh ti khon 2
+Điu 169 ca B lut Lao đng;
+b) Có đ 15 năm tr lên làm ngh, công vic đc bit nng nhc, đc hi,
+nguy him thuc danh mc do B Lao đng - Thuưong binh và Xã hi ban hành.";
+c) Sa đi, b sung khon 1 Điu 73 nhuư sau:
+“1. Ngưi lao đng hưng lưong hưu khi có đ các điu kin sau đây:
+a) Đ tui ngh hưu theo quy đnh ti khon 2 Điu 169 ca B lut Lao đng;
+b) Đ 20 năm đóng bo him xã hi tr lên.".
+2. Sa đi, b sung Điu 32 ca B lut T tng dân s s 92/2015/QH13
+nhu sau:
+a) Sa đi, b sung tên điu, khon 1; b sung các khon 1a, 1b và 1c vào
+sau khoån 1 như sau:
+"Điu 32. Nhng tranh chp v lao đng và tranh chp liên quan đn
+lao đng thuc thm quyn gii quyt ca Tòa án
+1. Tranh chp lao đng cá nhân gia ngưi lao đng vi ngưi s dng lao
+đng phi thông qua th tc hòa gii ca hòa gii viên lao đng mà hòa gii thành
+nhưng các bên không thc hin hoc thc hin không đúng, hòa gii khng thành
+hoc ht thi hn hòa gii theo quy đnh ca pháp lut v lao đng mà hòa gii
+viên lao đng không tin hành hòa gii, trù các tranh chp lao đng sau đây không
+bt buc phi qua th tc hòa gii:
+a) V x lý k lut lao đng theo hình thc sa thi hoc v trưng hp b đon
+phưong chm dt hp đng lao đng;
+b) V bi thưng thit hi, tr cp khi chm dt hp đng lao đng;
+c) Gia ngưi giúp vic gia đình vi ngưi s dng lao đng;
+d) V bo him xã hi theo quy đnh c pháp lut v bo him xã hi, v
+bo him y t theo quy đnh ca pháp lut v bo him y t, v bo him tht
+nghip theo quy đnh ca pháp lut v vic làm, v bo him tai nn lao đng,
+bnh ngh nghip theo quy đnh ca pháp lut v an toàn, v sinh lao đng;
+đ) V bi thưng thit hi gia ngưi lao đng vói doanh nghip, t chc
+đưa ngưi lao đng đi làm vic nc ngoài theo hp đng;
+e) Gia ngưi lao đng thuê li vi ngưi s dng lao đng thuê li.
+
+## Page 86 OCR text (44 lines)
+
+86
+lao đng mà Ban trng tài lao đng không đuc thành lp, Ban trng tài lao đng
+kn r quyt  i quyt tanh hp hc mt trong á bên không t hh
+quyt đnh ca Ban trng tài lao đng thì có quyn yêu cu Tòa án gii quyt.
+1b. Tranh chp lao đng tp th v quyn theo quy đnh ca pháp lut v lao
+đng đã qua th tc hòa gii ca hòa gii viên lao đng mà hòa gii không thành,
+ht thi hn hòa gii theo quy đnh ca pháp lut v lao đng mà hòa gii viên lao
+đng không tin hành hòa gii hoc mt trong các bên không thc hin biên bn
+hòa gii thành thì có quyn yêu cu Tòa án gii quyt.
+1c. Tranh chp lao đng tp th v quyn mà hai bên tha thun la chn Hi
+đng trng tài lao đng gii quyt nhung ht thi hn theo quy đnh ca pháp lut
+v lao đng mà Ban trng tài lao đng không đuc thành lp, Ban trng tài lao đng
+không ra quyt đnh gii quyt tranh chp hoc mt trong các bên không thi hành
+quyt đnh ca Ban trng tài lao đng thì có quyn yêu cu Tòa án gii quyt.";
+b) Bãi b khon 2 Điu 32.
+Điu 220. Hiu lc thi hành
+1. B lut này có hiu lc thi hành tù ngày 01 tháng 01 năm 2021.
+B lut Lao đng s 10/2012/QH13 ht hiu lc thi hành k t ngày B lut
+này có hiu lc.
+2. K t ngày B lut này có hiu lc thi hành, hp đồng lao đng, tha uc
+lao đng tp th, các tha thun hp pháp đã giao kt có ni dung không trái hoc
+bo đm cho ngưi lao đng có quyn và điu kin thun li hon so vi quy đnh
+ca B lut này đưc tip tc thc hin, tr trưng hp các bên có tha thun v
+vic sa đi, b sung đ phù hp và đ áp dng quy đnh ca B lut này.
+3. Ch đ lao đng đi vi cán b, công chc, viên chc, ngưi thuc lc
+lung Quân đi nhân dân, Công an nhân dân, t chc xã hi, xã viên hp tác xã,
+ngui làm vic không có quan h lao đng do các văn bn pháp lut khác quy đnh
+nhung tùy tng đi tưng mà đuc áp dng mt s quy đnh trong B lut này.
+VĂN PHÒNG QUÓC HQI
+XÁC THŪC VĂN BĂN HQP NHÁT
+S:125 /VBHN-VPQH
+Hà Ni, ngày27 tháng 8 năm 2025
+Noi nhn:
+- Vǎn phòng Chính phú (đ đăng Công báo);
+- CucKTVB và Qun lý xlýVPHC,
+B TP (đ đăng trên CSDLQG v PL);
+- Vu Thông tin, VPQH (đ đăng trên Cng
+大
+thông tin đin t ca QH);
+- Vu Chuyn đồi s, VPQH (đ đăng trên
+trang thông tin ni b Intranet);
+- Luu: HC, TH.
+ng
+ghon
+
+## Assessment vs acceptance criteria
+
+- Dieu 220 heading: RECOVERED as "Điu 220. Hiu lc thi hành" (readable, but needs
+  fuzzy heading match — "Điu" != "Điều" for ARTICLE_RE).
+- Dieu 220 clauses 1-3: RECOVERED, human-readable (effective date 01/01/2021,
+  BLLĐ 2012 expired, contracts continue, cadre regime).
+- Diacritics: PARTIAL — base letters mostly right, tone marks frequently
+  dropped/wrong (vic=việc, lut=luật, khon=khoản, hiu lc=hiệu lực). Usable for
+  humans, degraded for BM25 lexical match.
+- Page 85 overlaps CLEAN text-layer region (Dieu 219 amending text, raw lines
+  ~3260-3334 are fine) — do NOT replace whole pages; splice only the corrupted
+  segment (raw lines ~3335-3399).
+- Signature block OCR'd (with errors: "QUÓC HQI", stray "大", "ghon") — filter via
+  signature stoplist, do not chunk.
+
+## Decision (TBD — pending user review)
+
+- [ ] Accept OCR splice for corrupted segment only
+- [ ] Try preprocessing to improve diacritics first
+- [ ] Abort OCR route

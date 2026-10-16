@@ -420,7 +420,7 @@ class TestValidator:
                 "clause": "1",
                 "point": None,
                 "chunk_type": "clause",
-                "content": "Content duplicate.",
+                "content": "Content.",
                 "page_start": 1,
                 "page_end": 1,
             }
@@ -428,6 +428,44 @@ class TestValidator:
         report = validate_chunks(chunks)
         duplicates = [i for i in report.issues if i.code == "DUPLICATE_STRUCTURE_KEY"]
         assert len(duplicates) > 0
+
+    def test_shared_structure_key_different_content(self):
+        # Quoted amendments (e.g. Dieu 219) reuse structure keys with
+        # different content: informational, not a warning.
+        chunks = [
+            {
+                "chunk_id": "test_1",
+                "document_id": "test",
+                "document_name": "Test",
+                "document_number": "1",
+                "article": "Điều 1",
+                "clause": "1",
+                "point": None,
+                "chunk_type": "clause",
+                "content": "Content.",
+                "page_start": 1,
+                "page_end": 1,
+            },
+            {
+                "chunk_id": "test_2",
+                "document_id": "test",
+                "document_name": "Test",
+                "document_number": "1",
+                "article": "Điều 1",
+                "clause": "1",
+                "point": None,
+                "chunk_type": "clause",
+                "content": "Different quoted content.",
+                "page_start": 1,
+                "page_end": 1,
+            }
+        ]
+        report = validate_chunks(chunks)
+        duplicates = [i for i in report.issues if i.code == "DUPLICATE_STRUCTURE_KEY"]
+        assert len(duplicates) == 0
+        shared = [i for i in report.issues if i.code == "SHARED_STRUCTURE_KEY"]
+        assert len(shared) == 1
+        assert shared[0].severity == "INFO"
 
 
 class TestSafeIdPart:

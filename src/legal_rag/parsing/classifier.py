@@ -1,7 +1,10 @@
 import re
+import unicodedata
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from pathlib import Path
+
+from legal_rag.parsing.constants import FUZZY_ARTICLE_TOKENS, SIGNATURE_MARKERS
 
 
 @dataclass
@@ -25,6 +28,10 @@ class LineInfo:
 CHAPTER_RE = re.compile(r"^\s*Chương\s+([IVXLCDM]+|\d+)\s*$", re.IGNORECASE)
 SECTION_RE = re.compile(r"^\s*Mục\s+(\d+)\s*$", re.IGNORECASE)
 ARTICLE_RE = re.compile(r"^\s*Điều\s+(\d+)\s*\.?\s*(.*?)\s*$", re.IGNORECASE)
+# Fallback for corrupted headings (mojibake/OCR), e.g. "Di~u 220." or "Điu 220.".
+# Same group layout as ARTICLE_RE: (1)=number, (2)=title. Only applied when the
+# first token normalizes to a known "Điều" variant (see match_article_heading).
+FUZZY_ARTICLE_RE = re.compile(r"^\s*\S+\s+(\d+)\s*\.?\s*(.*?)\s*$")
 CLAUSE_RE = re.compile(r"^\s*(\d+)\s*\.\s+(.+?)\s*$")
 POINT_RE = re.compile(r"^\s*([a-zđ])\s*\)\s*(.*?)\s*$", re.IGNORECASE)
 
@@ -46,6 +53,47 @@ ARTICLE_INTRO_STARTS = (
     "CĂN CỨ", "QUỐC HỘI", "CHÍNH PHỦ", "BỘ TRƯỞNG",
     "CỤC TRƯỞNG", "HUYỆN TRƯỞNG", "XÃ TRƯỞNG",
 )
+
+
+def normalize_vi(text: str) -> str:
+    """Lowercase, strip diacritics and non-letters for robust matching."""
+    text = unicodedata.normalize("NFD", text.lower().replace("đ", "d"))
+    text = "".join(c for c in text if unicodedata.category(c) != "Mn")
+    return re.sub(r"[^a-z]", "", text)
+
+
+def match_article_heading(text: str) -> Optional[Tuple[int, str, bool]]:
+    """Match an article heading, tolerating corrupted "Điều" spellings.
+
+    Returns (number, title, fuzzy) or None. fuzzy=True when ARTICLE_RE fails
+    but the first token normalizes to a known variant (e.g. "Di~u", "Điu").
+    """
+    m = ARTICLE_RE.match(text)
+    if m:
+        return int(m.group(1)), m.group(2).strip(), False
+    m2 = FUZZY_ARTICLE_RE.match(text)
+    if m2 and normalize_vi(m2.group(0).split()[0]) in FUZZY_ARTICLE_TOKENS:
+        return int(m2.group(1)), m2.group(2).strip(), True
+    return None
+
+
+def is_noise_line(text: str) -> bool:
+    """True for lines carrying no content (pure punctuation/symbols)."""
+    stripped = text.strip()
+    if not stripped:
+        return True
+    return not re.search(r"[\wÀ-ỹà-ỹđĐ]", stripped)
+
+
+def is_signature_start(text: str) -> bool:
+    """True if a line starts the trailing signature/auth block.
+
+    Uses startswith (not substring): the block headers always begin the
+    line, while legitimate content may merely contain these words
+    (e.g. "Trưởng văn phòng đại diện").
+    """
+    norm = normalize_vi(text)
+    return norm.startswith(SIGNATURE_MARKERS)
 
 
 def clean_line(text: str) -> str:
@@ -142,6 +190,15 @@ class LineClassifier:
                 confidence = 0.8
                 break
 
+        fuzzy_heading = False
+        if not candidate_type:
+            fuzzy = match_article_heading(text)
+            if fuzzy is not None and fuzzy[2]:
+                candidate_type = "article"
+                match = FUZZY_ARTICLE_RE.match(text)
+                confidence = 0.5
+                fuzzy_heading = True
+
         if not candidate_type:
             line.is_structural_candidate = False
             return line
@@ -153,6 +210,7 @@ class LineClassifier:
         features = self._extract_features(
             text, candidate_type, match, prev_line, next_line
         )
+        features["fuzzy_heading"] = fuzzy_heading
         line.features = features
 
         line.confidence = self._calculate_confidence(candidate_type, features)

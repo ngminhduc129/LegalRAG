@@ -8,10 +8,26 @@ from legal_rag.parsing.classifier import (
     ARTICLE_RE, CLAUSE_RE, POINT_RE,
     clean_line, is_page_number, extract_pdf_lines,
     is_legal_reference_continuation, is_article_intro_start,
-    extract_article_number
+    extract_article_number, match_article_heading,
+    is_noise_line, is_signature_start,
 )
 
 from legal_rag.parsing.constants import DOCUMENT_NAME, DOCUMENT_NUMBER
+
+
+def is_ref_like_title(title: str) -> bool:
+    """True if a heading title is actually a cross-reference fragment.
+
+    Compares whole words (not prefixes): "Làm thêm giờ" must NOT match
+    the starter "là".
+    """
+    cleaned = title.strip().lstrip("\"'“”‘’([{").lower()
+    words = cleaned.split()
+    if not words:
+        return False
+    if words[0] in ("của", "tại", "theo", "và", "hoặc", "trong", "như", "là"):
+        return True
+    return " ".join(words[:2]) in ("quy định", "đối với", "căn cứ")
 
 
 @dataclass
@@ -113,12 +129,31 @@ class LegalStructureParser:
         self.state = ParserState()
         self.chunks = []
         self.warnings = []
+        self.seen_articles = {}
+        self.dropped_lines = 0
 
     def parse(self, lines: List[dict]) -> List[Dict[str, Any]]:
-        classified = self.classifier.classify_all(lines)
         self.state = ParserState()
         self.chunks = []
         self.warnings = []
+        self.dropped_lines = 0
+        self.seen_articles = {}
+
+        kept = []
+        signature_seen = False
+        for line_data in lines:
+            text = line_data.get("text", "")
+            if is_noise_line(text):
+                self.dropped_lines += 1
+                continue
+            if signature_seen or is_signature_start(text):
+                signature_seen = True
+                self.dropped_lines += 1
+                continue
+            kept.append(line_data)
+        self.warnings.append(f"Dropped {self.dropped_lines} noise/signature lines")
+
+        classified = self.classifier.classify_all(kept)
 
         i = 0
         while i < len(classified):
@@ -224,15 +259,26 @@ class LegalStructureParser:
         return True
 
     def _handle_article(self, line_info: LineInfo, i: int, classified: List[LineInfo]) -> int:
-        match = ARTICLE_RE.match(line_info.text)
-        if not match:
+        parsed = match_article_heading(line_info.text)
+        if parsed is None:
+            return i
+        article_number, article_title_text = parsed[0], parsed[1]
+
+        # Cross-reference fragments (e.g. "của Bộ luật này;") are content,
+        # not new articles. Returning i routes the line to _handle_content.
+        if is_ref_like_title(article_title_text):
+            return i
+
+        # Article numbers are unique: any repeat is a page-header reprint
+        # (drop the line) or an in-text reference (keep as content).
+        if article_number in self.seen_articles:
+            if self.state.article == f"Điều {article_number}":
+                return i + 1
             return i
 
         if not self._should_start_new_article(line_info, i, classified):
             return i
 
-        article_number = match.group(1)
-        article_title_text = match.group(2).strip()
         candidate_article = f"Điều {article_number}"
 
         same_article = (
@@ -256,29 +302,27 @@ class LegalStructureParser:
         self.state.article = candidate_article
         self.state.article_title = article_title_text or None
         self.state.article_page = line_info.page
+        self.seen_articles[article_number] = article_title_text
 
         new_i = self._collect_multiline_article_title(i, classified)
 
         return new_i
 
-    def _looks_like_content_paragraph(self, text: str) -> bool:
-        text = text.strip()
-        if not text:
-            return True
-        if len(text) > 120:
-            return True
-        if text.endswith('.'):
-            return True
-        if text[0].islower():
-            return True
-        content_keywords = (
-            'được', 'quy định', 'căn cứ', 'theo', 'phải', 'có quyền', 'nghĩa vụ',
-            'thỏa thuận', 'thỏa ước', 'quy định của', 'căn cứ vào', 'dựa trên'
-        )
-        lower = text.lower()
-        if any(kw in lower for kw in content_keywords):
-            return True
-        return False
+    def _is_title_continuation(self, text: str) -> bool:
+        """True if a line right after a heading continues the title.
+
+        Titles wrap mid-phrase, so a continuation starts lowercase or with
+        a digit (e.g. "15 tuổi đến chưa đủ 18 tuổi" completing "...từ đủ").
+        A genuine intro/content sentence starts uppercase or with a quote —
+        never lowercase. (Digit-start structural lines like "1. ..." are
+        filtered by stop_patterns before this check runs.)
+        """
+        stripped = text.strip().lstrip("\"'“”‘’([{")
+        if not stripped:
+            return False
+        if len(stripped) > 120:
+            return False
+        return stripped[0].islower() or stripped[0].isdigit()
 
     def _collect_multiline_article_title(self, i: int, classified: List[LineInfo]) -> int:
         if not self.state.article_title:
@@ -286,7 +330,7 @@ class LegalStructureParser:
 
         stop_patterns = [CHAPTER_RE, SECTION_RE, ARTICLE_RE, CLAUSE_RE, POINT_RE]
         max_title_len = 200
-        max_title_lines = 3
+        max_title_lines = 5
 
         j = i + 1
         title_lines = 1
@@ -299,7 +343,7 @@ class LegalStructureParser:
             if is_article_intro_start(next_text):
                 break
 
-            if self._looks_like_content_paragraph(next_text):
+            if not self._is_title_continuation(next_text):
                 break
 
             if len(self.state.article_title) > max_title_len:

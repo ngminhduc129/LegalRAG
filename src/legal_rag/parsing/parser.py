@@ -187,6 +187,18 @@ class LegalStructureParser:
         self._close_all()
         return self.chunks
 
+    @staticmethod
+    def _clean_structure_title(title: str, kind: str) -> str:
+        """Strip a page folio accidentally glued to a header title.
+
+        Page running headers merge the title and folio on one visual line
+        (e.g. "ĐIỀU KHOẢN THI HÀNH3"). Chapter/section titles never
+        legitimately end with bare digits, so a trailing 1-3 digit run is
+        removed. Callers should log the change for audit.
+        """
+        cleaned = re.sub(r"\d{1,3}$", "", title).strip()
+        return cleaned
+
     def _handle_chapter(self, line_info: LineInfo, i: int, classified: List[LineInfo]) -> int:
         match = CHAPTER_RE.match(line_info.text)
         if not match:
@@ -196,15 +208,16 @@ class LegalStructureParser:
 
         self.state.chapter = f"Chương {match.group(1)}"
         self.state.chapter_title = None
+        # Sections belong to the previous chapter: a new chapter starts
+        # without a section until a Mục heading appears.
+        self.state.section = None
+        self.state.section_title = None
 
-        new_i = i + 1
-        if new_i < len(classified):
-            next_text = classified[new_i].text
-            if not any(p.match(next_text) for p in [CHAPTER_RE, SECTION_RE, ARTICLE_RE, CLAUSE_RE]):
-                self.state.chapter_title = next_text
-                new_i += 1
-
-        return new_i
+        title, new_i = self._collect_structure_title(i, classified, "chapter")
+        if title:
+            self.state.chapter_title = title
+            return new_i
+        return i + 1
 
     def _handle_section(self, line_info: LineInfo, i: int, classified: List[LineInfo]) -> int:
         match = SECTION_RE.match(line_info.text)
@@ -216,14 +229,11 @@ class LegalStructureParser:
         self.state.section = f"Mục {match.group(1)}"
         self.state.section_title = None
 
-        new_i = i + 1
-        if new_i < len(classified):
-            next_text = classified[new_i].text
-            if not any(p.match(next_text) for p in [CHAPTER_RE, SECTION_RE, ARTICLE_RE, CLAUSE_RE]):
-                self.state.section_title = next_text
-                new_i += 1
-
-        return new_i
+        title, new_i = self._collect_structure_title(i, classified, "section")
+        if title:
+            self.state.section_title = title
+            return new_i
+        return i + 1
 
     def _should_start_new_article(self, line_info: LineInfo, i: int, classified: List[LineInfo]) -> bool:
         if not line_info.is_structural_candidate or line_info.candidate_type != "article":
@@ -323,6 +333,57 @@ class LegalStructureParser:
         if len(stripped) > 120:
             return False
         return stripped[0].islower() or stripped[0].isdigit()
+
+    def _is_structure_title_continuation(self, current_title: str, text: str) -> bool:
+        """Continuation rule for chapter/section titles (stricter context).
+
+        Same as article titles, plus two extras safe here because chapter
+        and section titles are always ALL-CAPS phrases: a dangling comma
+        means the title is incomplete, and a short ALL-CAPS line is another
+        header fragment (body text is Title Case, never ALL-CAPS).
+        """
+        stripped = text.strip().lstrip("\"'“”‘’([{")
+        if not stripped or len(stripped) > 100:
+            return False
+        if current_title.rstrip().endswith(","):
+            return True
+        if stripped[0].islower() or stripped[0].isdigit():
+            return True
+        cased = [c for c in stripped if c.isalpha()]
+        return bool(cased) and all(c.isupper() for c in cased)
+
+    def _collect_structure_title(
+        self, i: int, classified: List[LineInfo], kind: str
+    ) -> tuple:
+        """Collect a possibly multi-line chapter/section title."""
+        stop_patterns = [CHAPTER_RE, SECTION_RE, ARTICLE_RE, CLAUSE_RE]
+        max_title_len = 200
+        max_title_lines = 5
+
+        title = ""
+        j = i + 1
+        title_lines = 0
+        while j < len(classified) and title_lines < max_title_lines:
+            next_text = classified[j].text
+            if any(p.match(next_text) for p in stop_patterns):
+                break
+            if is_article_intro_start(next_text):
+                break
+            candidate = f"{title} {next_text}".strip() if title else next_text
+            if title and not self._is_structure_title_continuation(title, next_text):
+                break
+            if len(candidate) > max_title_len:
+                break
+            title = candidate
+            j += 1
+            title_lines += 1
+
+        cleaned = self._clean_structure_title(title, kind)
+        if cleaned != title:
+            self.warnings.append(
+                f"Stripped folio from {kind} title: {title!r} -> {cleaned!r}"
+            )
+        return cleaned, j
 
     def _collect_multiline_article_title(self, i: int, classified: List[LineInfo]) -> int:
         if not self.state.article_title:

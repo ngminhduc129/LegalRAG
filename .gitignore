@@ -33,10 +33,16 @@ Thumbs.db
 # Data (versioned with DVC)
 data/raw/*.pdf
 data/processed/*.jsonl
+data/processed/*.csv
 data/chunks/**/*.jsonl
 data/chunks/**/*.csv
+data/chunks/**/validation_report*.txt
+data/chunks/**/build_manifest.json
 data/indexes/**/*.pkl
 data/qa/*.jsonl
+
+# Local evidence renders (regenerable from the PDF; not committed)
+data/ocr/renders/
 
 # Experiments (auto-generated)
 experiments/runs/

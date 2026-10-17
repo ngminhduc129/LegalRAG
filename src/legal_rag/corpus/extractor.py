@@ -6,13 +6,14 @@ import re
 import json
 import csv
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 import fitz  # PyMuPDF
 
 from legal_rag.parsing.parser import parse_legal_structure
 from legal_rag.parsing.constants import DOCUMENT_NAME, DOCUMENT_NUMBER
 from legal_rag.chunking.legal_aware import save_jsonl, save_csv
+from legal_rag.corpus.patches import apply_page_patches
 
 
 def clean_line(text: str) -> str:
@@ -44,9 +45,17 @@ def extract_pdf_lines(pdf_path: Path) -> List[Dict[str, Any]]:
     return lines
 
 
-def parse_corpus(pdf_path: Path) -> List[Dict[str, Any]]:
-    """Parse PDF into structured chunks with legal hierarchy."""
+def parse_corpus(
+    pdf_path: Path, patches: Optional[List[Dict[str, Any]]] = None
+) -> List[Dict[str, Any]]:
+    """Parse PDF into structured chunks with legal hierarchy.
+
+    ``patches`` (see legal_rag.corpus.patches) are applied to the extracted
+    lines before parsing, fixing pages whose text layer is broken.
+    """
     lines = extract_pdf_lines(pdf_path)
+    if patches:
+        lines, _ = apply_page_patches(lines, patches)
     chunks = parse_legal_structure(lines)
     return chunks
 

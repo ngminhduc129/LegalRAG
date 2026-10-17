@@ -2,6 +2,7 @@
 
 import typer
 from pathlib import Path
+from typing import List
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
@@ -30,25 +31,50 @@ def pdf(
         "-d",
         help="Document identifier",
     ),
+    patches: List[Path] = typer.Option(
+        [Path("data/ocr/patches")],
+        "--patches",
+        "-p",
+        help="Page patch files or directories (repeatable)",
+    ),
 ):
-    """Parse PDF into structured legal corpus (JSONL + CSV)."""
-    from legal_rag.corpus.extractor import parse_corpus, save_corpus
+    """Parse PDF into structured legal corpus (JSONL + CSV), applying page patches."""
+    from legal_rag.corpus.extractor import extract_pdf_lines, save_corpus
+    from legal_rag.corpus.patches import PatchError, apply_page_patches, load_patches
+    from legal_rag.parsing.parser import parse_legal_structure
 
     console.print(f"[bold]Parsing PDF:[/bold] {pdf_path}")
     console.print(f"[bold]Output:[/bold] {output_dir}")
 
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        console=console,
-    ) as progress:
-        task = progress.add_task("Extracting PDF...", total=None)
-        chunks = parse_corpus(pdf_path)
-        progress.update(task, description=f"Parsed {len(chunks)} chunks")
+    try:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("Extracting PDF...", total=None)
+            lines = extract_pdf_lines(pdf_path)
+            patch_list = load_patches(list(patches), document_id=document_id)
+            lines, patch_reports = apply_page_patches(lines, patch_list)
+            for report in patch_reports:
+                coverage = report.get("ocr_coverage")
+                coverage_text = (
+                    f", OCR coverage {coverage:.4f}" if coverage is not None else ""
+                )
+                console.print(
+                    f"[cyan]patched page {report['page']}:[/cyan] "
+                    f"{report['replaced_lines']} extracted lines -> "
+                    f"{report['inserted_lines']} verified lines{coverage_text}"
+                )
+            chunks = parse_legal_structure(lines)
+            progress.update(task, description=f"Parsed {len(chunks)} chunks")
 
-        task2 = progress.add_task("Saving corpus...", total=None)
-        jsonl_path, csv_path = save_corpus(chunks, output_dir, document_id)
-        progress.update(task2, description="Saved")
+            task2 = progress.add_task("Saving corpus...", total=None)
+            jsonl_path, csv_path = save_corpus(chunks, output_dir, document_id)
+            progress.update(task2, description="Saved")
+    except (FileNotFoundError, PatchError) as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(code=1)
 
     console.print(f"[green]✓[/green] JSONL: {jsonl_path}")
     console.print(f"[green]✓[/green] CSV:   {csv_path}")

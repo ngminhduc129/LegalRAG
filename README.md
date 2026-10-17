@@ -91,7 +91,10 @@ cp configs/base.yaml configs/my_experiment.yaml
 ### Pipeline Commands
 
 ```bash
-# 1. Parse PDF into structured corpus
+# 0. Standard build (recommended): PDF -> page patches -> corpus -> legal-aware chunks -> validation
+legal-rag pipeline data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf --run-id run04
+
+# 1. Parse PDF into structured corpus (page patches in data/ocr/patches are applied automatically)
 legal-rag parse pdf data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf
 
 # 2. Run legal-aware chunking

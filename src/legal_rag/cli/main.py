@@ -9,6 +9,7 @@ from legal_rag.cli.index import app as index_app
 from legal_rag.cli.retrieve import app as retrieve_app
 from legal_rag.cli.generate import app as generate_app
 from legal_rag.cli.evaluate import app as evaluate_app
+from legal_rag.cli.pipeline import pipeline as pipeline_command
 
 app = typer.Typer(
     name="legal-rag",
@@ -22,6 +23,10 @@ app.add_typer(index_app, name="index")
 app.add_typer(retrieve_app, name="retrieve")
 app.add_typer(generate_app, name="generate")
 app.add_typer(evaluate_app, name="evaluate")
+app.command(
+    "pipeline",
+    help="Standard pipeline: PDF -> page patches -> corpus -> legal-aware chunks -> validation",
+)(pipeline_command)
 
 console = Console()
 

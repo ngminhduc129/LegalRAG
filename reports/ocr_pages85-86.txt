@@ -115,7 +115,9 @@ ghon
 - 2026-10-17: OCR diacritics judged insufficient for lexical search. Page 86
   verified to be a raster scan whose hidden text layer (font "HiddenHorzOCR")
   is lossy non-Vietnamese OCR noise (same word spelled several wrong ways on
-  the same page). Superseded by a human transcription of the 600-DPI render:
-  data/ocr/p86_transcription.json (see git history for the switch).
-- The OCR text above is kept as historical evidence for the cross-check
-  performed by scripts/splice_p86_transcription.py.
+  the same page). Superseded by a human transcription of the 600-DPI render,
+  shipped as a standard page patch:
+  data/ocr/patches/labor_code_2019_page86.json
+  (applied automatically by `legal-rag pipeline` and `legal-rag parse pdf`).
+- The OCR text above is kept as historical evidence: every build re-runs the
+  LCS cross-check of the patch against this file (min coverage 0.82).

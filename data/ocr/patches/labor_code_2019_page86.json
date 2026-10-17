@@ -1,14 +1,28 @@
 {
+  "version": 1,
+  "document_id": "labor_code_2019",
   "source_pdf": "data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf",
   "page": 86,
   "page_kind": "raster scan with broken hidden OCR text layer (font 'HiddenHorzOCR'); that text layer is lossy non-Vietnamese OCR noise and unusable for diacritics",
-  "method": "manual transcription read from a 600-DPI PyMuPDF render (3 bands); verified against the scan image",
-  "verification": "diacritics-stripped comparison against PaddleOCR output (data/ocr/vbhn125_p85_86_ocr.json) at splice time",
+  "method": "manual transcription read from a 600-DPI PyMuPDF render of the page; verified against the scan image and cross-checked against the OCR evidence (see apply.ocr_evidence)",
   "scope": "content lines only: tail of Điều 219 khoản 2 (points 1a, 1b, 1c, b) and Điều 220 (3 khoản)",
   "omitted": [
     "page number '86'",
     "trailing signature block (VĂN PHÒNG QUỐC HỘI / XÁC THỰC VĂN BẢN HỢP NHẤT / Nơi nhận ...) - dropped by the parser signature stoplist; not legal content"
   ],
+  "apply": {
+    "mode": "replace_page",
+    "anchors": {
+      "prev_line_endswith": "quy định của pháp luật về",
+      "first_line_startswith": "lao động mà",
+      "last_line_endswith": "trong Bộ luật này."
+    },
+    "ocr_evidence": {
+      "path": "data/ocr/vbhn125_p85_86_ocr.json",
+      "page_key": "86",
+      "min_lcs_coverage": 0.82
+    }
+  },
   "lines": [
     "lao động mà Ban trọng tài lao động không được thành lập, Ban trọng tài lao động",
     "không ra quyết định giải quyết tranh chấp hoặc một trong các bên không thi hành",

@@ -1,0 +1,41 @@
+{
+  "source_pdf": "data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf",
+  "page": 86,
+  "page_kind": "raster scan with broken hidden OCR text layer (font 'HiddenHorzOCR'); that text layer is lossy non-Vietnamese OCR noise and unusable for diacritics",
+  "method": "manual transcription read from a 600-DPI PyMuPDF render (3 bands); verified against the scan image",
+  "verification": "diacritics-stripped comparison against PaddleOCR output (data/ocr/vbhn125_p85_86_ocr.json) at splice time",
+  "scope": "content lines only: tail of Điều 219 khoản 2 (points 1a, 1b, 1c, b) and Điều 220 (3 khoản)",
+  "omitted": [
+    "page number '86'",
+    "trailing signature block (VĂN PHÒNG QUỐC HỘI / XÁC THỰC VĂN BẢN HỢP NHẤT / Nơi nhận ...) - dropped by the parser signature stoplist; not legal content"
+  ],
+  "lines": [
+    "lao động mà Ban trọng tài lao động không được thành lập, Ban trọng tài lao động",
+    "không ra quyết định giải quyết tranh chấp hoặc một trong các bên không thi hành",
+    "quyết định của Ban trọng tài lao động thì có quyền yêu cầu Tòa án giải quyết.",
+    "1b. Tranh chấp lao động tập thể về quyền theo quy định của pháp luật về lao",
+    "động đã qua thủ tục hòa giải của hòa giải viên lao động mà hòa giải không thành,",
+    "hết thời hạn hòa giải theo quy định của pháp luật về lao động mà hòa giải viên lao",
+    "động không tiến hành hòa giải hoặc một trong các bên không thực hiện biên bản",
+    "hòa giải thành thì có quyền yêu cầu Tòa án giải quyết.",
+    "1c. Tranh chấp lao động tập thể về quyền mà hai bên thỏa thuận lựa chọn Hội",
+    "đồng trọng tài lao động giải quyết nhưng hết thời hạn theo quy định của pháp luật",
+    "về lao động mà Ban trọng tài lao động không được thành lập, Ban trọng tài lao động",
+    "không ra quyết định giải quyết tranh chấp hoặc một trong các bên không thi hành",
+    "quyết định của Ban trọng tài lao động thì có quyền yêu cầu Tòa án giải quyết.”;",
+    "b) Bãi bỏ khoản 2 Điều 32.",
+    "Điều 220. Hiệu lực thi hành",
+    "1. Bộ luật này có hiệu lực thi hành từ ngày 01 tháng 01 năm 2021.",
+    "Bộ luật Lao động số 10/2012/QH13 hết hiệu lực thi hành kể từ ngày Bộ luật",
+    "này có hiệu lực.",
+    "2. Kể từ ngày Bộ luật này có hiệu lực thi hành, hợp đồng lao động, thỏa ước",
+    "lao động tập thể, các thỏa thuận hợp pháp đã giao kết có nội dung không trái hoặc",
+    "bảo đảm cho người lao động có quyền và điều kiện thuận lợi hơn so với quy định",
+    "của Bộ luật này được tiếp tục thực hiện, trừ trường hợp các bên có thỏa thuận về",
+    "việc sửa đổi, bổ sung để phù hợp và để áp dụng quy định của Bộ luật này.",
+    "3. Chế độ lao động đối với cán bộ, công chức, viên chức, người thuộc lực",
+    "lượng Quân đội nhân dân, Công an nhân dân, tổ chức xã hội, xã viên hợp tác xã,",
+    "người làm việc không có quan hệ lao động do các văn bản pháp luật khác quy định",
+    "nhưng tùy từng đối tượng mà được áp dụng một số quy định trong Bộ luật này."
+  ]
+}

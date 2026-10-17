@@ -109,8 +109,13 @@ ghon
 - Signature block OCR'd (with errors: "QUÓC HQI", stray "大", "ghon") — filter via
   signature stoplist, do not chunk.
 
-## Decision (TBD — pending user review)
+## Decision log
 
-- [ ] Accept OCR splice for corrupted segment only
-- [ ] Try preprocessing to improve diacritics first
-- [ ] Abort OCR route
+- 2026-10-16: accepted OCR splice for the corrupted segment only (pipeline run02).
+- 2026-10-17: OCR diacritics judged insufficient for lexical search. Page 86
+  verified to be a raster scan whose hidden text layer (font "HiddenHorzOCR")
+  is lossy non-Vietnamese OCR noise (same word spelled several wrong ways on
+  the same page). Superseded by a human transcription of the 600-DPI render:
+  data/ocr/p86_transcription.json (see git history for the switch).
+- The OCR text above is kept as historical evidence for the cross-check
+  performed by scripts/splice_p86_transcription.py.

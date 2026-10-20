@@ -6,10 +6,10 @@
 flowchart TD
     %% Data Layer
     RawPDF["📄 Raw PDF\n(Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf)"]
-    Processed["📦 Processed Corpus\n(data/processed/*.jsonl)"]
-    Chunks["✂️ Chunks\n(data/chunks/{strategy}/*.jsonl)"]
+    Processed["📦 Processed Corpus\n(data/processed/*_corpus.jsonl)"]
+    Chunks["✂️ Chunks\n(data/chunks/legal_aware_{run_id}/*.jsonl)"]
     Indexes["🔍 Indexes\n(data/indexes/{bm25,dense}/*.pkl)"]
-    QA["❓ Ground Truth QA\n(data/qa/{train,dev,test}.jsonl)"]
+    QA["❓ Ground Truth QA\n(data/qa/{train,dev,test}.jsonl) (planned)"]
 
     %% Processing Pipeline
     Parse["📖 Parse\nlegal_rag.parse.pdf"]
@@ -106,6 +106,7 @@ flowchart LR
 
         subgraph Corpus["📦 corpus/"]
             Extractor["extractor.py"]
+            Patches["patches.py\n(page patches)"]
         end
 
         subgraph Retrieval["🔍 retrieval/"]
@@ -116,8 +117,10 @@ flowchart LR
             Reranker["reranker.py\n(Reranker)"]
         end
 
-        subgraph GenEval["🤖📊 generation/ / evaluation/ / pipeline/"]
-            Stub["(Stubs - TODO)"]
+        Pipeline["🔁 pipeline.py\n(run_pipeline)"]
+
+        subgraph GenEval["🤖📊 generation/ / evaluation/"]
+            Stub["(Planned - not implemented)"]
         end
     end
 
@@ -167,7 +170,7 @@ graph TD
     Corpus --> Article
     Corpus --> Clause
     
-    LegalAware --> LegalChunks["data/chunks/legal_aware/"]
+    LegalAware --> LegalChunks["data/chunks/legal_aware_{run_id}/"]
     Fixed300 --> Fix300Chunks["data/chunks/fixed_300/"]
     Fixed500 --> Fix500Chunks["data/chunks/fixed_500/"]
     Fixed800 --> Fix800Chunks["data/chunks/fixed_800/"]
@@ -259,53 +262,38 @@ LegalRAG/
 │   ├── generation.yaml               # Generation config
 │   ├── evaluation.yaml               # Evaluation config
 │   └── experiment.yaml               # Experiment tracking
-├── data/                             # Data (DVC versioned)
-│   ├── raw/                          # Original PDF (read-only)
-│   ├── processed/                    # Parsed corpus (JSONL)
-│   ├── chunks/                       # By strategy
-│   │   ├── legal_aware/              # Legal-aware (proposed)
-│   │   ├── fixed_300/500/800/        # Fixed-size baselines
-│   │   ├── paragraph/                # Paragraph baseline
-│   │   ├── article/                  # Article baseline
-│   │   └── clause/                   # Clause baseline
-│   ├── indexes/                      # Retrieval indexes
-│   │   ├── bm25/                     # BM25 indexes
-│   │   └── dense/                    # Dense vector indexes
-│   └── qa/                           # Ground truth (frozen)
-│       ├── train.jsonl
-│       ├── dev.jsonl
-│       └── test.jsonl
+├── data/                             # Data (run outputs are git-ignored)
+│   ├── raw/                          # Source PDFs (read-only)
+│   ├── ocr/                          # OCR evidence + page patches
+│   │   ├── patches/                  # JSON page patches (page-86 fix)
+│   │   └── renders/                  # Verification renders (local, ignored)
+│   ├── processed/                    # Parsed corpus per run (JSONL)
+│   ├── chunks/                       # legal_aware_<run_id>/ (pipeline); baselines on demand
+│   ├── indexes/                      # Retrieval indexes (generated)
+│   └── qa/                           # Ground truth (planned, frozen)
 ├── src/
 │   └── legal_rag/                    # Installable package
 │       ├── config.py                 # Pydantic config management
 │       ├── parsing/                  # PDF parsing & legal structure
 │       ├── chunking/                 # 5 chunking strategies
-│       ├── corpus/                   # Corpus extraction
+│       ├── corpus/                   # Corpus extraction + page patches
 │       ├── retrieval/                # BM25, Dense, Hybrid, Reranker
-│       ├── generation/               # LLM answer generation (stub)
-│       ├── evaluation/               # Metrics & evaluation (stub)
-│       ├── pipeline/                 # End-to-end pipelines (stub)
-│       ├── utils/                    # Utilities
+│       ├── pipeline.py               # Standard end-to-end build
+│       ├── generation/               # LLM answer generation (planned)
+│       ├── evaluation/               # Metrics & evaluation (planned)
 │       └── cli/                      # Typer CLI commands
-├── scripts/                          # One-off scripts
-├── experiments/                      # Experiment outputs
-│   └── runs/
-│       └── {run_id}/
-│           ├── config_snapshot.yaml
-│           ├── metrics.json
-│           ├── predictions.jsonl
-│           └── logs/
 ├── tests/                            # Unit & integration tests
-│   ├── unit/                         # 39 passing tests
-│   ├── integration/
-│   └── fixtures/
+│   ├── unit/                         # Unit tests
+│   └── integration/
 ├── notebooks/                        # EDA & analysis
+├── reports/                          # Decision logs / generated reports
+├── experiments/                      # Experiment outputs (auto-generated, planned)
 ├── pyproject.toml                    # Package config
 ├── requirements.txt                  # Production deps
 ├── requirements-dev.txt              # Dev deps
 ├── README.md
-├── AGENTS.md                         # Project rules
-└── .pre-commit-config.yaml
+├── ARCHITECTURE.md
+└── AGENTS.md                         # Project rules
 ```
 
 ## Key Design Principles

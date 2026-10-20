@@ -13,54 +13,37 @@ LegalRAG/
 │   ├── generation.yaml     # Generation config
 │   ├── evaluation.yaml     # Evaluation config
 │   └── experiment.yaml     # Experiment tracking config
-├── data/                    # Data directories (versioned with DVC)
-│   ├── raw/                # Original PDF (read-only)
-│   ├── processed/          # Parsed corpus (JSONL)
-│   ├── chunks/             # Chunked data by strategy
-│   │   ├── legal_aware/    # Legal-aware chunking (proposed)
-│   │   ├── fixed_300/      # Fixed-size 300 tokens
-│   │   ├── fixed_500/      # Fixed-size 500 tokens
-│   │   ├── fixed_800/      # Fixed-size 800 tokens
-│   │   ├── paragraph/      # Paragraph-based
-│   │   ├── article/        # Article-level
-│   │   └── clause/         # Clause-level
-│   ├── indexes/            # Retrieval indexes
-│   │   ├── bm25/           # BM25 indexes
-│   │   └── dense/          # Dense vector indexes
-│   └── qa/                 # Ground truth QA pairs (frozen)
-│       ├── train.jsonl
-│       ├── dev.jsonl
-│       └── test.jsonl
+├── data/                    # Data directories (run outputs are git-ignored)
+│   ├── raw/                # Source PDFs (read-only)
+│   ├── ocr/                # OCR evidence + page patches
+│   │   ├── patches/        # JSON page patches (e.g. page-86 transcription fix)
+│   │   └── renders/        # Verification renders (local only, ignored)
+│   ├── processed/          # Corpus per run: labor_code_2019_<run_id>_corpus.jsonl
+│   ├── chunks/             # legal_aware_<run_id>/ from pipeline;
+│   │                       # fixed_300/500/800, paragraph, article, clause on demand
+│   ├── indexes/            # Retrieval indexes (created by `legal-rag index ...`)
+│   └── qa/                 # Ground truth QA pairs (planned, frozen)
 ├── src/                     # Source code (installable package)
 │   └── legal_rag/
 │       ├── __init__.py
 │       ├── config.py       # Pydantic config management
 │       ├── parsing/        # PDF parsing & legal structure
-│       ├── chunking/       # Chunking strategies
-│       ├── corpus/         # Corpus extraction
+│       ├── chunking/       # Legal-aware + baseline chunkers
+│       ├── corpus/         # Corpus extraction + page patches
 │       ├── retrieval/      # BM25, Dense, Hybrid, Reranker
-│       ├── generation/     # LLM answer generation
-│       ├── evaluation/     # Metrics & evaluation
-│       ├── pipeline/       # End-to-end pipelines
-│       └── utils/          # Utilities
-├── src/cli/                 # CLI entry points (Typer)
-├── scripts/                 # One-off scripts
-├── experiments/             # Experiment outputs (auto-generated)
-│   └── runs/
-│       └── {run_id}/
-│           ├── config_snapshot.yaml
-│           ├── metrics.json
-│           ├── predictions.jsonl
-│           └── logs/
+│       ├── pipeline.py     # Standard end-to-end build (parse -> patch -> chunk -> validate)
+│       └── cli/            # CLI entry points (Typer)
 ├── tests/                   # Unit & integration tests
 │   ├── unit/
-│   ├── integration/
-│   └── fixtures/
+│   └── integration/
 ├── notebooks/               # EDA & analysis notebooks
-├── reports/                 # Generated reports
+├── reports/                 # Decision logs / generated reports
+├── experiments/             # Experiment outputs (auto-generated, planned)
 ├── pyproject.toml           # Package configuration
 ├── requirements.txt         # Production dependencies
 ├── requirements-dev.txt     # Development dependencies
+├── README.md
+├── ARCHITECTURE.md
 └── AGENTS.md               # Project rules
 ```
 
@@ -92,34 +75,27 @@ cp configs/base.yaml configs/my_experiment.yaml
 
 ```bash
 # 0. Standard build (recommended): PDF -> page patches -> corpus -> legal-aware chunks -> validation
-legal-rag pipeline data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf --run-id run04
+#    Pick a new --run-id for every build; reusing an existing id is rejected (results are never overwritten).
+legal-rag pipeline data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf --run-id run07
 
-# 1. Parse PDF into structured corpus (page patches in data/ocr/patches are applied automatically)
+# 1. Parse PDF into a structured corpus (page patches in data/ocr/patches are applied automatically)
 legal-rag parse pdf data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf
 
-# 2. Run legal-aware chunking
-legal-rag chunk legal_aware data/processed/labor_code_2019_corpus.jsonl
+# 2. Run all baseline chunking strategies on the run's corpus
+legal-rag chunk all_baselines data/processed/labor_code_2019_run07_corpus.jsonl
 
-# 3. Run all baseline chunking strategies
-legal-rag chunk all_baselines data/processed/labor_code_2019_corpus.jsonl
+# 3. Build BM25 / dense indexes from the run's chunks
+legal-rag index bm25 data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
+legal-rag index dense data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
 
-# 4. Build BM25 index
-legal-rag index bm25 data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl
+# 4. Retrieval (--chunks is required, so a stale run is never picked silently)
+legal-rag retrieve bm25 "nghỉ phép năm bao nhiêu ngày" --chunks data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
+legal-rag retrieve hybrid "nghỉ phép năm bao nhiêu ngày" --chunks data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
+legal-rag retrieve rerank "nghỉ phép năm bao nhiêu ngày" --chunks data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
 
-# 5. Build dense (embedding) index
-legal-rag index dense data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl
-
-# 6. Hybrid retrieval
-legal-rag retrieve hybrid "nghỉ phép năm bao nhiêu ngày"
-
-# 7. Hybrid + Reranking
-legal-rag retrieve rerank "nghỉ phép năm bao nhiêu ngày"
-
-# 8. Validate chunks
-legal-rag chunk validate data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl
-
-# 9. Clean chunks
-legal-rag chunk clean data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl
+# 5. Validate / clean chunks
+legal-rag chunk validate data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
+legal-rag chunk clean data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
 ```
 
 ### Using Config File
@@ -133,7 +109,7 @@ legal-rag --config configs/my_experiment.yaml parse pdf ...
 
 | Strategy | Description | Output Dir |
 |----------|-------------|------------|
-| `legal_aware` | Preserves legal hierarchy (Chapter→Section→Article→Clause→Point) | `data/chunks/legal_aware/` |
+| `legal_aware` | Preserves legal hierarchy (Chapter→Section→Article→Clause→Point); standard output of `legal-rag pipeline` | `data/chunks/legal_aware_<run_id>/` |
 | `fixed_300/500/800` | Fixed-size with overlap | `data/chunks/fixed_{size}/` |
 | `paragraph` | Paragraph-based | `data/chunks/paragraph/` |
 | `article` | One chunk per article | `data/chunks/article/` |
@@ -197,13 +173,7 @@ Each run creates a directory under `experiments/runs/{run_id}/` with:
 
 ## Data Versioning
 
-Use DVC for data versioning:
-
-```bash
-dvc init
-dvc add data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf
-dvc add data/qa/test.jsonl
-```
+DVC is planned but not enabled yet. Source PDFs and run outputs (`data/processed/`, `data/chunks/`, `data/indexes/`) are git-ignored and reproducible via `legal-rag pipeline`.
 
 ## Disclaimer
 

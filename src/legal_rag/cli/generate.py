@@ -14,10 +14,13 @@ console = Console()
 def answer(
     query: str = typer.Argument(..., help="Question to answer"),
     chunks_path: Path = typer.Option(
-        Path("data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl"),
+        ...,
         "--chunks",
         "-c",
-        help="Path to chunks JSONL",
+        help="Path to chunks JSONL (pipeline output: data/chunks/legal_aware_run<id>/labor_code_2019_legal_aware.jsonl)",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
     ),
     bm25_path: Path = typer.Option(
         Path("data/indexes/bm25/bm25_index.pkl"),
@@ -62,10 +65,13 @@ def batch(
         help="Output path for answers",
     ),
     chunks_path: Path = typer.Option(
-        Path("data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl"),
+        ...,
         "--chunks",
         "-c",
-        help="Path to chunks JSONL",
+        help="Path to chunks JSONL (pipeline output: data/chunks/legal_aware_run<id>/labor_code_2019_legal_aware.jsonl)",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
     ),
     bm25_path: Path = typer.Option(
         Path("data/indexes/bm25/bm25_index.pkl"),

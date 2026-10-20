@@ -15,10 +15,13 @@ console = Console()
 def bm25(
     query: str = typer.Argument(..., help="Search query"),
     chunks_path: Path = typer.Option(
-        Path("data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl"),
+        ...,
         "--chunks",
         "-c",
-        help="Path to chunks JSONL",
+        help="Path to chunks JSONL (pipeline output: data/chunks/legal_aware_run<id>/labor_code_2019_legal_aware.jsonl)",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
     ),
     index_path: Path = typer.Option(
         Path("data/indexes/bm25/bm25_index.pkl"),
@@ -57,10 +60,13 @@ def bm25(
 def dense(
     query: str = typer.Argument(..., help="Search query"),
     chunks_path: Path = typer.Option(
-        Path("data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl"),
+        ...,
         "--chunks",
         "-c",
-        help="Path to chunks JSONL",
+        help="Path to chunks JSONL (pipeline output: data/chunks/legal_aware_run<id>/labor_code_2019_legal_aware.jsonl)",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
     ),
     index_path: Path = typer.Option(
         Path("data/indexes/dense/dense_index.pkl"),
@@ -104,10 +110,13 @@ def dense(
 def hybrid(
     query: str = typer.Argument(..., help="Search query"),
     chunks_path: Path = typer.Option(
-        Path("data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl"),
+        ...,
         "--chunks",
         "-c",
-        help="Path to chunks JSONL",
+        help="Path to chunks JSONL (pipeline output: data/chunks/legal_aware_run<id>/labor_code_2019_legal_aware.jsonl)",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
     ),
     bm25_path: Path = typer.Option(
         Path("data/indexes/bm25/bm25_index.pkl"),
@@ -162,10 +171,13 @@ def hybrid(
 def rerank(
     query: str = typer.Argument(..., help="Search query"),
     chunks_path: Path = typer.Option(
-        Path("data/chunks/legal_aware/labor_code_2019_legal_aware.jsonl"),
+        ...,
         "--chunks",
         "-c",
-        help="Path to chunks JSONL",
+        help="Path to chunks JSONL (pipeline output: data/chunks/legal_aware_run<id>/labor_code_2019_legal_aware.jsonl)",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
     ),
     bm25_path: Path = typer.Option(
         Path("data/indexes/bm25/bm25_index.pkl"),

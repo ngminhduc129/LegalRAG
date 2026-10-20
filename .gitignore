@@ -70,9 +70,6 @@ dmypy.json
 # Ruff
 .ruff_cache/
 
-# Pre-commit
-.pre-commit-config.yaml
-
 # DVC
 .dvc/
 *.dvc

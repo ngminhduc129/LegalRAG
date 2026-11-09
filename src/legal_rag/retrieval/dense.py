@@ -124,14 +124,17 @@ class DenseIndex:
         print(f"Dense index saved to {path}")
 
     @classmethod
-    def load(cls, path: Path) -> "DenseIndex":
+    def load(cls, path: Path, device: Optional[str] = None) -> "DenseIndex":
         """Load index from disk."""
         with path.open("rb") as f:
             data = pickle.load(f)
 
+        if device is None:
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+
         idx = cls(
             model_name=data["model_name"],
-            device=data["device"],
+            device=device,
             batch_size=data["batch_size"],
             max_length=data.get("max_length", 256),
         )

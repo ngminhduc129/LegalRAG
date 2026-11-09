@@ -5,10 +5,13 @@ import gc
 import hashlib
 import importlib.metadata
 import json
+import random
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import torch
 
 from legal_rag.retrieval.dense import DenseIndex
@@ -30,6 +33,7 @@ CHUNK_FILES = (
     Path("run07/article/labor_code_2019_article.jsonl"),
     Path("run07/clause/labor_code_2019_clause.jsonl"),
 )
+SEED = 42
 
 
 def sha256_file(path: Path) -> str:
@@ -61,13 +65,30 @@ def main() -> None:
     if args.max_length != 256:
         raise ValueError("This comparison requires max-length=256 for both models")
 
+    random.seed(SEED)
+    np.random.seed(SEED)
+    torch.manual_seed(SEED)
+    if args.device == "cuda":
+        torch.cuda.manual_seed_all(SEED)
+
     datasets = [(relative, args.input_root / relative) for relative in CHUNK_FILES]
     missing = [str(path) for _, path in datasets if not path.is_file()]
     if missing:
         raise FileNotFoundError("Missing chunk JSONL files:\n" + "\n".join(missing))
 
+    repo_root = Path(__file__).resolve().parents[1]
+    git_commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    ).stdout.strip()
     manifest: dict[str, Any] = {
         "created_at": datetime.now(timezone.utc).isoformat(),
+        "git_commit": git_commit,
+        "seed": SEED,
         "device": args.device,
         "gpu": torch.cuda.get_device_name(0) if args.device == "cuda" else None,
         "torch_version": torch.__version__,

@@ -72,6 +72,7 @@ def dense(
         help="Device (cuda/cpu). Default: auto-detect",
     ),
     batch_size: int = typer.Option(32, "--batch-size", help="Batch size for encoding"),
+    max_length: int = typer.Option(256, "--max-length", min=1, help="Maximum input sequence length"),
 ):
     """Build dense (embedding) index from chunks."""
     from legal_rag.retrieval.dense import build_dense_index
@@ -92,6 +93,7 @@ def dense(
             model_name=model,
             device=device,
             batch_size=batch_size,
+            max_length=max_length,
         )
         progress.update(task, description="Done")
 
@@ -121,6 +123,15 @@ def hybrid(
     rrf_k: int = typer.Option(60, "--rrf-k", help="RRF k parameter"),
     weight_bm25: float = typer.Option(0.5, "--weight-bm25", help="Weight for BM25 (weighted fusion)"),
     weight_dense: float = typer.Option(0.5, "--weight-dense", help="Weight for dense (weighted fusion)"),
+    model: str = typer.Option(
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        "--model",
+        "-m",
+        help="Sentence transformer model name",
+    ),
+    max_length: int = typer.Option(256, "--max-length", min=1, help="Maximum input sequence length"),
+    device: str = typer.Option(None, "--device", help="Device (cuda/cpu). Default: auto-detect"),
+    batch_size: int = typer.Option(32, "--batch-size", help="Batch size for encoding"),
     rebuild: bool = typer.Option(False, "--rebuild", help="Rebuild indexes if they exist"),
 ):
     """Build both BM25 and dense indexes for hybrid retrieval."""
@@ -153,7 +164,14 @@ def hybrid(
         if dense_path.exists() and not rebuild:
             progress.update(task2, description="Dense exists, skipping")
         else:
-            build_dense_index(chunks_path, dense_path)
+            build_dense_index(
+                chunks_path,
+                dense_path,
+                model_name=model,
+                device=device,
+                batch_size=batch_size,
+                max_length=max_length,
+            )
             progress.update(task2, description="Dense done")
 
     console.print(f"[green]✓[/green] Hybrid indexes ready")

@@ -59,6 +59,7 @@ class DenseConfig(BaseModel):
     model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     device: str = "cuda"
     batch_size: int = 32
+    max_length: int = 256
 
 
 class HybridConfig(BaseModel):

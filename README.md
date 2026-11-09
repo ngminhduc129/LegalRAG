@@ -87,8 +87,8 @@ legal-rag chunk all-baselines data/processed/labor_code_2019_run07_corpus.jsonl 
 # 3. Build BM25 / dense indexes from the run's chunks
 legal-rag index bm25 data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
 legal-rag index dense data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
-# Optional BGE-M3 dense index (kept separate from the default model's index)
-legal-rag index dense data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl --model BAAI/bge-m3 --output data/indexes/dense/bge_m3/dense_index.pkl
+# Optional BGE-M3 dense index (separate output, max sequence length 256)
+legal-rag index dense data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl --model BAAI/bge-m3 --max-length 256 --output data/indexes/dense/bge_m3/dense_index.pkl
 
 # 4. Retrieval (--chunks is required, so a stale run is never picked silently)
 legal-rag retrieve bm25 "nghỉ phép năm bao nhiêu ngày" --chunks data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
@@ -120,6 +120,18 @@ legal-rag --config configs/my_experiment.yaml parse pdf ...
 Baseline chunks retain document name/number, page range, and `source_refs` with the source legal hierarchy. Fixed-size and paragraph chunks can reference multiple Articles; clause chunks also retain article-introduction text. Use a new `--output-base` for each run.
 
 The default dense model remains `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`. BGE-M3 is available as an explicit alternative via `--model BAAI/bge-m3` or the [BGE-M3 dense config](configs/retrieval/dense_bge_m3.yaml). The current dense index uses BGE-M3's sentence-transformer dense embeddings only; its sparse and multi-vector retrieval modes are not implemented here.
+
+For a same-length GPU comparison of both dense models across the current chunk sets, upload `data/chunks/run07_colab_inputs.zip` to the Colab runtime and clone this repository. Install the project and `sentence-transformers`, extract the archive to `/content/input`, then run:
+
+```bash
+python scripts/build_colab_embeddings.py \
+  --input-root /content/input/chunks \
+  --output-root /content/drive/MyDrive/LegalRAG/indexes/run07_maxlen256 \
+  --device cuda \
+  --max-length 256
+```
+
+The script saves separate indexes per model and chunk strategy plus an `embedding_manifest.json`; it requires a CUDA runtime by default and refuses to overwrite existing indexes. Mount Google Drive first if using the example output path.
 
 ## Retrieval Methods
 

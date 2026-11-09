@@ -83,6 +83,7 @@ def dense(
     ),
     device: Optional[str] = typer.Option(None, "--device", help="Device (cuda/cpu)"),
     batch_size: int = typer.Option(32, "--batch-size", help="Batch size"),
+    max_length: int = typer.Option(256, "--max-length", min=1, help="Maximum input sequence length"),
 ):
     """Search using dense (embedding) only."""
     from legal_rag.retrieval.dense import DenseIndex, build_dense_index
@@ -98,7 +99,14 @@ def dense(
         if index_path.exists():
             index = DenseIndex.load(index_path)
         else:
-            index = build_dense_index(chunks_path, index_path, model_name=model, device=device, batch_size=batch_size)
+            index = build_dense_index(
+                chunks_path,
+                index_path,
+                model_name=model,
+                device=device,
+                batch_size=batch_size,
+                max_length=max_length,
+            )
         progress.update(task, description="Searching...")
 
         results = index.search(query, k=k)

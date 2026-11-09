@@ -26,9 +26,12 @@ class DenseIndex:
         model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
         device: Optional[str] = None,
         batch_size: int = 32,
+        max_length: int = 256,
     ):
         if not SENTENCE_TRANSFORMERS_AVAILABLE:
             raise ImportError("sentence-transformers not installed. Run: pip install sentence-transformers")
+        if max_length <= 0:
+            raise ValueError("max_length must be greater than zero")
 
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -36,7 +39,9 @@ class DenseIndex:
         self.model_name = model_name
         self.device = device
         self.batch_size = batch_size
+        self.max_length = max_length
         self.model = SentenceTransformer(model_name, device=device)
+        self.model.max_seq_length = max_length
         self.documents: List[Dict[str, Any]] = []
         self.doc_ids: List[str] = []
         self.embeddings: Optional[np.ndarray] = None
@@ -108,6 +113,7 @@ class DenseIndex:
             "model_name": self.model_name,
             "device": self.device,
             "batch_size": self.batch_size,
+            "max_length": self.max_length,
             "documents": self.documents,
             "doc_ids": self.doc_ids,
             "embeddings": self.embeddings,
@@ -127,6 +133,7 @@ class DenseIndex:
             model_name=data["model_name"],
             device=data["device"],
             batch_size=data["batch_size"],
+            max_length=data.get("max_length", 256),
         )
         idx.documents = data["documents"]
         idx.doc_ids = data["doc_ids"]
@@ -143,6 +150,7 @@ def build_dense_index(
     model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
     device: Optional[str] = None,
     batch_size: int = 32,
+    max_length: int = 256,
 ) -> DenseIndex:
     """Build dense index from chunks file."""
     print(f"Loading chunks from {chunks_path}...")
@@ -153,7 +161,12 @@ def build_dense_index(
                 chunks.append(json.loads(line))
 
     print(f"Building dense index with {len(chunks)} chunks...")
-    index = DenseIndex(model_name=model_name, device=device, batch_size=batch_size)
+    index = DenseIndex(
+        model_name=model_name,
+        device=device,
+        batch_size=batch_size,
+        max_length=max_length,
+    )
     index.add_documents(chunks)
     index.save(index_path)
     return index

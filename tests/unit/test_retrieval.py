@@ -135,6 +135,40 @@ class TestDenseIndex:
         from legal_rag.retrieval.dense import DenseIndex
         assert DenseIndex is not None
 
+    def test_dense_index_sets_and_persists_max_length(self, monkeypatch, tmp_path):
+        import numpy as np
+        import legal_rag.retrieval.dense as dense_module
+
+        class FakeSentenceTransformer:
+            def __init__(self, model_name, device):
+                self.model_name = model_name
+                self.device = device
+                self.max_seq_length = 128
+
+            def encode(self, texts, **kwargs):
+                return np.ones((len(texts), 2), dtype=np.float32)
+
+        monkeypatch.setattr(dense_module, "SentenceTransformer", FakeSentenceTransformer)
+        monkeypatch.setattr(dense_module, "SENTENCE_TRANSFORMERS_AVAILABLE", True)
+
+        index = dense_module.DenseIndex(model_name="test-model", device="cpu", max_length=256)
+        assert index.model.max_seq_length == 256
+        index.add_documents([{"chunk_id": "doc_1", "content": "Nội dung"}])
+
+        path = tmp_path / "dense.pkl"
+        index.save(path)
+        loaded = dense_module.DenseIndex.load(path)
+
+        assert loaded.max_length == 256
+        assert loaded.model.max_seq_length == 256
+
+    def test_dense_index_rejects_nonpositive_max_length(self, monkeypatch):
+        import legal_rag.retrieval.dense as dense_module
+
+        monkeypatch.setattr(dense_module, "SENTENCE_TRANSFORMERS_AVAILABLE", True)
+        with pytest.raises(ValueError, match="max_length"):
+            dense_module.DenseIndex(device="cpu", max_length=0)
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

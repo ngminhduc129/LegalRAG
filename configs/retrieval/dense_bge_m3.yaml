@@ -4,5 +4,6 @@ enabled: true
 model: "BAAI/bge-m3"
 device: "cuda"
 batch_size: 32
+max_length: 256
 
 index_path: "data/indexes/dense/bge_m3/dense_index.pkl"

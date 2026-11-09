@@ -10,24 +10,6 @@ app = typer.Typer(name="chunk", help="Run chunking strategies on parsed corpus")
 console = Console()
 
 
-def corpus_to_lines(corpus_chunks: list) -> list:
-    """Convert parser-output corpus chunks to lines format for baseline chunkers.
-    
-    Baseline chunkers expect: [{"text": str, "page": int}, ...]
-    Corpus chunks have full metadata with 'content' field.
-    """
-    lines = []
-    for chunk in corpus_chunks:
-        content = chunk.get("content", "")
-        page = chunk.get("page_start", 1)
-        # Split content by newlines to simulate lines
-        for line_text in content.split("\n"):
-            line_text = line_text.strip()
-            if line_text:
-                lines.append({"text": line_text, "page": page})
-    return lines
-
-
 @app.command()
 def legal_aware(
     input_path: Path = typer.Argument(
@@ -140,16 +122,13 @@ def fixed_size(
                     corpus_chunks.append(json.loads(line))
         progress.update(task, description=f"Loaded {len(corpus_chunks)} corpus chunks")
 
-        # Convert to lines format for baseline chunker
-        lines = corpus_to_lines(corpus_chunks)
-
         task2 = progress.add_task("Chunking...", total=None)
         chunker = FixedSizeChunker(
             chunk_size=chunk_size,
             overlap=overlap,
             document_id=document_id,
         )
-        result_chunks = chunker.chunk(lines)
+        result_chunks = chunker.chunk(corpus_chunks)
         progress.update(task2, description=f"Created {len(result_chunks)} chunks")
 
         task3 = progress.add_task("Saving...", total=None)
@@ -206,12 +185,9 @@ def paragraph(
                     corpus_chunks.append(json.loads(line))
         progress.update(task, description=f"Loaded {len(corpus_chunks)} corpus chunks")
 
-        # Convert to lines format for baseline chunker
-        lines = corpus_to_lines(corpus_chunks)
-
         task2 = progress.add_task("Chunking...", total=None)
         chunker = ParagraphChunker(document_id=document_id)
-        result_chunks = chunker.chunk(lines)
+        result_chunks = chunker.chunk(corpus_chunks)
         progress.update(task2, description=f"Created {len(result_chunks)} chunks")
 
         task3 = progress.add_task("Saving...", total=None)
@@ -392,25 +368,22 @@ def all_baselines(
                     corpus_chunks.append(json.loads(line))
         progress.update(task, description=f"Loaded {len(corpus_chunks)} corpus chunks")
 
-        # FixedSize and Paragraph need lines format; Article and Clause accept corpus format
-        lines = corpus_to_lines(corpus_chunks)
-
         strategies = [
-            ("fixed_300", FixedSizeChunker(chunk_size=300, overlap=60, document_id=document_id), lines, "data/chunks/fixed_300"),
-            ("fixed_500", FixedSizeChunker(chunk_size=500, overlap=100, document_id=document_id), lines, "data/chunks/fixed_500"),
-            ("fixed_800", FixedSizeChunker(chunk_size=800, overlap=160, document_id=document_id), lines, "data/chunks/fixed_800"),
-            ("paragraph", ParagraphChunker(document_id=document_id), lines, "data/chunks/paragraph"),
-            ("article", ArticleChunker(document_id=document_id), corpus_chunks, "data/chunks/article"),
-            ("clause", ClauseChunker(document_id=document_id), corpus_chunks, "data/chunks/clause"),
+            ("fixed_300", FixedSizeChunker(chunk_size=300, overlap=60, document_id=document_id), corpus_chunks),
+            ("fixed_500", FixedSizeChunker(chunk_size=500, overlap=100, document_id=document_id), corpus_chunks),
+            ("fixed_800", FixedSizeChunker(chunk_size=800, overlap=160, document_id=document_id), corpus_chunks),
+            ("paragraph", ParagraphChunker(document_id=document_id), corpus_chunks),
+            ("article", ArticleChunker(document_id=document_id), corpus_chunks),
+            ("clause", ClauseChunker(document_id=document_id), corpus_chunks),
         ]
 
-        for name, chunker, input_data, out_dir in strategies:
+        for name, chunker, input_data in strategies:
             task2 = progress.add_task(f"Chunking {name}...", total=None)
             result_chunks = chunker.chunk(input_data)
             progress.update(task2, description=f"Created {len(result_chunks)} chunks for {name}")
 
             task3 = progress.add_task(f"Saving {name}...", total=None)
-            out_path = Path(out_dir)
+            out_path = output_base / name
             out_path.mkdir(parents=True, exist_ok=True)
             jsonl_path = out_path / f"{document_id}_{name}.jsonl"
             csv_path = out_path / f"{document_id}_{name}.csv"

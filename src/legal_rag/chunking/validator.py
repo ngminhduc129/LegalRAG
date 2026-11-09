@@ -122,6 +122,30 @@ def is_truncated_title(title: str) -> bool:
     return any(lower.endswith(ending) for ending in truncated_endings)
 
 
+def _chunk_articles(chunk: Dict[str, Any]) -> List[str]:
+    articles = []
+    if isinstance(chunk.get("article"), str) and chunk["article"]:
+        articles.append(chunk["article"])
+    plural_articles = chunk.get("articles")
+    if isinstance(plural_articles, list):
+        articles.extend(
+            article
+            for article in plural_articles
+            if isinstance(article, str) and article
+        )
+    source_refs = chunk.get("source_refs")
+    if not isinstance(source_refs, list):
+        source_refs = []
+    articles.extend(
+        reference["article"]
+        for reference in source_refs
+        if isinstance(reference, dict)
+        and isinstance(reference.get("article"), str)
+        and reference["article"]
+    )
+    return list(dict.fromkeys(articles))
+
+
 class PostParseValidator:
     EXPECTED_ARTICLE_COUNT = 220
 
@@ -150,8 +174,8 @@ class PostParseValidator:
             chunk["_chunk_id"] = idx + 1
             self._validate_chunk(chunk, idx + 1)
 
-            article = chunk.get("article")
-            if article:
+            articles = _chunk_articles(chunk)
+            for article in articles:
                 match = re.match(r"Điều\s+(\d+)", article)
                 if match:
                     num = int(match.group(1))
@@ -171,35 +195,37 @@ class PostParseValidator:
             if chunk.get("point"):
                 self.stats["points"] += 1
 
-            struct_key = (
-                chunk.get("article"),
-                chunk.get("clause"),
-                chunk.get("point"),
-                chunk.get("chunk_type")
-            )
-            if struct_key in seen_structure:
-                if seen_structure[struct_key] == chunk.get("content", ""):
-                    self.issues.append(ValidationIssue(
-                        severity="WARNING",
-                        code="DUPLICATE_STRUCTURE_KEY",
-                        message=f"Duplicate structure key with identical content: {struct_key}",
-                        chunk_id=idx + 1,
-                        article=article,
-                        clause=chunk.get("clause"),
-                        point=chunk.get("point"),
-                    ))
+            article = chunk.get("article")
+            if article and chunk.get("chunk_type") not in {"fixed_size", "paragraph"}:
+                struct_key = (
+                    article,
+                    chunk.get("clause"),
+                    chunk.get("point"),
+                    chunk.get("chunk_type")
+                )
+                if struct_key in seen_structure:
+                    if seen_structure[struct_key] == chunk.get("content", ""):
+                        self.issues.append(ValidationIssue(
+                            severity="WARNING",
+                            code="DUPLICATE_STRUCTURE_KEY",
+                            message=f"Duplicate structure key with identical content: {struct_key}",
+                            chunk_id=idx + 1,
+                            article=article,
+                            clause=chunk.get("clause"),
+                            point=chunk.get("point"),
+                        ))
+                    else:
+                        self.issues.append(ValidationIssue(
+                            severity="INFO",
+                            code="SHARED_STRUCTURE_KEY",
+                            message=f"Shared structure key with different content (quoted numbering): {struct_key}",
+                            chunk_id=idx + 1,
+                            article=article,
+                            clause=chunk.get("clause"),
+                            point=chunk.get("point"),
+                        ))
                 else:
-                    self.issues.append(ValidationIssue(
-                        severity="INFO",
-                        code="SHARED_STRUCTURE_KEY",
-                        message=f"Shared structure key with different content (quoted numbering): {struct_key}",
-                        chunk_id=idx + 1,
-                        article=article,
-                        clause=chunk.get("clause"),
-                        point=chunk.get("point"),
-                    ))
-            else:
-                seen_structure[struct_key] = chunk.get("content", "")
+                    seen_structure[struct_key] = chunk.get("content", "")
 
         expected = set(range(1, self.EXPECTED_ARTICLE_COUNT + 1))
         missing = expected - article_numbers
@@ -219,7 +245,7 @@ class PostParseValidator:
         content = chunk.get("content", "")
         chunk_type = chunk.get("chunk_type")
 
-        if is_short_title(article_title):
+        if article and article_title and is_short_title(article_title):
             self.issues.append(ValidationIssue(
                 severity="WARNING",
                 code="SHORT_ARTICLE_TITLE",
@@ -228,7 +254,7 @@ class PostParseValidator:
                 article=article,
             ))
 
-        if is_truncated_title(article_title):
+        if article and article_title and is_truncated_title(article_title):
             self.issues.append(ValidationIssue(
                 severity="WARNING",
                 code="TRUNCATED_ARTICLE_TITLE",
@@ -264,7 +290,15 @@ class PostParseValidator:
             chunk["has_legal_refs"] = True
             chunk["legal_refs"] = refs
 
-        required = ["chunk_id", "document_id", "document_name", "document_number", "article", "chunk_type", "page_start", "page_end"]
+        required = [
+            "chunk_id",
+            "document_id",
+            "document_name",
+            "document_number",
+            "chunk_type",
+            "page_start",
+            "page_end",
+        ]
         for field in required:
             if chunk.get(field) is None or chunk.get(field) == "":
                 self.issues.append(ValidationIssue(
@@ -274,6 +308,49 @@ class PostParseValidator:
                     chunk_id=chunk_id,
                     article=article,
                 ))
+
+        if chunk_type != "preamble" and not _chunk_articles(chunk):
+            self.issues.append(ValidationIssue(
+                severity="ERROR",
+                code="MISSING_METADATA",
+                message="Missing article or source_refs article metadata",
+                chunk_id=chunk_id,
+                article=article,
+            ))
+
+        source_refs = chunk.get("source_refs", [])
+        if not isinstance(source_refs, list):
+            self.issues.append(ValidationIssue(
+                severity="ERROR",
+                code="INVALID_SOURCE_REFERENCES",
+                message="source_refs must be a list",
+                chunk_id=chunk_id,
+                article=article,
+            ))
+        else:
+            for reference in source_refs:
+                if not isinstance(reference, dict) or not reference.get("document_id"):
+                    self.issues.append(ValidationIssue(
+                        severity="ERROR",
+                        code="INVALID_SOURCE_REFERENCE",
+                        message="Each source reference must include document_id",
+                        chunk_id=chunk_id,
+                        article=article,
+                    ))
+                    continue
+                try:
+                    ref_start = int(reference["page_start"])
+                    ref_end = int(reference["page_end"])
+                    if ref_start < 1 or ref_end < ref_start:
+                        raise ValueError
+                except (KeyError, TypeError, ValueError):
+                    self.issues.append(ValidationIssue(
+                        severity="ERROR",
+                        code="INVALID_SOURCE_REFERENCE",
+                        message="Each source reference must have a valid page range",
+                        chunk_id=chunk_id,
+                        article=article,
+                    ))
 
         try:
             ps = int(chunk["page_start"])
@@ -297,10 +374,17 @@ class PostParseValidator:
 
     def _cross_validate_chunks(self, chunks: List[Dict], article_to_chunks: Dict):
         for article, article_chunks in article_to_chunks.items():
-            has_intro = any(c["chunk_type"] == "article_intro" for c in article_chunks)
+            has_intro = any(
+                c["chunk_type"] in {"article_intro", "article"}
+                for c in article_chunks
+            )
             has_clauses = any(c.get("clause") for c in article_chunks)
+            has_baseline_content = any(
+                c["chunk_type"] in {"fixed_size", "paragraph"}
+                for c in article_chunks
+            )
 
-            if not has_intro and not has_clauses:
+            if not has_intro and not has_clauses and not has_baseline_content:
                 self.issues.append(ValidationIssue(
                     severity="INFO",
                     code="ARTICLE_NO_CONTENT",

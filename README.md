@@ -81,8 +81,8 @@ legal-rag pipeline data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf --run-id r
 # 1. Parse PDF into a structured corpus (page patches in data/ocr/patches are applied automatically)
 legal-rag parse pdf data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf
 
-# 2. Run all baseline chunking strategies on the run's corpus
-legal-rag chunk all_baselines data/processed/labor_code_2019_run07_corpus.jsonl
+# 2. Run all baseline chunking strategies into a new run-specific directory
+legal-rag chunk all-baselines data/processed/labor_code_2019_run07_corpus.jsonl --output-base data/chunks/run07
 
 # 3. Build BM25 / dense indexes from the run's chunks
 legal-rag index bm25 data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
@@ -110,10 +110,12 @@ legal-rag --config configs/my_experiment.yaml parse pdf ...
 | Strategy | Description | Output Dir |
 |----------|-------------|------------|
 | `legal_aware` | Preserves legal hierarchy (Chapter→Section→Article→Clause→Point); standard output of `legal-rag pipeline` | `data/chunks/legal_aware_<run_id>/` |
-| `fixed_300/500/800` | Fixed-size with overlap | `data/chunks/fixed_{size}/` |
-| `paragraph` | Paragraph-based | `data/chunks/paragraph/` |
-| `article` | One chunk per article | `data/chunks/article/` |
-| `clause` | One chunk per clause | `data/chunks/clause/` |
+| `fixed_300/500/800` | Fixed-size with overlap | `<output-base>/fixed_{size}/` |
+| `paragraph` | Paragraph-based | `<output-base>/paragraph/` |
+| `article` | One chunk per article | `<output-base>/article/` |
+| `clause` | Clause chunks plus article introductions | `<output-base>/clause/` |
+
+Baseline chunks retain document name/number, page range, and `source_refs` with the source legal hierarchy. Fixed-size and paragraph chunks can reference multiple Articles; clause chunks also retain article-introduction text. Use a new `--output-base` for each run.
 
 ## Retrieval Methods
 

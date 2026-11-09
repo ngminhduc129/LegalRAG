@@ -214,6 +214,141 @@ class TestFixedSizeChunker:
             assert "page_end" in chunk
 
 
+class TestBaselineChunkerCorpusMetadata:
+    def test_fixed_size_preserves_all_source_structures(self):
+        corpus_chunks = [
+            _parser_chunk(
+                article="Điều 1",
+                article_title="Title 1",
+                clause="1",
+                content="one two three",
+                page_start=2,
+                page_end=2,
+            ),
+            _parser_chunk(
+                article="Điều 2",
+                article_title="Title 2",
+                clause="1",
+                content="four five",
+                page_start=3,
+                page_end=3,
+            ),
+        ]
+        chunks = FixedSizeChunker(
+            chunk_size=4,
+            overlap=0,
+            document_id="test",
+        ).chunk(corpus_chunks)
+
+        assert chunks[0]["articles"] == ["Điều 1", "Điều 2"]
+        assert chunks[0]["article"] is None
+        assert chunks[0]["page_start"] == 2
+        assert chunks[0]["page_end"] == 3
+        assert chunks[0]["document_name"] == "Bộ luật Lao động"
+        assert chunks[0]["document_number"] == "125/VBHN-VPQH"
+        assert [ref["article"] for ref in chunks[0]["source_refs"]] == [
+            "Điều 1",
+            "Điều 2",
+        ]
+        assert validate_chunks(chunks).errors == 0
+
+    def test_paragraph_preserves_source_metadata(self):
+        corpus_chunks = [
+            _parser_chunk(
+                article="Điều 1",
+                article_title="Title 1",
+                content="First sentence.\nContinuation",
+                page_start=4,
+                page_end=4,
+            ),
+            _parser_chunk(
+                article="Điều 2",
+                article_title="Title 2",
+                content="Second sentence.",
+                page_start=5,
+                page_end=5,
+            ),
+        ]
+        chunks = ParagraphChunker(document_id="test").chunk(corpus_chunks)
+
+        assert chunks[0]["article"] == "Điều 1"
+        assert chunks[0]["articles"] == ["Điều 1"]
+        assert chunks[0]["page_start"] == 4
+        assert chunks[0]["page_end"] == 4
+        assert chunks[1]["articles"] == ["Điều 1", "Điều 2"]
+        assert chunks[1]["page_start"] == 4
+        assert chunks[1]["page_end"] == 5
+        assert all(chunk["source_refs"] for chunk in chunks)
+
+    def test_article_and_clause_include_document_metadata_and_sources(self):
+        corpus_chunks = [
+            _parser_chunk(
+                article="Điều 1",
+                article_title="Title 1",
+                clause="1",
+                point="a",
+                chunk_type="point",
+                content="Point A.",
+                page_start=6,
+                page_end=6,
+            ),
+            _parser_chunk(
+                article="Điều 1",
+                article_title="Title 1",
+                clause="1",
+                point="b",
+                chunk_type="point",
+                content="Point B.",
+                page_start=7,
+                page_end=7,
+            ),
+        ]
+
+        article = ArticleChunker(document_id="test").chunk(corpus_chunks)[0]
+        clause = ClauseChunker(document_id="test").chunk(corpus_chunks)[0]
+
+        for chunk in (article, clause):
+            assert chunk["document_name"] == "Bộ luật Lao động"
+            assert chunk["document_number"] == "125/VBHN-VPQH"
+            assert chunk["page_start"] == 6
+            assert chunk["page_end"] == 7
+            assert len(chunk["source_refs"]) == 2
+        assert clause["points"] == ["a", "b"]
+
+    def test_clause_chunker_keeps_article_intro_content(self):
+        corpus_chunks = [
+            _parser_chunk(
+                article="Điều 1",
+                article_title="Title 1",
+                chunk_type="article_intro",
+                content="Article introduction.",
+                page_start=1,
+                page_end=1,
+            ),
+            _parser_chunk(
+                article="Điều 1",
+                article_title="Title 1",
+                clause="1",
+                chunk_type="clause",
+                content="Clause content.",
+                page_start=1,
+                page_end=1,
+            ),
+        ]
+
+        chunks = ClauseChunker(document_id="test").chunk(corpus_chunks)
+
+        assert [chunk["chunk_type"] for chunk in chunks] == [
+            "article_intro",
+            "clause",
+        ]
+        assert [chunk["content"] for chunk in chunks] == [
+            "Article introduction.",
+            "Clause content.",
+        ]
+        assert all(chunk["source_refs"] for chunk in chunks)
+
+
 class TestParagraphChunker:
     def test_paragraph_chunking(self):
         chunker = ParagraphChunker(document_id="test")

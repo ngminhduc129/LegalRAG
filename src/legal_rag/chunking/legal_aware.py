@@ -21,6 +21,87 @@ from legal_rag.parsing.constants import DOCUMENT_NAME, DOCUMENT_NUMBER
 from legal_rag.chunking.base import BaseChunker
 
 
+STRUCTURE_FIELDS = (
+    "chapter",
+    "chapter_title",
+    "section",
+    "section_title",
+    "article",
+    "article_title",
+    "clause",
+    "point",
+)
+
+
+def _source_reference(source: Dict[str, Any], document_id: str) -> Dict[str, Any]:
+    reference = {
+        "document_id": source.get("document_id", document_id),
+        "document_name": source.get("document_name", DOCUMENT_NAME),
+        "document_number": source.get("document_number", DOCUMENT_NUMBER),
+        **{field: source.get(field) for field in STRUCTURE_FIELDS},
+        "chunk_type": source.get("chunk_type"),
+        "page_start": source.get("page_start", source.get("page", 1)),
+        "page_end": source.get("page_end", source.get("page", 1)),
+    }
+    if source.get("chunk_id"):
+        reference["source_chunk_id"] = source["chunk_id"]
+    return reference
+
+
+def _aggregate_source_metadata(
+    sources: List[Dict[str, Any]], document_id: str
+) -> Dict[str, Any]:
+    """Keep source hierarchy and page locations for chunks spanning parser records."""
+    references = []
+    seen = set()
+    for source in sources:
+        reference = _source_reference(source, document_id)
+        key = tuple(reference.items())
+        if key not in seen:
+            seen.add(key)
+            references.append(reference)
+
+    metadata = {
+        "document_id": document_id,
+        "document_name": next(
+            (reference["document_name"] for reference in references if reference["document_name"]),
+            DOCUMENT_NAME,
+        ),
+        "document_number": next(
+            (reference["document_number"] for reference in references if reference["document_number"]),
+            DOCUMENT_NUMBER,
+        ),
+        "source_refs": references,
+    }
+    for field in STRUCTURE_FIELDS:
+        values = list(dict.fromkeys(
+            reference[field]
+            for reference in references
+            if reference.get(field) is not None
+        ))
+        metadata[field] = values[0] if len(values) == 1 else None
+        if field in {"chapter", "section", "article", "article_title", "clause", "point"}:
+            plural_field = {
+                "chapter": "chapters",
+                "section": "sections",
+                "article": "articles",
+                "article_title": "article_titles",
+                "clause": "clauses",
+                "point": "points",
+            }[field]
+            metadata[plural_field] = values
+
+    pages = [
+        page
+        for reference in references
+        for page in (reference["page_start"], reference["page_end"])
+        if isinstance(page, int) and page > 0
+    ]
+    metadata["page_start"] = min(pages) if pages else 1
+    metadata["page_end"] = max(pages) if pages else metadata["page_start"]
+    return metadata
+
+
 # =========================================================
 # CHUNK CREATION
 # =========================================================
@@ -219,34 +300,57 @@ class FixedSizeChunker(BaseChunker):
         document_id: str = "labor_code_2019",
         preserve_metadata: bool = False,
     ):
+        if chunk_size <= 0:
+            raise ValueError("chunk_size must be greater than zero")
+        if overlap < 0 or overlap >= chunk_size:
+            raise ValueError("overlap must be non-negative and smaller than chunk_size")
         self.chunk_size = chunk_size
         self.overlap = overlap
         self.document_id = document_id
         self.preserve_metadata = preserve_metadata
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Chunk from lines (joins all text first)."""
-        text = "\n".join(line["text"] for line in lines)
-        return self._chunk_text(text, lines if self.preserve_metadata else None)
+        """Chunk parser records or lines while retaining their source metadata."""
+        if lines and "content" in lines[0]:
+            return self._chunk_corpus(lines)
+        return self._chunk_lines(lines)
 
     def chunk_from_pdf(self, pdf_path: Path) -> List[Dict[str, Any]]:
         """Parse PDF directly into chunks."""
         lines = extract_pdf_lines(pdf_path)
-        text = "\n".join(line["text"] for line in lines)
-        return self._chunk_text(text, lines if self.preserve_metadata else None)
+        return self._chunk_lines(lines)
 
-    def _chunk_text(self, text: str, lines: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
-        words = text.split()
+    def _chunk_corpus(self, corpus_chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        words = [
+            (word, source)
+            for source in corpus_chunks
+            for word in source.get("content", "").split()
+        ]
+        return self._chunk_words(words)
+
+    def _chunk_lines(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        words = [
+            (word, line)
+            for line in lines
+            for word in line.get("text", "").split()
+        ]
+        return self._chunk_words(words)
+
+    def _chunk_words(self, words: List[tuple]) -> List[Dict[str, Any]]:
         chunks = []
         step = self.chunk_size - self.overlap
         for i in range(0, len(words), step):
-            chunk_words = words[i:i + self.chunk_size]
-            if not chunk_words:
+            window = words[i:i + self.chunk_size]
+            if not window:
                 break
-            chunk_text = " ".join(chunk_words)
+            chunk_text = " ".join(word for word, _ in window)
+            metadata = _aggregate_source_metadata(
+                [source for _, source in window],
+                self.document_id,
+            )
             chunk_data = {
-                "chunk_id": f"{self.document_id}_fixed_{i // step}",
-                "document_id": self.document_id,
+                **metadata,
+                "chunk_id": f"{self.document_id}_fixed_{self.chunk_size}_{i // step}",
                 "content": chunk_text,
                 "chunk_type": "fixed_size",
                 "chunk_index": i // step,
@@ -254,14 +358,6 @@ class FixedSizeChunker(BaseChunker):
                 "overlap": self.overlap,
                 "unit": "words",
             }
-            # Optionally add metadata from first line in chunk range
-            if lines and self.preserve_metadata:
-                # Find approximate page range for this chunk
-                char_pos = len(" ".join(words[:i]))
-                chunk_char_len = len(chunk_text)
-                # Simple heuristic: assign page from first line
-                chunk_data["page_start"] = lines[0]["page"] if lines else 1
-                chunk_data["page_end"] = lines[-1]["page"] if lines else 1
             chunks.append(chunk_data)
         return chunks
 
@@ -285,8 +381,17 @@ class ParagraphChunker(BaseChunker):
         self.document_id = document_id
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        if lines and "content" in lines[0]:
+            text_lines = [
+                (text, source.get("page_start", 1), source)
+                for source in lines
+                for text in source.get("content", "").splitlines()
+                if text.strip()
+            ]
+            return self._chunk_lines(text_lines)
+
         text_lines = [
-            (line["text"], line.get("page", 1))
+            (line["text"], line.get("page", 1), line)
             for line in lines
             if line.get("text") and line["text"].strip()
         ]
@@ -295,7 +400,7 @@ class ParagraphChunker(BaseChunker):
     def chunk_from_pdf(self, pdf_path: Path) -> List[Dict[str, Any]]:
         lines = extract_pdf_lines(pdf_path)
         text_lines = [
-            (line["text"], line.get("page", 1))
+            (line["text"], line.get("page", 1), line)
             for line in lines
             if line.get("text") and line["text"].strip()
         ]
@@ -309,25 +414,34 @@ class ParagraphChunker(BaseChunker):
         chunks = []
         buf: List[str] = []
         pages: List[int] = []
-        for text, page in text_lines:
+        sources = []
+        for text, page, source in text_lines:
             buf.append(text.strip())
             pages.append(page)
+            sources.append(source)
             if self._ends_paragraph(text):
-                chunks.append(self._make_chunk(chunks, buf, pages))
+                chunks.append(self._make_chunk(chunks, buf, pages, sources))
                 buf = []
                 pages = []
+                sources = []
         if buf:
-            chunks.append(self._make_chunk(chunks, buf, pages))
+            chunks.append(self._make_chunk(chunks, buf, pages, sources))
         # Re-number sequentially
         for i, chunk in enumerate(chunks):
             chunk["chunk_id"] = f"{self.document_id}_para_{i}"
             chunk["paragraph_index"] = i
         return chunks
 
-    def _make_chunk(self, chunks: List[Dict[str, Any]], buf: List[str], pages: List[int]) -> Dict[str, Any]:
+    def _make_chunk(
+        self,
+        chunks: List[Dict[str, Any]],
+        buf: List[str],
+        pages: List[int],
+        sources: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
         return {
+            **_aggregate_source_metadata(sources, self.document_id),
             "chunk_id": "",
-            "document_id": self.document_id,
             "content": "\n".join(buf),
             "chunk_type": "paragraph",
             "paragraph_index": len(chunks),
@@ -338,7 +452,7 @@ class ParagraphChunker(BaseChunker):
     def _chunk_text(self, text: str, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         # Kept for backward compatibility; delegates to line-based chunking.
         text_lines = [
-            (line["text"], line.get("page", 1))
+            (line["text"], line.get("page", 1), line)
             for line in (lines or [])
             if line.get("text") and line["text"].strip()
         ]
@@ -370,30 +484,17 @@ class ArticleChunker(BaseChunker):
             if article not in articles:
                 articles[article] = {
                     "chunks": [],
-                    "title": chunk.get("article_title", ""),
-                    "pages": set(),
-                    "chapter": chunk.get("chapter"),
-                    "section": chunk.get("section"),
                 }
             articles[article]["chunks"].append(chunk)
-            articles[article]["pages"].add(chunk.get("page_start", 1))
-            articles[article]["pages"].add(chunk.get("page_end", 1))
 
         chunks = []
         for i, (article, data) in enumerate(articles.items()):
             content = "\n".join(c["content"] for c in data["chunks"] if c.get("content"))
-            pages = sorted(data["pages"])
             chunks.append({
+                **_aggregate_source_metadata(data["chunks"], self.document_id),
                 "chunk_id": f"{self.document_id}_article_{i}",
-                "document_id": self.document_id,
-                "chapter": data.get("chapter"),
-                "section": data.get("section"),
-                "article": article,
-                "article_title": data["title"],
                 "content": content,
                 "chunk_type": "article",
-                "page_start": min(pages) if pages else 1,
-                "page_end": max(pages) if pages else 1,
             })
         return chunks
 
@@ -424,29 +525,30 @@ class ArticleChunker(BaseChunker):
                     articles[current_article] = {
                         "lines": [], 
                         "title": article_match.group(2).strip(), 
-                        "pages": set(),
+                        "sources": [],
                         "chapter": current_chapter,
                         "section": current_section,
                     }
             if current_article:
                 articles[current_article]["lines"].append(text)
-                articles[current_article]["pages"].add(page)
+                articles[current_article]["sources"].append({
+                    **line,
+                    "page_start": page,
+                    "page_end": page,
+                    "chapter": articles[current_article]["chapter"],
+                    "section": articles[current_article]["section"],
+                    "article": current_article,
+                    "article_title": articles[current_article]["title"],
+                })
 
         chunks = []
         for i, (article, data) in enumerate(articles.items()):
             content = "\n".join(data["lines"])
-            pages = sorted(data["pages"])
             chunks.append({
+                **_aggregate_source_metadata(data["sources"], self.document_id),
                 "chunk_id": f"{self.document_id}_article_{i}",
-                "document_id": self.document_id,
-                "chapter": data.get("chapter"),
-                "section": data.get("section"),
-                "article": article,
-                "article_title": data["title"],
                 "content": content,
                 "chunk_type": "article",
-                "page_start": min(pages),
-                "page_end": max(pages),
             })
         return chunks
 
@@ -473,38 +575,37 @@ class ClauseChunker(BaseChunker):
     def _chunk_corpus(self, corpus_chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Group corpus chunks by (article, clause)."""
         clauses = {}
+        article_intros = []
         for chunk in corpus_chunks:
             article = chunk.get("article")
             clause = chunk.get("clause")
+            if article and chunk.get("chunk_type") == "article_intro":
+                article_intros.append(chunk)
             if not article or clause is None:
                 continue
             key = (article, clause)
             if key not in clauses:
                 clauses[key] = {
                     "chunks": [],
-                    "pages": set(),
-                    "chapter": chunk.get("chapter"),
-                    "section": chunk.get("section"),
                 }
             clauses[key]["chunks"].append(chunk)
-            clauses[key]["pages"].add(chunk.get("page_start", 1))
-            clauses[key]["pages"].add(chunk.get("page_end", 1))
 
-        chunks = []
+        chunks = [
+            {
+                **_aggregate_source_metadata([source], self.document_id),
+                "chunk_id": f"{self.document_id}_article_intro_{i}",
+                "content": source.get("content", ""),
+                "chunk_type": "article_intro",
+            }
+            for i, source in enumerate(article_intros)
+        ]
         for i, ((article, clause), data) in enumerate(clauses.items()):
             content = "\n".join(c["content"] for c in data["chunks"] if c.get("content"))
-            pages = sorted(data["pages"])
             chunks.append({
+                **_aggregate_source_metadata(data["chunks"], self.document_id),
                 "chunk_id": f"{self.document_id}_clause_{i}",
-                "document_id": self.document_id,
-                "chapter": data.get("chapter"),
-                "section": data.get("section"),
-                "article": article,
-                "clause": clause,
                 "content": content,
                 "chunk_type": "clause",
-                "page_start": min(pages) if pages else 1,
-                "page_end": max(pages) if pages else 1,
             })
         return chunks
 
@@ -515,8 +616,28 @@ class ClauseChunker(BaseChunker):
         current_chapter = None
         current_section = None
         clause_parts = []
-        clause_pages = []
+        clause_sources = []
         clause_idx = 0
+        current_point = None
+
+        def finish_clause(article: str, chapter: Optional[str], section: Optional[str]):
+            nonlocal clause_idx, clause_parts, clause_sources
+            metadata = _aggregate_source_metadata(clause_sources, self.document_id)
+            metadata.update({
+                "chapter": chapter,
+                "section": section,
+                "article": article,
+                "clause": current_clause,
+            })
+            chunks.append({
+                **metadata,
+                "chunk_id": f"{self.document_id}_clause_{clause_idx}",
+                "content": "\n".join(clause_parts),
+                "chunk_type": "clause",
+            })
+            clause_idx += 1
+            clause_parts = []
+            clause_sources = []
 
         for line in lines:
             text = line["text"]
@@ -538,65 +659,54 @@ class ClauseChunker(BaseChunker):
                 # Save current clause and article before resetting, to emit pending clause with correct article
                 pending_clause = current_clause
                 pending_article = current_article
+                pending_chapter = current_chapter
+                pending_section = current_section
                 current_article = new_article
                 current_clause = None
+                current_point = None
                 if clause_parts and pending_article:
-                    chunks.append({
-                        "chunk_id": f"{self.document_id}_clause_{clause_idx}",
-                        "document_id": self.document_id,
-                        "chapter": current_chapter,
-                        "section": current_section,
-                        "article": pending_article,
-                        "clause": pending_clause,
-                        "content": "\n".join(clause_parts),
-                        "chunk_type": "clause",
-                        "page_start": min(clause_pages),
-                        "page_end": max(clause_pages),
-                    })
-                    clause_idx += 1
-                    clause_parts = []
-                    clause_pages = []
+                    current_clause = pending_clause
+                    finish_clause(pending_article, pending_chapter, pending_section)
+                    current_clause = None
                 continue
 
             clause_match = CLAUSE_RE.match(text)
             if clause_match and current_article:
                 if clause_parts:
-                    chunks.append({
-                        "chunk_id": f"{self.document_id}_clause_{clause_idx}",
-                        "document_id": self.document_id,
-                        "chapter": current_chapter,
-                        "section": current_section,
-                        "article": current_article,
-                        "clause": current_clause,
-                        "content": "\n".join(clause_parts),
-                        "chunk_type": "clause",
-                        "page_start": min(clause_pages),
-                        "page_end": max(clause_pages),
-                    })
-                    clause_idx += 1
+                    finish_clause(current_article, current_chapter, current_section)
                 current_clause = clause_match.group(1)
                 clause_parts = [clause_match.group(2)]
-                clause_pages = [page]
+                current_point = None
+                clause_sources = [{
+                    **line,
+                    "page_start": page,
+                    "page_end": page,
+                    "chapter": current_chapter,
+                    "section": current_section,
+                    "article": current_article,
+                    "clause": current_clause,
+                }]
                 continue
 
             if current_clause:
                 clause_parts.append(text)
-                clause_pages.append(page)
+                point_match = POINT_RE.match(text)
+                if point_match:
+                    current_point = point_match.group(1)
+                clause_sources.append({
+                    **line,
+                    "page_start": page,
+                    "page_end": page,
+                    "chapter": current_chapter,
+                    "section": current_section,
+                    "article": current_article,
+                    "clause": current_clause,
+                    "point": current_point,
+                })
 
         # Last clause
         if clause_parts and current_article:
-            chunks.append({
-                "chunk_id": f"{self.document_id}_clause_{clause_idx}",
-                "document_id": self.document_id,
-                "chapter": current_chapter,
-                "section": current_section,
-                "article": current_article,
-                "clause": current_clause,
-                "content": "\n".join(clause_parts),
-                "chunk_type": "clause",
-                "page_start": min(clause_pages),
-                "page_end": max(clause_pages),
-            })
+            finish_clause(current_article, current_chapter, current_section)
 
         return chunks
 

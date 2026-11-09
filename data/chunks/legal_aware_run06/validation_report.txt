@@ -1,0 +1,14 @@
+============================================================
+VALIDATION REPORT
+============================================================
+Total chunks: 982
+Articles found: 220
+Expected articles: 220
+Missing articles: 0
+Errors: 0
+Warnings: 4
+Infos: 19
+
+Issues by type:
+  SHARED_STRUCTURE_KEY: 19
+  CONTENT_ENDS_MID_SENTENCE: 4

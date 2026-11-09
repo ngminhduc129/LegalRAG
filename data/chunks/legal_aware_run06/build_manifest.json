@@ -1,0 +1,38 @@
+{
+  "run_id": "run06",
+  "document_id": "labor_code_2019",
+  "created_at": "2026-10-17T08:54:51+00:00",
+  "git_commit": "8b26c5357d4e30a92bba8d0b2f444ed8cfb568be",
+  "pdf": {
+    "path": "data\\raw\\Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf",
+    "sha256": "08dcc4dbef97d2aabcd3558b614006089ac7923b1a03a30c5c8d7c357bb25308",
+    "raw_lines": 3106
+  },
+  "patches": [
+    {
+      "page": 86,
+      "path": "data\\ocr\\patches\\labor_code_2019_page86.json",
+      "replaced_lines": 41,
+      "inserted_lines": 27,
+      "ocr_coverage": 0.8348432055749129,
+      "sha256": "b2c94388ff8e50bc2535ee1c128e732be2b98faf8ae157a4e0fb1485ba038eff"
+    }
+  ],
+  "counts": {
+    "lines_after_patches": 3092,
+    "corpus_chunks": 982,
+    "final_chunks": 982
+  },
+  "validation": {
+    "errors": 0,
+    "warnings": 4,
+    "infos": 19,
+    "report": "data\\chunks\\legal_aware_run06\\validation_report.txt"
+  },
+  "outputs": {
+    "corpus_jsonl": "data\\processed\\labor_code_2019_run06_corpus.jsonl",
+    "corpus_csv": "data\\processed\\labor_code_2019_run06_corpus_preview.csv",
+    "chunks_jsonl": "data\\chunks\\legal_aware_run06\\labor_code_2019_legal_aware.jsonl",
+    "chunks_csv": "data\\chunks\\legal_aware_run06\\labor_code_2019_legal_aware.csv"
+  }
+}

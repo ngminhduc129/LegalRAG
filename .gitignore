@@ -38,6 +38,7 @@ data/chunks/**/*.jsonl
 data/chunks/**/*.csv
 data/chunks/**/validation_report*.txt
 data/chunks/**/build_manifest.json
+!data/chunks/legal_aware_run06/*
 data/indexes/**/*.pkl
 data/qa/*.jsonl
 

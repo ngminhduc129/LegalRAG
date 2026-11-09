@@ -1,0 +1,8 @@
+# Dense Retrieval Configuration: BGE-M3
+
+enabled: true
+model: "BAAI/bge-m3"
+device: "cuda"
+batch_size: 32
+
+index_path: "data/indexes/dense/bge_m3/dense_index.pkl"

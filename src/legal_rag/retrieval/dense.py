@@ -46,6 +46,18 @@ class DenseIndex:
         self.doc_ids: List[str] = []
         self.embeddings: Optional[np.ndarray] = None
         self.is_built = False
+        self.oversized_chunk_count: int = 0
+
+    def _count_tokens(self, text: str) -> int:
+        """Count tokens using the embedding model's tokenizer.
+
+        Falls back to a whitespace estimate when the tokenizer is unavailable,
+        so this helper never raises and never changes chunking behaviour.
+        """
+        try:
+            return len(self.model.tokenizer.encode(text, add_special_tokens=True))
+        except AttributeError:
+            return len(text.split())
 
     def add_documents(self, chunks: List[Dict[str, Any]]):
         """Add documents and compute embeddings."""
@@ -72,7 +84,23 @@ class DenseIndex:
             parts.append(chunk.get("content", ""))
             texts.append(" ".join(parts))
 
-        print(f"Computing embeddings for {len(texts)} documents...")
+        # Warn about chunks that exceed the model's max_length; do NOT alter
+        # chunking strategy here (caller decides how to split oversized chunks).
+        oversized = 0
+        for chunk, text in zip(chunks, texts):
+            n_tokens = self._count_tokens(text)
+            if n_tokens > self.max_length:
+                oversized += 1
+                chunk_id = chunk.get("chunk_id", "<unknown>")
+                print(
+                    f"[WARN] chunk {chunk_id} exceeds max_length={self.max_length} "
+                    f"tokens ({n_tokens}); content will be truncated by the model"
+                )
+        self.oversized_chunk_count = oversized
+        print(
+            f"Computing embeddings for {len(texts)} documents... "
+            f"{oversized} chunk(s) exceed max_length={self.max_length}"
+        )
         self.embeddings = self.model.encode(
             texts,
             batch_size=self.batch_size,
@@ -126,6 +154,7 @@ class DenseIndex:
             "embeddings": self.embeddings,
             "is_built": self.is_built,
             "vector_count": int(self.embeddings.shape[0]),
+            "oversized_chunk_count": int(self.oversized_chunk_count),
         }
         with path.open("wb") as f:
             pickle.dump(data, f)

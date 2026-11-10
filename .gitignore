@@ -53,6 +53,9 @@ data/ocr/*
 # Experiments (auto-generated)
 experiments/runs/
 
+# Local analysis output (audits, mappings; regenerable)
+output/
+
 # Logs
 *.log
 logs/

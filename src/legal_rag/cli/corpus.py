@@ -44,19 +44,21 @@ def audit(
     table.add_column("pages", justify="right")
     table.add_column("text", justify="right")
     table.add_column("need OCR", justify="right")
+    table.add_column("U+FFFD", justify="right")
     for item in audits:
         table.add_row(
             item.document_id,
             item.status,
             str(item.pages),
             str(item.pages_with_text),
-            str(len(item.pages_without_text)),
+            str(len(item.pages_needing_ocr)),
+            str(item.corruption_hits) if item.corruption_hits else "-",
         )
     console.print(table)
     console.print(
         f"[green]\u2713[/green] wrote {path} "
         f"({sum(a.pages for a in audits)} pages, "
-        f"{sum(len(a.pages_without_text) for a in audits)} need OCR)"
+        f"{sum(len(a.pages_needing_ocr) for a in audits)} need OCR)"
     )
 
 
@@ -152,13 +154,26 @@ def build(
     blocked = [
         item
         for item in result["documents"]
-        if item["status"] in {"ocr_required", "parse_failed", "empty", "missing_pdf"}
+        if item["status"]
+        in {
+            "ocr_required",
+            "parse_failed",
+            "empty",
+            "missing_pdf",
+            "source_corrupt",
+        }
     ]
     if blocked:
         console.print(
             f"[yellow]{len(blocked)} document(s) need attention:[/yellow] "
             + ", ".join(f"{item['document_id']}({item['status']})" for item in blocked)
         )
+        corrupt = [item for item in blocked if item["status"] == "source_corrupt"]
+        if corrupt:
+            console.print(
+                "[red]Corrupt PDFs must be re-downloaded into data/raw/ "
+                "(the build never edits source files).[/red]"
+            )
 
 
 if __name__ == "__main__":

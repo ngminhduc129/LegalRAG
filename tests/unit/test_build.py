@@ -2,11 +2,13 @@
 
 from pathlib import Path
 
+import fitz
 import pytest
 
 import legal_rag.corpus.build as build_module
 from legal_rag.corpus.audit import PdfAudit
 from legal_rag.corpus.build import build_document, run_corpus_build
+from legal_rag.corpus.extractor import extract_pdf_lines
 from legal_rag.corpus.registry import DocumentMeta, DocumentRegistry
 
 
@@ -31,6 +33,7 @@ def _audit(document, pages=1, with_text=1, without=None):
         pages=pages,
         pages_with_text=with_text,
         pages_without_text=without or [],
+        pages_needing_ocr=without or [],
     )
 
 
@@ -84,6 +87,26 @@ def test_build_document_missing_pdf(tmp_path):
     assert chunks == []
 
 
+def test_build_document_source_corrupt_skips_ocr(tmp_path, monkeypatch):
+    document = _document(tmp_path)
+    corrupt = _audit(document, pages=122, with_text=0, without=list(range(1, 123)))
+    corrupt.status = "source_corrupt"
+    corrupt.corruption_hits = 5_000_000
+    corrupt.error = "corrupted streams"
+    monkeypatch.setattr(build_module, "audit_pdf", lambda *a, **k: corrupt)
+
+    def _fail(*args, **kwargs):
+        raise AssertionError("OCR must not run for a corrupt PDF")
+
+    monkeypatch.setattr(build_module, "_resolve_ocr_pages", _fail)
+
+    result, chunks = build_document(document, tmp_path / "by_document")
+    assert result.status == "source_corrupt"
+    assert result.error == "corrupted streams"
+    assert result.pages == 122
+    assert chunks == []
+
+
 def test_run_corpus_build_refuses_existing_run(tmp_path):
     document = _document(tmp_path)
     registry = DocumentRegistry([document])
@@ -96,3 +119,28 @@ def test_run_corpus_build_refuses_existing_run(tmp_path):
             chunks_dir=tmp_path,
             ocr_engine="tesseract",
         )
+
+
+def _pdf_with_text(path, text="Van ban co text layer."):
+    doc = fitz.open()
+    page = doc.new_page()
+    page.insert_text((30, 40), text)
+    doc.save(path)
+    doc.close()
+    return path
+
+
+def test_extract_prefers_ocr_for_pages_selected_for_ocr(tmp_path):
+    pdf = _pdf_with_text(tmp_path / "scan.pdf", "Co quan phat hanh: Van phong")
+    lines = extract_pdf_lines(
+        pdf, ocr_pages={1: ["Điều 1. Phạm vi điều chỉnh", "1. Nội dung."]}
+    )
+    assert lines[0]["text"] == "Điều 1. Phạm vi điều chỉnh"
+    assert lines[0]["text_source"] == "ocr"
+
+
+def test_extract_keeps_text_layer_when_page_not_ocr(tmp_path):
+    pdf = _pdf_with_text(tmp_path / "digital.pdf")
+    lines = extract_pdf_lines(pdf, ocr_pages={})
+    assert lines
+    assert lines[0]["text_source"] == "text_layer"

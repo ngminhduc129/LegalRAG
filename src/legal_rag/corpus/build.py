@@ -135,7 +135,7 @@ def _resolve_ocr_pages(
     Returns ``(pages, ocr_used, error)``.  Cached pages are reused first so a
     re-run with no engine can still use previously OCR'd pages.
     """
-    missing_pages = list(audit.pages_without_text)
+    missing_pages = list(audit.pages_needing_ocr)
     if not missing_pages:
         return {}, 0, None
 
@@ -210,14 +210,19 @@ def build_document(
     audit = audit_pdf(document.pdf, document)
     result.pages = audit.pages
     result.pages_with_text = audit.pages_with_text
-    result.pages_ocr_required = len(audit.pages_without_text)
+    result.pages_ocr_required = len(audit.pages_needing_ocr)
+
+    if audit.status == "source_corrupt":
+        result.status = "source_corrupt"
+        result.error = audit.error
+        return result, []
 
     ocr_pages, ocr_used, ocr_error = _resolve_ocr_pages(
         document, audit, engine, Path(ocr_cache), dpi, force_ocr, ocr_workers
     )
     result.pages_ocr_used = ocr_used
     empty_ocr_pages = [
-        page for page in audit.pages_without_text if not ocr_pages.get(page)
+        page for page in audit.pages_needing_ocr if not ocr_pages.get(page)
     ]
     result.pages_ocr_empty = len(empty_ocr_pages)
     if empty_ocr_pages:
@@ -225,7 +230,7 @@ def build_document(
     if ocr_error:
         result.warnings.append(f"OCR_ERROR: {ocr_error}")
 
-    if audit.pages_with_text == 0 and not ocr_pages:
+    if audit.pages and len(audit.pages_needing_ocr) == audit.pages and not ocr_pages:
         result.status = "ocr_required"
         result.error = ocr_error or (
             "no embedded text layer and no OCR engine/cached pages available"
@@ -434,6 +439,7 @@ def run_corpus_build(
         "git_commit": _git_commit(),
         "ocr_engine": engine.name if engine else None,
         "ocr_engine_error": engine_error,
+        "ocr_psm": getattr(engine, "psm", None),
         "dpi": dpi,
         "ocr_workers": ocr_workers,
         "documents_requested": len(documents),

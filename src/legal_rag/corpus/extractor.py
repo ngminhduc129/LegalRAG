@@ -1,6 +1,5 @@
 """PDF extraction and legal structure parsing for corpus processing."""
 
-import re
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
@@ -9,17 +8,8 @@ import fitz  # PyMuPDF
 from legal_rag.chunking.legal_aware import save_csv, save_jsonl
 from legal_rag.corpus.patches import apply_page_patches
 from legal_rag.corpus.registry import DocumentMeta, resolve_document
+from legal_rag.parsing.classifier import clean_line, is_page_number
 from legal_rag.parsing.parser import ParseResult, parse_legal_structure
-
-
-def clean_line(text: str) -> str:
-    text = text.replace("\u00a0", " ")
-    text = text.replace("\u00ad", "")
-    return re.sub(r"[ \t]+", " ", text).strip()
-
-
-def is_page_number(text: str) -> bool:
-    return bool(re.fullmatch(r"\d{1,3}", text.strip()))
 
 
 def _page_lines(text: str, page_num: int, source: str) -> List[Dict[str, Any]]:
@@ -38,24 +28,26 @@ def extract_pdf_lines(
     pdf_path: Path,
     ocr_pages: Optional[Mapping[int, Sequence[str]]] = None,
 ) -> List[Dict[str, Any]]:
-    """Extract page lines, injecting OCR text for pages without a text layer.
+    """Extract page lines, preferring OCR text for pages selected for OCR.
 
-    ``ocr_pages`` maps a 1-based page number to already-OCR'd lines.  Pages
-    whose embedded text layer is blank (or missing from ``ocr_pages``) are
-    reported by :func:`audit_pdf` rather than silently dropped here.
+    ``ocr_pages`` maps a 1-based page number to already-OCR'd lines.  A page is
+    in that mapping only when the audit decided its text layer is missing or
+    unusable (for example a scanned page that carries only a header stamp), so
+    its OCR text wins over the fragmentary text layer.  Pages that are absent
+    from the mapping keep their embedded text layer.
     """
     lines: List[Dict[str, Any]] = []
     ocr_pages = ocr_pages or {}
     with fitz.open(pdf_path) as pdf:
         for page_index, page in enumerate(pdf):
             page_num = page_index + 1
-            page_text = page.get_text("text", sort=True)
-            if page_text.strip():
-                lines.extend(_page_lines(page_text, page_num, "text_layer"))
-                continue
             ocr_lines = ocr_pages.get(page_num)
             if ocr_lines:
                 lines.extend(_page_lines("\n".join(ocr_lines), page_num, "ocr"))
+                continue
+            page_text = page.get_text("text", sort=True)
+            if page_text.strip():
+                lines.extend(_page_lines(page_text, page_num, "text_layer"))
     return lines
 
 

@@ -112,18 +112,18 @@ never fall back to hard-coded Labour Code metadata.
 legal-rag corpus audit --output data/processed/corpus_audit.json
 
 # 1. Build every registry document into a fresh run directory
-legal-rag corpus build --run-id run10_ocr --ocr-engine tesseract --dpi 300 --ocr-workers 6
+legal-rag corpus build --run-id run14_ocr --ocr-engine tesseract --dpi 300 --ocr-workers 6
 
-# 2. Inspect statuses (ok / partial_text / ocr_required / appendix_only / ...)
-cat data/chunks/run10_ocr/corpus_status.json
+# 2. Inspect statuses (ok / partial_text / ocr_required / appendix_only / source_corrupt / ...)
+cat data/chunks/run14_ocr/corpus_status.json
 
 # 3. Gold coverage: can every test reference be found in the chunks?
 legal-rag evaluate coverage data/qa/test.jsonl \
-  --chunks data/chunks/run10_ocr/all_legal_aware.jsonl
+  --chunks data/chunks/run14_ocr/all_legal_aware.jsonl
 
 # 4. Retrieval evaluation (BM25 only works without a GPU/model download)
 legal-rag evaluate retrieval data/qa/test.jsonl \
-  --chunks data/chunks/run10_ocr/all_legal_aware.jsonl \
+  --chunks data/chunks/run14_ocr/all_legal_aware.jsonl \
   --method bm25 --k 1,3,5,10,20
 ```
 

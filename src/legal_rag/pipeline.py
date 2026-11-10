@@ -72,7 +72,14 @@ def run_pipeline(
             "choose a new --run-id (old runs are never overwritten)"
         )
 
-    raw_lines = extract_pdf_lines(pdf_path)
+    empty_pages: List[int] = []
+
+    def _note_empty(page_num: int, name: Optional[str]) -> None:
+        empty_pages.append(page_num)
+
+    raw_lines = extract_pdf_lines(
+        pdf_path, on_empty_page=_note_empty, pdf_name=str(pdf_path)
+    )
     patches = load_patches(list(patch_paths or []), document_id=document_id)
     lines, patch_reports = apply_page_patches(raw_lines, patches)
 
@@ -96,6 +103,7 @@ def run_pipeline(
         "document_name": document.document_name,
         "document_number": document.document_number,
         "warnings": parse_result.warnings,
+        "empty_pages": parse_result.empty_pages,
         "dropped_lines": parse_result.dropped_lines,
         "articles_seen": parse_result.articles_seen,
         "missing_articles": parse_result.missing_articles,
@@ -135,6 +143,7 @@ def run_pipeline(
             "path": str(pdf_path),
             "sha256": _sha256(pdf_path),
             "raw_lines": len(raw_lines),
+            "empty_pages": empty_pages,
         },
         "patches": patch_reports,
         "counts": {

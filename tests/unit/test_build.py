@@ -144,3 +144,29 @@ def test_extract_keeps_text_layer_when_page_not_ocr(tmp_path):
     lines = extract_pdf_lines(pdf, ocr_pages={})
     assert lines
     assert lines[0]["text_source"] == "text_layer"
+
+
+def _pdf_with_empty_page(path):
+    doc = fitz.open()
+    page1 = doc.new_page()
+    page1.insert_text((30, 40), "Điều 1. Phạm vi điều chỉnh.")
+    page2 = doc.new_page()  # no text layer: scanned / blank page
+    doc.save(path)
+    doc.close()
+    return path
+
+
+def test_extract_warns_and_records_empty_page(tmp_path, capsys):
+    pdf = _pdf_with_empty_page(tmp_path / "mixed.pdf")
+    empty: list[int] = []
+    lines = extract_pdf_lines(
+        pdf,
+        on_empty_page=lambda p, n: empty.append(p),
+        pdf_name="mixed.pdf",
+    )
+    # Only page 1 (with text) yields lines.
+    assert all(line["page"] == 1 for line in lines)
+    assert empty == [2]
+    captured = capsys.readouterr()
+    assert "[WARN] page 2 of mixed.pdf has no text layer" in captured.out
+    assert "mixed.pdf" in captured.out

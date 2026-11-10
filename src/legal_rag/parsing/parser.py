@@ -175,6 +175,7 @@ class ParseResult:
     signature_lines: int = 0
     appendix_chunks: int = 0
     review_lines: List[Dict[str, Any]] = field(default_factory=list)
+    empty_pages: List[int] = field(default_factory=list)
 
 
 def join_text(parts: List[str]) -> str:

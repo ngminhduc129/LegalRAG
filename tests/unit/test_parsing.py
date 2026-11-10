@@ -1,4 +1,4 @@
-"""Unit tests for parsing module."""
+﻿"""Unit tests for parsing module."""
 
 import pytest
 from legal_rag.parsing.classifier import (
@@ -13,6 +13,11 @@ from legal_rag.parsing.classifier import (
     POINT_RE,
 )
 from legal_rag.parsing.parser import LegalStructureParser, parse_legal_structure
+
+
+def _parse(lines):
+    """Parser now returns ParseResult; tests mostly need the chunk list."""
+    return parse_legal_structure(lines).chunks
 
 
 class TestClassifier:
@@ -84,7 +89,7 @@ class TestParser:
             {"text": "1. Bộ luật này quy định...", "page": 1},
             {"text": "2. Đối tượng áp dụng...", "page": 1},
         ]
-        chunks = parse_legal_structure(lines)
+        chunks = _parse(lines)
         assert len(chunks) >= 3  # article_intro + 2 clauses
         article_chunks = [c for c in chunks if c["article"] == "Điều 1"]
         assert len(article_chunks) >= 3
@@ -96,7 +101,7 @@ class TestParser:
             {"text": "a) Point 1", "page": 1},
             {"text": "b) Point 2", "page": 1},
         ]
-        chunks = parse_legal_structure(lines)
+        chunks = _parse(lines)
         point_chunks = [c for c in chunks if c["chunk_type"] == "point"]
         assert len(point_chunks) == 2
         assert point_chunks[0]["point"] == "a"
@@ -111,7 +116,7 @@ class TestParser:
             {"text": "Điều 1. Title", "page": 2},  # Duplicate
             {"text": "Nội dung bổ sung về phạm vi điều chỉnh.", "page": 2},
         ]
-        chunks = parse_legal_structure(lines)
+        chunks = _parse(lines)
         article_chunks = [c for c in chunks if c["article"] == "Điều 1"]
         # Should not create duplicate article structure
         assert len(article_chunks) >= 1
@@ -123,7 +128,7 @@ class TestEdgeCases:
             {"text": "Điều 1. Title", "page": 1},
             {"text": "1. Theo quy định tại Điều 5", "page": 1},
         ]
-        chunks = parse_legal_structure(lines)
+        chunks = _parse(lines)
         # The reference should not be parsed as a new article
         articles = {c["article"] for c in chunks if c.get("article")}
         assert "Điều 5" not in articles
@@ -135,8 +140,90 @@ class TestEdgeCases:
             {"text": "  ", "page": 1},  # Whitespace only
             {"text": "1. Clause", "page": 1},
         ]
-        chunks = parse_legal_structure(lines)
+        chunks = _parse(lines)
         assert len(chunks) >= 1
+
+
+class TestSignatureAndAppendix:
+    def test_quoted_noi_nhan_does_not_truncate(self):
+        lines = [
+            {"text": "Điều 1. Title", "page": 1},
+            {"text": "Nội dung có cụm “Nơi nhận:” trong ngoặc kép.", "page": 1},
+            {"text": "1. Clause one", "page": 1},
+            {"text": "Nơi nhận:", "page": 2},
+            {"text": "- Văn phòng Quốc hội;", "page": 2},
+            {"text": "TM. BỘ TRƯỞNG", "page": 2},
+            {"text": "Nguyễn Văn A", "page": 2},
+        ]
+        result = parse_legal_structure(lines)
+        assert result.signature_lines > 0
+        assert any(c["chunk_type"] == "clause" for c in result.chunks)
+        assert "Nội dung có cụm" in "\n".join(c["content"] for c in result.chunks)
+
+    def test_distribution_list_line_is_not_signature_start(self):
+        from legal_rag.parsing.classifier import is_signature_start
+
+        assert not is_signature_start("- Văn phòng Quốc hội;")
+        assert not is_signature_start("“Nơi nhận:”")
+        assert is_signature_start("Nơi nhận:")
+
+    def test_appendix_is_separated(self):
+        lines = [
+            {"text": "Điều 1. Title", "page": 1},
+            {"text": "1. Clause", "page": 1},
+            {"text": "Nơi nhận:", "page": 1},
+            {"text": "TM. BỘ TRƯỞNG", "page": 1},
+            {"text": "- Lưu: VT, PC.", "page": 1},
+            {"text": "PHỤ LỤC I", "page": 2},
+            {"text": "Mẫu số 01", "page": 2},
+            {"text": "Nội dung biểu mẫu.", "page": 2},
+        ]
+        result = parse_legal_structure(lines)
+        assert result.appendix_chunks >= 1
+        appendix = [c for c in result.chunks if c["chunk_type"] == "appendix"]
+        assert appendix
+        assert appendix[0]["article"] is None
+        assert "Nội dung biểu mẫu." in appendix[0]["content"]
+
+    def test_signature_end_splits_appendix_without_marker(self):
+        lines = [
+            {"text": "Điều 1. Title", "page": 1},
+            {"text": "1. Clause", "page": 1},
+            {"text": "Nội dung kết thúc./.", "page": 1},
+            {"text": "Nơi nhận: BỘ TRƯỞNG", "page": 1},
+            {"text": "- Bộ trưởng (để báo cáo);", "page": 1},
+            {"text": "(để biết); Nguyễn Văn A - Lưu: VT, PC.", "page": 1},
+            {"text": "BẢNG DỮ LIỆU", "page": 2},
+            {"text": "Nội dung bảng.", "page": 2},
+        ]
+        result = parse_legal_structure(lines)
+        assert result.appendix_chunks >= 1
+        assert any(c["chunk_type"] == "appendix" for c in result.chunks)
+
+    def test_document_metadata_propagated(self):
+        from legal_rag.corpus.registry import DocumentMeta
+
+        document = DocumentMeta(
+            document_id="nd_test",
+            document_name="Nghị định test",
+            document_number="99/2020/NĐ-CP",
+            doc_type="Nghị định",
+        )
+        lines = [
+            {"text": "Điều 1. Title", "page": 1},
+            {"text": "1. Clause", "page": 1},
+        ]
+        result = parse_legal_structure(lines, document)
+        for chunk in result.chunks:
+            assert chunk["document_id"] == "nd_test"
+            assert chunk["document_name"] == "Nghị định test"
+            assert chunk["document_number"] == "99/2020/NĐ-CP"
+
+    def test_nfc_normalization(self):
+        from legal_rag.parsing.classifier import clean_line
+
+        decomposed = "Điều 1. Pha\u0323m vi"
+        assert clean_line(decomposed) == "Điều 1. Phạm vi"
 
 
 if __name__ == "__main__":

@@ -175,6 +175,45 @@ class TestLegalAwareChunker:
         assert len(chunks) == 1
         assert chunks[0]["chunk_type"] == "preamble"
 
+    def test_appendix_only_not_merged_into_preamble(self):
+        """Appendix-only documents must keep appendix chunks separate."""
+        corpus_chunks = [
+            _parser_chunk(article=None, chunk_type="appendix", content="Appendix table A"),
+            _parser_chunk(article=None, chunk_type="appendix", content="Appendix table B"),
+        ]
+        chunks = self.chunker.chunk(corpus_chunks)
+        assert [c["chunk_type"] for c in chunks] == ["appendix", "appendix"]
+        assert chunks[0]["chunk_id"].startswith("test_doc_appendix_")
+        assert chunks[0]["parent_id"] is None
+
+    def test_registry_metadata_fills_missing_fields(self):
+        """Chunker fills missing document metadata from the registry entry."""
+        from legal_rag.corpus.registry import DocumentMeta
+
+        document = DocumentMeta(
+            document_id="nd_x",
+            document_name="Nghị định X",
+            document_number="1/2020/NĐ-CP",
+            doc_type="Nghị định",
+        )
+        chunker = LegalAwareChunker(document_id=document)
+        corpus_chunks = [
+            {
+                "article": "Điều 1",
+                "clause": "1",
+                "point": None,
+                "chunk_type": "clause",
+                "content": "Clause",
+                "page_start": 1,
+                "page_end": 1,
+            }
+        ]
+        chunk = chunker.chunk(corpus_chunks)[0]
+        assert chunk["document_id"] == "nd_x"
+        assert chunk["document_name"] == "Nghị định X"
+        assert chunk["document_number"] == "1/2020/NĐ-CP"
+        assert chunk["document_type"] == "Nghị định"
+
 
 class TestFixedSizeChunker:
     def test_fixed_size_chunking(self):

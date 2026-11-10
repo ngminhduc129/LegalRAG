@@ -29,7 +29,9 @@ LegalRAG/
 │       ├── config.py       # Pydantic config management
 │       ├── parsing/        # PDF parsing & legal structure
 │       ├── chunking/       # Legal-aware + baseline chunkers
-│       ├── corpus/         # Corpus extraction + page patches
+│       ├── corpus/         # Registry, audit, OCR adapters, batch build, page patches
+│       ├── qa/             # QA dataset schema (tolerant loader)
+│       ├── evaluation/     # Retrieval metrics + gold coverage
 │       ├── retrieval/      # BM25, Dense, Hybrid, Reranker
 │       ├── pipeline.py     # Standard end-to-end build (parse -> patch -> chunk -> validate)
 │       └── cli/            # CLI entry points (Typer)
@@ -100,6 +102,63 @@ legal-rag chunk validate data/chunks/legal_aware_run07/labor_code_2019_legal_awa
 legal-rag chunk clean data/chunks/legal_aware_run07/labor_code_2019_legal_aware.jsonl
 ```
 
+### Whole-corpus build (all PDFs in `data/raw/`)
+
+Document identity lives in `configs/corpus/documents.yaml`; parser and chunker
+never fall back to hard-coded Labour Code metadata.
+
+```bash
+# 0. Audit text-layer coverage per PDF/page (read-only; never edits data/raw)
+legal-rag corpus audit --output data/processed/corpus_audit.json
+
+# 1. Build every registry document into a fresh run directory
+legal-rag corpus build --run-id run09_ocr --ocr-engine tesseract --dpi 300
+
+# 2. Inspect statuses (ok / partial_text / ocr_required / appendix_only / ...)
+cat data/chunks/run09_ocr/corpus_status.json
+
+# 3. Gold coverage: can every test reference be found in the chunks?
+legal-rag evaluate coverage data/qa/test.jsonl \
+  --chunks data/chunks/run09_ocr/all_legal_aware.jsonl
+
+# 4. Retrieval evaluation (BM25 only works without a GPU/model download)
+legal-rag evaluate retrieval data/qa/test.jsonl \
+  --chunks data/chunks/run09_ocr/all_legal_aware.jsonl \
+  --method bm25 --k 1,3,5,10,20
+```
+
+Build output contract (`data/chunks/<run_id>/`):
+
+| File | Content |
+|------|---------|
+| `all_legal_aware.jsonl` | merged chunks from every document that produced text |
+| `by_document/<id>.jsonl` | per-document chunks |
+| `chunk_stats.json` | counts by chunk type and document |
+| `corpus_status.json` | per-document status and OCR page counts |
+| `parse_reports/<id>.json` | dropped lines, articles seen/missing, signature/appendix counts |
+| `run_manifest.json` | git commit, PDF hashes, OCR engine, validation counts |
+
+Documents whose PDF has no text layer are marked `ocr_required`, never silently
+skipped. Appendix/table chunks get `retrieval_eligible: false` and are excluded
+from retrieval metrics by default.
+
+### OCR setup
+
+OCR is optional. `easyocr` (supports `vi`) or Tesseract (`vie`) can be used:
+
+```bash
+pip install -e ".[ocr]"            # easyocr + pytesseract
+
+# Tesseract on Windows (UB Mannheim build), then Vietnamese model:
+winget install --id UB-Mannheim.TesseractOCR -e
+# Download vie.traineddata into data/ocr/tessdata/
+#   https://github.com/tesseract-ocr/tessdata_best/raw/main/vie.traineddata
+```
+
+`corpus build` caches each OCR page in `data/ocr/<document_id>/page-XXX.json`
+(keyed by engine + language + DPI), so re-runs do not repeat OCR work. Use
+`--force-ocr` to ignore the cache.
+
 ### Using Config File
 
 ```bash
@@ -145,8 +204,13 @@ The script saves separate indexes per model and chunk strategy plus an `embeddin
 ## Evaluation
 
 ```bash
-# Retrieval evaluation
-legal-rag evaluate retrieval data/qa/test.jsonl
+# Gold coverage: every gold reference must exist in the chunk corpus
+legal-rag evaluate coverage data/qa/test.jsonl --chunks data/chunks/<run_id>/all_legal_aware.jsonl
+
+# Retrieval evaluation (fixed hit definitions; see evaluation/retrieval.py)
+legal-rag evaluate retrieval data/qa/test.jsonl \
+  --chunks data/chunks/<run_id>/all_legal_aware.jsonl \
+  --method bm25 --k 1,3,5,10,20 --level article
 
 # Generation evaluation
 legal-rag evaluate generation output/predictions.jsonl
@@ -154,6 +218,11 @@ legal-rag evaluate generation output/predictions.jsonl
 # End-to-end evaluation
 legal-rag evaluate end_to_end data/qa/test.jsonl
 ```
+
+Metric definitions are written into the output JSON (`metrics.definitions`) and
+must not change between runs: `hit_rate_at_k` is the fraction of queries with at
+least one relevant chunk in the top-k, while `ref_recall_at_k` counts distinct
+gold references. `--level clause` additionally requires a matching clause.
 
 ## Testing
 

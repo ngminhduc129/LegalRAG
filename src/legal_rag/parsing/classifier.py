@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 from pathlib import Path
 
-from legal_rag.parsing.constants import FUZZY_ARTICLE_TOKENS, SIGNATURE_MARKERS
+from legal_rag.parsing.constants import FUZZY_ARTICLE_TOKENS
 
 
 @dataclass
@@ -41,9 +41,9 @@ LEGAL_REF_PREFIXES = (
     "QUY ĐỊNH TẠI",
     "CỦA ĐIỀU",
     "TẠI ĐIỀU",
-    "KHOẢN \d+ ĐIỀU",
-    "ĐIỀU \d+ CỦA",
-    "ĐIỀU \d+ CỦA BỘ LUẬT",
+    r"KHOẢN \d+ ĐIỀU",
+    r"ĐIỀU \d+ CỦA",
+    r"ĐIỀU \d+ CỦA BỘ LUẬT",
     "THEO ĐIỀU",
     "THEO KHOẢN",
 )
@@ -85,18 +85,71 @@ def is_noise_line(text: str) -> bool:
     return not re.search(r"[\wÀ-ỹà-ỹđĐ]", stripped)
 
 
-def is_signature_start(text: str) -> bool:
-    """True if a line starts the trailing signature/auth block.
+SIGNATURE_LINE_RE = re.compile(r"^\s*Nơi nhận\s*:", re.IGNORECASE)
+SIGNATURE_TITLE_RE = re.compile(
+    r"^\s*(TM\.|KT\.|BỘ TRƯỞNG|THỦ TƯỚNG|CHỦ TỊCH|PHÓ THỦ TƯỚNG|THỨ TRƯỞNG)",
+    re.IGNORECASE,
+)
+SIGNATURE_TITLE_ANY_RE = re.compile(
+    r"\b(TM\.|KT\.|BỘ TRƯỞNG|THỦ TƯỚNG|CHỦ TỊCH|PHÓ THỦ TƯỚNG|THỨ TRƯỞNG)\b",
+    re.IGNORECASE,
+)
+APPENDIX_LINE_RE = re.compile(
+    r"^\s*(PHỤ LỤC|Phụ lục)(\s+[IVXLC\d]+)?\s*$|^\s*(Mẫu số|Biểu số)\b",
+    re.IGNORECASE,
+)
+APPENDIX_HEADING_RE = re.compile(
+    r"^\s*(PHỤ LỤC|Phụ lục)(\s+[IVXLC\d]+)?\s*$",
+    re.IGNORECASE,
+)
+VBHN_SIGNATURE_RE = re.compile(
+    r"^\s*(VAN PHONG QUOC HQI|VĂN PHÒNG QUỐC HỘI)\s*$",
+    re.IGNORECASE,
+)
+SIGNATURE_END_RE = re.compile(r"\bLưu\s*[:：]", re.IGNORECASE)
 
-    Uses startswith (not substring): the block headers always begin the
-    line, while legitimate content may merely contain these words
-    (e.g. "Trưởng văn phòng đại diện").
+
+def is_signature_start(text: str) -> bool:
+    """True only for an actual signature-block opening line.
+
+    The previous implementation normalized the whole line and matched
+    ``"noinhan"`` with ``startswith``.  That also matched quoted text such as
+    ``“Nơi nhận”`` inside an amendment and distribution-list lines such as
+    ``- Văn phòng Quốc hội;``.  Requiring the raw ``Nơi nhận:`` prefix avoids
+    both false positives.
     """
-    norm = normalize_vi(text)
-    return norm.startswith(SIGNATURE_MARKERS)
+    return bool(SIGNATURE_LINE_RE.match(text))
+
+
+def is_signature_title(text: str) -> bool:
+    return bool(SIGNATURE_TITLE_RE.match(text))
+
+
+def has_signature_title_anywhere(text: str) -> bool:
+    """True if a signer title appears anywhere in the line.
+
+    Some PDFs merge the distribution header and the signer title on one line
+    (``"Nơi nhận: BỘ TRƯỞNG"``), so an anchored match alone misses the block.
+    """
+    return bool(SIGNATURE_TITLE_ANY_RE.search(text))
+
+
+def is_appendix_start(text: str) -> bool:
+    return bool(APPENDIX_LINE_RE.match(text))
+
+
+def is_appendix_heading(text: str) -> bool:
+    """True only for a top-level ``PHỤ LỤC ...`` heading."""
+    return bool(APPENDIX_HEADING_RE.match(text))
+
+
+def is_signature_end(text: str) -> bool:
+    """True for the closing distribution-list line (``Lưu: VT, ...``)."""
+    return bool(SIGNATURE_END_RE.search(text))
 
 
 def clean_line(text: str) -> str:
+    text = unicodedata.normalize("NFC", text)
     text = text.replace("\u00a0", " ")
     text = text.replace("\u00ad", "")
     return re.sub(r"[ \t]+", " ", text).strip()

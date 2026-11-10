@@ -17,7 +17,7 @@ from legal_rag.parsing.classifier import (
     CHAPTER_RE, SECTION_RE, ARTICLE_RE, CLAUSE_RE, POINT_RE,
     clean_line, is_page_number, extract_pdf_lines,
 )
-from legal_rag.parsing.constants import DOCUMENT_NAME, DOCUMENT_NUMBER
+from legal_rag.corpus.registry import DocumentMeta, resolve_document
 from legal_rag.chunking.base import BaseChunker
 
 
@@ -33,11 +33,13 @@ STRUCTURE_FIELDS = (
 )
 
 
-def _source_reference(source: Dict[str, Any], document_id: str) -> Dict[str, Any]:
+def _source_reference(source: Dict[str, Any], document: DocumentMeta) -> Dict[str, Any]:
     reference = {
-        "document_id": source.get("document_id", document_id),
-        "document_name": source.get("document_name", DOCUMENT_NAME),
-        "document_number": source.get("document_number", DOCUMENT_NUMBER),
+        "document_id": source.get("document_id", document.document_id),
+        "document_name": source.get("document_name", document.document_name),
+        "document_number": source.get("document_number", document.document_number),
+        "document_type": source.get("document_type", document.doc_type),
+        "status": source.get("status", document.status),
         **{field: source.get(field) for field in STRUCTURE_FIELDS},
         "chunk_type": source.get("chunk_type"),
         "page_start": source.get("page_start", source.get("page", 1)),
@@ -49,27 +51,28 @@ def _source_reference(source: Dict[str, Any], document_id: str) -> Dict[str, Any
 
 
 def _aggregate_source_metadata(
-    sources: List[Dict[str, Any]], document_id: str
+    sources: List[Dict[str, Any]], document: DocumentMeta
 ) -> Dict[str, Any]:
     """Keep source hierarchy and page locations for chunks spanning parser records."""
     references = []
     seen = set()
     for source in sources:
-        reference = _source_reference(source, document_id)
+        reference = _source_reference(source, document)
         key = tuple(reference.items())
         if key not in seen:
             seen.add(key)
             references.append(reference)
 
     metadata = {
-        "document_id": document_id,
+        **document.as_metadata(),
+        "document_id": document.document_id,
         "document_name": next(
             (reference["document_name"] for reference in references if reference["document_name"]),
-            DOCUMENT_NAME,
+            document.document_name,
         ),
         "document_number": next(
             (reference["document_number"] for reference in references if reference["document_number"]),
-            DOCUMENT_NUMBER,
+            document.document_number,
         ),
         "source_refs": references,
     }
@@ -111,11 +114,11 @@ def join_text(parts: List[str]) -> str:
     return "\n".join(p.strip() for p in parts if p and p.strip()).strip()
 
 
-def _safe_id_part(value: Optional[str]) -> str:
+def _safe_id_part(value) -> str:
     """Convert a value to a safe ID part, handling None."""
     if value is None:
         return "none"
-    return value.replace(" ", "_").replace("/", "_").lower()
+    return str(value).replace(" ", "_").replace("/", "_").lower()
 
 
 def make_chunk(
@@ -131,16 +134,17 @@ def make_chunk(
     page_start: int,
     page_end: int,
     chunk_type: str,
-    document_id: str = "labor_code_2019",
+    document: Optional[DocumentMeta] = None,
+    document_id: Optional[str] = None,
     parent_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Create a standardized chunk record."""
-    chunk_id = f"{document_id}_{_safe_id_part(article)}_{_safe_id_part(clause)}_{_safe_id_part(point)}_{chunk_type}"
+    doc = resolve_document(document or document_id)
+    chunk_id = f"{doc.document_id}_{_safe_id_part(article)}_{_safe_id_part(clause)}_{_safe_id_part(point)}_{chunk_type}"
     return {
+        **doc.as_metadata(),
         "chunk_id": chunk_id,
-        "document_id": document_id,
-        "document_name": DOCUMENT_NAME,
-        "document_number": DOCUMENT_NUMBER,
+        "document_id": doc.document_id,
         "chapter": chapter,
         "chapter_title": chapter_title,
         "section": section,
@@ -176,8 +180,9 @@ class LegalAwareChunker(BaseChunker):
     - point: Individual point within a clause (includes clause_intro context)
     """
 
-    def __init__(self, document_id: str = "labor_code_2019"):
-        self.document_id = document_id
+    def __init__(self, document_id: DocumentMeta | str = "unknown"):
+        self.document = resolve_document(document_id)
+        self.document_id = self.document.document_id
 
     def chunk(self, corpus_chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
@@ -195,16 +200,35 @@ class LegalAwareChunker(BaseChunker):
         if not corpus_chunks:
             return []
 
+        # Appendix chunks are standalone: they must never be merged into the
+        # preamble, and an appendix-only document (no article at all) must
+        # still produce output.
+        appendix_chunks = [
+            chunk for chunk in corpus_chunks
+            if chunk.get("chunk_type") == "appendix"
+        ]
+        body_chunks = [
+            chunk for chunk in corpus_chunks
+            if chunk.get("chunk_type") != "appendix"
+        ]
+
         # Find first article chunk to identify preamble
         first_article_idx = None
-        for i, chunk in enumerate(corpus_chunks):
+        for i, chunk in enumerate(body_chunks):
             if chunk.get("article") is not None:
                 first_article_idx = i
                 break
 
-        # Extract preamble: all chunks before first article
-        preamble_chunks = corpus_chunks[:first_article_idx] if first_article_idx is not None else corpus_chunks
-        article_chunks = corpus_chunks[first_article_idx:] if first_article_idx is not None else []
+        # Extract preamble: all non-appendix chunks before the first article.
+        # If there is no article at all, everything non-appendix is preamble.
+        preamble_chunks = (
+            body_chunks[:first_article_idx]
+            if first_article_idx is not None
+            else body_chunks
+        )
+        article_chunks = (
+            body_chunks[first_article_idx:] if first_article_idx is not None else []
+        )
 
         result_chunks = []
 
@@ -226,7 +250,7 @@ class LegalAwareChunker(BaseChunker):
                     page_start=min(pages),
                     page_end=max(pages),
                     chunk_type="preamble",
-                    document_id=self.document_id,
+                    document=self.document,
                 ))
 
         # 2. Process article chunks - add IDs and parent links.
@@ -235,8 +259,9 @@ class LegalAwareChunker(BaseChunker):
         # Pass 1: collect all clause_intro chunk_ids keyed by (article, clause).
         clause_intro_map = {}  # (article, clause) -> chunk_id of clause_intro
         for chunk in article_chunks:
-            if chunk["chunk_type"] == "clause_intro" and chunk.get("clause") and chunk.get("article"):
-                chunk_id = f"{self.document_id}_{_safe_id_part(chunk.get('article'))}_{_safe_id_part(chunk.get('clause'))}_{_safe_id_part(chunk.get('point'))}_{chunk['chunk_type']}"
+            chunk_type = chunk.get("chunk_type", "unknown")
+            if chunk_type == "clause_intro" and chunk.get("clause") and chunk.get("article"):
+                chunk_id = f"{self.document_id}_{_safe_id_part(chunk.get('article'))}_{_safe_id_part(chunk.get('clause'))}_{_safe_id_part(chunk.get('point'))}_{chunk_type}"
                 clause_intro_map.setdefault((chunk["article"], chunk["clause"]), chunk_id)
 
         # Pass 2: emit chunks with parent links resolved.
@@ -247,11 +272,12 @@ class LegalAwareChunker(BaseChunker):
         seen_ids = set()
         for chunk in article_chunks:
             # Generate stable chunk_id with document_id
-            chunk_id = f"{self.document_id}_{_safe_id_part(chunk.get('article'))}_{_safe_id_part(chunk.get('clause'))}_{_safe_id_part(chunk.get('point'))}_{chunk['chunk_type']}"
+            chunk_type = chunk.get("chunk_type", "unknown")
+            chunk_id = f"{self.document_id}_{_safe_id_part(chunk.get('article'))}_{_safe_id_part(chunk.get('clause'))}_{_safe_id_part(chunk.get('point'))}_{chunk_type}"
 
             # Determine parent_id for points
             parent_id = None
-            if chunk["chunk_type"] == "point" and chunk.get("clause") and chunk.get("article"):
+            if chunk_type == "point" and chunk.get("clause") and chunk.get("article"):
                 parent_key = (chunk["article"], chunk["clause"])
                 parent_id = clause_intro_map.get(parent_key)
 
@@ -264,21 +290,51 @@ class LegalAwareChunker(BaseChunker):
             seen_ids.add(unique_id)
             chunk_id = unique_id
 
-            # Build transformed chunk
-            transformed = {
-                **chunk,
+            # Build transformed chunk, filling any missing document metadata
+            # from the registry entry instead of hard-coded constants.
+            transformed = {**chunk}
+            for key, value in self.document.as_metadata().items():
+                if not transformed.get(key):
+                    transformed[key] = value
+            transformed.update({
                 "chunk_id": chunk_id,
                 "document_id": self.document_id,
                 "parent_id": parent_id,
-            }
+            })
+            result_chunks.append(transformed)
+
+        # 3. Emit appendix chunks unchanged (no parent links, own chunk ids).
+        appendix_seen_ids = set()
+        for i, chunk in enumerate(appendix_chunks):
+            appendix_id = (
+                f"{self.document_id}_appendix_"
+                f"{_safe_id_part(chunk.get('appendix_title') or i + 1)}"
+            )
+            occurrence = 1
+            unique_id = appendix_id
+            while unique_id in appendix_seen_ids:
+                occurrence += 1
+                unique_id = f"{appendix_id}__occ{occurrence}"
+            appendix_seen_ids.add(unique_id)
+            transformed = {**chunk}
+            for key, value in self.document.as_metadata().items():
+                if not transformed.get(key):
+                    transformed[key] = value
+            transformed.update({
+                "chunk_id": unique_id,
+                "document_id": self.document_id,
+                "parent_id": None,
+            })
             result_chunks.append(transformed)
 
         return result_chunks
 
-    def chunk_from_pdf(self, pdf_path: Path) -> List[Dict[str, Any]]:
+    def chunk_from_pdf(
+        self, pdf_path: Path, document: DocumentMeta | str | None = None
+    ) -> List[Dict[str, Any]]:
         """Parse PDF directly into chunks (uses full parse pipeline)."""
         from legal_rag.corpus.extractor import parse_corpus
-        corpus_chunks = parse_corpus(pdf_path)
+        corpus_chunks = parse_corpus(pdf_path, document or self.document)
         return self.chunk(corpus_chunks)
 
 
@@ -297,7 +353,7 @@ class FixedSizeChunker(BaseChunker):
         self,
         chunk_size: int = 500,
         overlap: int = 50,
-        document_id: str = "labor_code_2019",
+        document_id: DocumentMeta | str = "unknown",
         preserve_metadata: bool = False,
     ):
         if chunk_size <= 0:
@@ -306,7 +362,8 @@ class FixedSizeChunker(BaseChunker):
             raise ValueError("overlap must be non-negative and smaller than chunk_size")
         self.chunk_size = chunk_size
         self.overlap = overlap
-        self.document_id = document_id
+        self.document = resolve_document(document_id)
+        self.document_id = self.document.document_id
         self.preserve_metadata = preserve_metadata
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -346,7 +403,7 @@ class FixedSizeChunker(BaseChunker):
             chunk_text = " ".join(word for word, _ in window)
             metadata = _aggregate_source_metadata(
                 [source for _, source in window],
-                self.document_id,
+                self.document,
             )
             chunk_data = {
                 **metadata,
@@ -377,8 +434,9 @@ class ParagraphChunker(BaseChunker):
     TERMINAL_ENDINGS = (".", ";", ":", "?", "!", "…")
     TRAILING_CLOSERS = "\"'”’»)]}"
 
-    def __init__(self, document_id: str = "labor_code_2019"):
-        self.document_id = document_id
+    def __init__(self, document_id: DocumentMeta | str = "unknown"):
+        self.document = resolve_document(document_id)
+        self.document_id = self.document.document_id
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         if lines and "content" in lines[0]:
@@ -440,7 +498,7 @@ class ParagraphChunker(BaseChunker):
         sources: List[Dict[str, Any]],
     ) -> Dict[str, Any]:
         return {
-            **_aggregate_source_metadata(sources, self.document_id),
+            **_aggregate_source_metadata(sources, self.document),
             "chunk_id": "",
             "content": "\n".join(buf),
             "chunk_type": "paragraph",
@@ -465,8 +523,9 @@ class ArticleChunker(BaseChunker):
     Accepts both lines format (from PDF) and corpus format (from parser).
     """
 
-    def __init__(self, document_id: str = "labor_code_2019"):
-        self.document_id = document_id
+    def __init__(self, document_id: DocumentMeta | str = "unknown"):
+        self.document = resolve_document(document_id)
+        self.document_id = self.document.document_id
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         # Detect format: corpus chunks have 'content' and 'article' fields
@@ -491,7 +550,7 @@ class ArticleChunker(BaseChunker):
         for i, (article, data) in enumerate(articles.items()):
             content = "\n".join(c["content"] for c in data["chunks"] if c.get("content"))
             chunks.append({
-                **_aggregate_source_metadata(data["chunks"], self.document_id),
+                **_aggregate_source_metadata(data["chunks"], self.document),
                 "chunk_id": f"{self.document_id}_article_{i}",
                 "content": content,
                 "chunk_type": "article",
@@ -545,7 +604,7 @@ class ArticleChunker(BaseChunker):
         for i, (article, data) in enumerate(articles.items()):
             content = "\n".join(data["lines"])
             chunks.append({
-                **_aggregate_source_metadata(data["sources"], self.document_id),
+                **_aggregate_source_metadata(data["sources"], self.document),
                 "chunk_id": f"{self.document_id}_article_{i}",
                 "content": content,
                 "chunk_type": "article",
@@ -563,8 +622,9 @@ class ClauseChunker(BaseChunker):
     Accepts both lines format (from PDF) and corpus format (from parser).
     """
 
-    def __init__(self, document_id: str = "labor_code_2019"):
-        self.document_id = document_id
+    def __init__(self, document_id: DocumentMeta | str = "unknown"):
+        self.document = resolve_document(document_id)
+        self.document_id = self.document.document_id
 
     def chunk(self, lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         # Detect format: corpus chunks have 'content' and 'clause' fields
@@ -592,7 +652,7 @@ class ClauseChunker(BaseChunker):
 
         chunks = [
             {
-                **_aggregate_source_metadata([source], self.document_id),
+                **_aggregate_source_metadata([source], self.document),
                 "chunk_id": f"{self.document_id}_article_intro_{i}",
                 "content": source.get("content", ""),
                 "chunk_type": "article_intro",
@@ -602,7 +662,7 @@ class ClauseChunker(BaseChunker):
         for i, ((article, clause), data) in enumerate(clauses.items()):
             content = "\n".join(c["content"] for c in data["chunks"] if c.get("content"))
             chunks.append({
-                **_aggregate_source_metadata(data["chunks"], self.document_id),
+                **_aggregate_source_metadata(data["chunks"], self.document),
                 "chunk_id": f"{self.document_id}_clause_{i}",
                 "content": content,
                 "chunk_type": "clause",
@@ -622,7 +682,7 @@ class ClauseChunker(BaseChunker):
 
         def finish_clause(article: str, chapter: Optional[str], section: Optional[str]):
             nonlocal clause_idx, clause_parts, clause_sources
-            metadata = _aggregate_source_metadata(clause_sources, self.document_id)
+            metadata = _aggregate_source_metadata(clause_sources, self.document)
             metadata.update({
                 "chapter": chapter,
                 "section": section,

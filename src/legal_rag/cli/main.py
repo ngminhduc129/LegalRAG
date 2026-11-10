@@ -5,6 +5,7 @@ from rich.console import Console
 
 from legal_rag.cli.parse import app as parse_app
 from legal_rag.cli.chunk import app as chunk_app
+from legal_rag.cli.corpus import app as corpus_app
 from legal_rag.cli.index import app as index_app
 from legal_rag.cli.retrieve import app as retrieve_app
 from legal_rag.cli.generate import app as generate_app
@@ -19,6 +20,7 @@ app = typer.Typer(
 
 app.add_typer(parse_app, name="parse")
 app.add_typer(chunk_app, name="chunk")
+app.add_typer(corpus_app, name="corpus")
 app.add_typer(index_app, name="index")
 app.add_typer(retrieve_app, name="retrieve")
 app.add_typer(generate_app, name="generate")

@@ -1,0 +1,224 @@
+# Document registry for the Vietnamese labour-law corpus.
+#
+# Metadata here is the single source of truth for document identity.  Values
+# that have not been verified against the source PDF are left null/unknown and
+# must not be guessed.  Fill effective dates and status only after checking the
+# document (or an official legal database).
+
+documents:
+  - document_id: labor_code_2019
+    pdf: data/raw/Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf
+    document_name: "Bộ luật Lao động"
+    document_number: "125/VBHN-VPQH"
+    doc_type: "Bộ luật"
+    issuer: "Văn phòng Quốc hội"
+    effective_from: null
+    effective_to: null
+    status: unknown
+    expected_articles: 220
+    profile: bo_luat
+    signature_markers: ["vanphong", "xacthuc", "noinhan"]
+    notes: "VBHN 125 hợp nhất Bộ luật Lao động 2019; cần xác minh ngày hiệu lực."
+
+  - document_id: nd_10_2024
+    pdf: data/raw/Nghị-định-10-2024-NĐ-CP.pdf
+    document_name: "Nghị định 10/2024/NĐ-CP"
+    document_number: "10/2024/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+    notes: "PDF scan, cần OCR."
+
+  - document_id: nd_12_2022
+    pdf: data/raw/Nghị-định-12-2022-NĐ-CP.pdf
+    document_name: "Nghị định 12/2022/NĐ-CP"
+    document_number: "12/2022/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+    notes: "PDF scan, cần OCR."
+
+  - document_id: nd_135_2020
+    pdf: data/raw/Nghị-định-135-2020-NĐ-CP.pdf
+    document_name: "Nghị định 135/2020/NĐ-CP"
+    document_number: "135/2020/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+    notes: "PDF scan, cần OCR."
+
+  - document_id: nd_145_2020
+    pdf: data/raw/Nghị-định-145-2020-NĐ-CP.pdf
+    document_name: "Nghị định 145/2020/NĐ-CP"
+    document_number: "145/2020/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+    notes: "PDF scan, cần OCR."
+
+  - document_id: nd_152_2020
+    pdf: data/raw/Nghị-định-152-2020-NĐ-CP.pdf
+    document_name: "Nghị định 152/2020/NĐ-CP"
+    document_number: "152/2020/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+    notes: "PDF scan, cần OCR."
+
+  - document_id: nd_161_2026
+    pdf: data/raw/Nghị-định-161-2026-NĐ-CP.pdf
+    document_name: "Nghị định 161/2026/NĐ-CP"
+    document_number: "161/2026/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+    notes: "Chỉ trang 1 có text layer; các trang còn lại cần OCR."
+
+  - document_id: nd_283_2026
+    pdf: data/raw/Nghị-định-283-2026-NĐ-CP.pdf
+    document_name: "Nghị định 283/2026/NĐ-CP"
+    document_number: "283/2026/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+
+  - document_id: nd_337_2025
+    pdf: data/raw/Nghị-định-337-2025-NĐ-CP.pdf
+    document_name: "Nghị định 337/2025/NĐ-CP"
+    document_number: "337/2025/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+    notes: "PDF scan, cần OCR."
+
+  - document_id: nd_38_2022
+    pdf: data/raw/Nghị-định-38-2022-NĐ-CP.pdf
+    document_name: "Nghị định 38/2022/NĐ-CP"
+    document_number: "38/2022/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+    notes: "PDF scan, cần OCR."
+
+  - document_id: nd_70_2023
+    pdf: data/raw/Nghị-định-70-2023-NĐ-CP.pdf
+    document_name: "Nghị định 70/2023/NĐ-CP"
+    document_number: "70/2023/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+
+  - document_id: nd_74_2024
+    pdf: data/raw/Nghị-định-74-2024-NĐ-CP.pdf
+    document_name: "Nghị định 74/2024/NĐ-CP"
+    document_number: "74/2024/NĐ-CP"
+    doc_type: "Nghị định"
+    issuer: "Chính phủ"
+    status: unknown
+    profile: nghi_dinh
+    notes: "Gần như toàn bộ PDF là scan, cần OCR."
+
+  - document_id: qd_582_2026
+    pdf: data/raw/Quyết-định-582-QĐ-BNV.pdf
+    document_name: "Quyết định 582/QĐ-BNV"
+    document_number: "582/QĐ-BNV"
+    doc_type: "Quyết định"
+    issuer: "Bộ Nội vụ"
+    status: unknown
+    profile: quyet_dinh
+
+  - document_id: tt_08_2026
+    pdf: data/raw/Thông-tư-08-2026-TT-BNV.pdf
+    document_name: "Thông tư 08/2026/TT-BNV"
+    document_number: "08/2026/TT-BNV"
+    doc_type: "Thông tư"
+    issuer: "Bộ Nội vụ"
+    status: unknown
+    profile: thong_tu
+    notes: "PDF scan, cần OCR."
+
+  - document_id: tt_09_2020
+    pdf: data/raw/Thông-tư-09-2020-TT-BLĐTBXH.pdf
+    document_name: "Thông tư 09/2020/TT-BLĐTBXH"
+    document_number: "09/2020/TT-BLĐTBXH"
+    doc_type: "Thông tư"
+    issuer: "Bộ Lao động - Thương binh và Xã hội"
+    status: unknown
+    profile: thong_tu
+
+  - document_id: tt_10_2020
+    pdf: data/raw/Thông-tư-10-2020-TT-BLĐTBXH.pdf
+    document_name: "Thông tư 10/2020/TT-BLĐTBXH"
+    document_number: "10/2020/TT-BLĐTBXH"
+    doc_type: "Thông tư"
+    issuer: "Bộ Lao động - Thương binh và Xã hội"
+    status: unknown
+    profile: thong_tu
+
+  - document_id: tt_11_2020
+    pdf: data/raw/Thông-tư-11-2020-TT-BLĐTBXH.pdf
+    document_name: "Thông tư 11/2020/TT-BLĐTBXH"
+    document_number: "11/2020/TT-BLĐTBXH"
+    doc_type: "Thông tư"
+    issuer: "Bộ Lao động - Thương binh và Xã hội"
+    status: unknown
+    profile: thong_tu
+    notes: "Phần lớn PDF là bảng danh mục nghề; cần xử lý bảng riêng."
+
+  - document_id: tt_13_2026
+    pdf: data/raw/Thông-tư-13-2026-TT-BNV.pdf
+    document_name: "Thông tư 13/2026/TT-BNV"
+    document_number: "13/2026/TT-BNV"
+    doc_type: "Thông tư"
+    issuer: "Bộ Nội vụ"
+    status: unknown
+    profile: thong_tu
+
+  - document_id: tt_18_2021
+    pdf: data/raw/Thông-tư-18-2021-TT-BVHTTDL.pdf
+    document_name: "Thông tư 18/2021/TT-BVHTTDL"
+    document_number: "18/2021/TT-BVHTTDL"
+    doc_type: "Thông tư"
+    issuer: "Bộ Văn hóa, Thể thao và Du lịch"
+    status: unknown
+    profile: thong_tu
+    notes: "Trang 1-4 là scan; phần còn lại là phụ lục biểu mẫu."
+
+  - document_id: tt_19_2021
+    pdf: data/raw/Thông-tư-19-2021-TT-BLĐTBXH.pdf
+    document_name: "Thông tư 19/2021/TT-BLĐTBXH"
+    document_number: "19/2021/TT-BLĐTBXH"
+    doc_type: "Thông tư"
+    issuer: "Bộ Lao động - Thương binh và Xã hội"
+    status: unknown
+    profile: thong_tu
+
+  - document_id: tt_24_2022
+    pdf: data/raw/Thông-tư-24-2022-TT-BLĐTBXH.pdf
+    document_name: "Thông tư 24/2022/TT-BLĐTBXH"
+    document_number: "24/2022/TT-BLĐTBXH"
+    doc_type: "Thông tư"
+    issuer: "Bộ Lao động - Thương binh và Xã hội"
+    status: unknown
+    profile: thong_tu
+    notes: "PDF scan, cần OCR."
+
+  - document_id: tt_01_bld
+    pdf: data/raw/thong-tu-01-bld.pdf
+    document_name: "Thông tư 01/BLĐTBXH"
+    document_number: "01/BLĐTBXH"
+    doc_type: "Thông tư"
+    issuer: "Bộ Lao động - Thương binh và Xã hội"
+    status: unknown
+    profile: thong_tu
+    notes: "[CẦN XÁC MINH] số hiệu, ngày ban hành và nội dung từ PDF scan."

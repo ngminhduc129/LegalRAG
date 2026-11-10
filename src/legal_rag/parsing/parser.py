@@ -1,18 +1,19 @@
 import re
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 from pathlib import Path
 
+from legal_rag.corpus.registry import DocumentMeta, resolve_document
 from legal_rag.parsing.classifier import (
     LineInfo, LineClassifier, CHAPTER_RE, SECTION_RE,
     ARTICLE_RE, CLAUSE_RE, POINT_RE,
     clean_line, is_page_number, extract_pdf_lines,
     is_legal_reference_continuation, is_article_intro_start,
     extract_article_number, match_article_heading,
-    is_noise_line, is_signature_start,
+    is_noise_line, is_signature_start, is_signature_title,
+    has_signature_title_anywhere,
+    is_appendix_start, is_appendix_heading, is_signature_end, VBHN_SIGNATURE_RE,
 )
-
-from legal_rag.parsing.constants import DOCUMENT_NAME, DOCUMENT_NUMBER
 
 
 def is_ref_like_title(title: str) -> bool:
@@ -54,6 +55,9 @@ class ParserState:
     article_intro: List[str] = field(default_factory=list)
     article_intro_pages: List[int] = field(default_factory=list)
 
+    preamble: List[str] = field(default_factory=list)
+    preamble_pages: List[int] = field(default_factory=list)
+
     def reset_article(self):
         self.article = None
         self.article_title = None
@@ -87,6 +91,20 @@ class ParserState:
         self.point_pages = []
 
 
+@dataclass
+class ParseResult:
+    """Structured parser output plus audit information."""
+
+    chunks: List[Dict[str, Any]] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)
+    dropped_lines: int = 0
+    articles_seen: List[int] = field(default_factory=list)
+    missing_articles: List[int] = field(default_factory=list)
+    duplicate_article_numbers: List[int] = field(default_factory=list)
+    signature_lines: int = 0
+    appendix_chunks: int = 0
+
+
 def join_text(parts: List[str]) -> str:
     return "\n".join(p.strip() for p in parts if p and p.strip()).strip()
 
@@ -103,11 +121,13 @@ def make_chunk(
     content: str,
     page_start: int,
     page_end: int,
-    chunk_type: str
+    chunk_type: str,
+    document: Optional[DocumentMeta] = None,
+    **extra: Any,
 ) -> Dict[str, Any]:
+    meta = (document or resolve_document(None)).as_metadata()
     return {
-        "document_name": DOCUMENT_NAME,
-        "document_number": DOCUMENT_NUMBER,
+        **meta,
         "chapter": chapter,
         "chapter_title": chapter_title,
         "section": section,
@@ -120,38 +140,43 @@ def make_chunk(
         "content": content.strip(),
         "page_start": page_start,
         "page_end": page_end,
+        **extra,
     }
 
 
 class LegalStructureParser:
-    def __init__(self):
+    def __init__(self, document: Optional[DocumentMeta] = None):
+        self.document = resolve_document(document)
         self.classifier = LineClassifier()
         self.state = ParserState()
         self.chunks = []
         self.warnings = []
         self.seen_articles = {}
+        self._article_occurrences: Dict[int, int] = {}
         self.dropped_lines = 0
+        self.signature_lines = 0
+        self.appendix_chunks = 0
 
-    def parse(self, lines: List[dict]) -> List[Dict[str, Any]]:
+    def parse(self, lines: List[dict]) -> ParseResult:
         self.state = ParserState()
         self.chunks = []
         self.warnings = []
         self.dropped_lines = 0
         self.seen_articles = {}
+        self._article_occurrences = {}
+        self.signature_lines = 0
+        self.appendix_chunks = 0
+
+        main_lines, signature_lines, appendix_lines = self._split_document(lines)
 
         kept = []
-        signature_seen = False
-        for line_data in lines:
+        for line_data in main_lines:
             text = line_data.get("text", "")
             if is_noise_line(text):
                 self.dropped_lines += 1
                 continue
-            if signature_seen or is_signature_start(text):
-                signature_seen = True
-                self.dropped_lines += 1
-                continue
             kept.append(line_data)
-        self.warnings.append(f"Dropped {self.dropped_lines} noise/signature lines")
+        self.warnings.append(f"Dropped {self.dropped_lines} noise lines")
 
         classified = self.classifier.classify_all(kept)
 
@@ -178,14 +203,189 @@ class LegalStructureParser:
             if new_i == i:
                 self._handle_content(line_info)
                 new_i = i + 1
-            else:
-                # Skip the lines that were consumed by the handler
-                pass
 
             i = new_i
 
         self._close_all()
-        return self.chunks
+        self._emit_appendix(appendix_lines)
+
+        articles_seen = sorted(self.seen_articles)
+        missing: List[int] = []
+        expected = self.document.expected_articles
+        if expected:
+            seen = set(articles_seen)
+            missing = [n for n in range(1, expected + 1) if n not in seen]
+            if missing:
+                self.warnings.append(f"MISSING_ARTICLES: {missing}")
+
+        duplicate_numbers = sorted(
+            number
+            for number, count in self._article_occurrences.items()
+            if count > 1
+        )
+
+        return ParseResult(
+            chunks=self.chunks,
+            warnings=self.warnings,
+            dropped_lines=self.dropped_lines,
+            articles_seen=articles_seen,
+            missing_articles=missing,
+            duplicate_article_numbers=duplicate_numbers,
+            signature_lines=self.signature_lines,
+            appendix_chunks=self.appendix_chunks,
+        )
+
+    def _find_signature_index(self, lines: List[dict]) -> Optional[int]:
+        """Locate the trailing signature block without matching quoted text.
+
+        A real block is opened by ``Nơi nhận:`` after a line ending in ``./.``
+        and contains a signer title within the next lines.  The VBHN marker is
+        accepted only near the end of the document.
+        """
+        for i, line in enumerate(lines):
+            text = line.get("text", "").strip()
+            if is_signature_start(text):
+                prev = lines[i - 1].get("text", "").rstrip() if i else ""
+                window = [item.get("text", "") for item in lines[i:i + 40]]
+                near_end = i >= int(0.5 * len(lines))
+                has_signer = any(
+                    is_signature_title(item) or has_signature_title_anywhere(item)
+                    for item in window
+                )
+                if has_signer and (prev.endswith(("./.", "./", "/")) or near_end):
+                    return i
+            if VBHN_SIGNATURE_RE.match(text) and i >= int(0.8 * len(lines)):
+                return i
+        return None
+
+    def _split_document(
+        self, lines: List[dict]
+    ) -> Tuple[List[dict], List[dict], List[dict]]:
+        """Split into main text, signature block, and appendix lines."""
+        signature_idx = self._find_signature_index(lines)
+        if signature_idx is not None:
+            main = lines[:signature_idx]
+            tail = lines[signature_idx:]
+            appendix_idx = next(
+                (i for i, line in enumerate(tail) if is_appendix_start(line.get("text", ""))),
+                None,
+            )
+            if appendix_idx is None:
+                # No explicit appendix heading: the signature block ends at the
+                # distribution-list closing line ("Luu: VT, ...").  Anything
+                # after it is appendix/table material and must not be dropped.
+                signature_end = next(
+                    (
+                        i + 1
+                        for i, line in enumerate(tail)
+                        if is_signature_end(line.get("text", ""))
+                    ),
+                    None,
+                )
+                if signature_end is not None and signature_end < len(tail):
+                    signature = tail[:signature_end]
+                    appendix = tail[signature_end:]
+                else:
+                    signature = tail
+                    appendix = []
+            else:
+                signature = tail[:appendix_idx]
+                appendix = tail[appendix_idx:]
+            self.signature_lines = len(signature)
+            if signature:
+                self.warnings.append(
+                    f"Signature block: {len(signature)} lines starting on page "
+                    f"{signature[0].get('page')}"
+                )
+            if appendix:
+                self.warnings.append(
+                    f"Appendix: {len(appendix)} lines starting on page "
+                    f"{appendix[0].get('page')}"
+                )
+            return main, signature, appendix
+
+        appendix_idx = next(
+            (
+                i
+                for i, line in enumerate(lines)
+                if is_appendix_start(line.get("text", ""))
+                and (i == 0 or i >= int(0.5 * len(lines)))
+            ),
+            None,
+        )
+        if appendix_idx is not None:
+            self.warnings.append(
+                f"Appendix without signature: {len(lines) - appendix_idx} lines "
+                f"starting on page {lines[appendix_idx].get('page')}"
+            )
+            return lines[:appendix_idx], [], lines[appendix_idx:]
+        return lines, [], []
+
+    def _emit_appendix(self, lines: List[dict]) -> None:
+        if not lines:
+            return
+        cleaned = [
+            line for line in lines if line.get("text", "").strip() and not is_noise_line(line["text"])
+        ]
+        if not cleaned:
+            return
+
+        groups: List[List[dict]] = []
+        current: List[dict] = []
+        for line in cleaned:
+            if is_appendix_heading(line["text"]) and current:
+                groups.append(current)
+                current = [line]
+            else:
+                current.append(line)
+        if current:
+            groups.append(current)
+
+        max_words = 400
+        for group in groups:
+            title = group[0]["text"].strip()
+            pieces: List[List[dict]] = []
+            current_piece: List[dict] = []
+            current_words = 0
+            for line in group:
+                words = len(line["text"].split())
+                if current_piece and current_words + words > max_words:
+                    pieces.append(current_piece)
+                    current_piece = []
+                    current_words = 0
+                current_piece.append(line)
+                current_words += words
+            if current_piece:
+                pieces.append(current_piece)
+
+            for piece in pieces:
+                content = join_text([line["text"] for line in piece])
+                if not content:
+                    continue
+                pages = [
+                    line["page"] for line in piece if isinstance(line.get("page"), int)
+                ]
+                self.chunks.append(
+                    make_chunk(
+                        chapter=None,
+                        chapter_title=None,
+                        section=None,
+                        section_title=None,
+                        article=None,
+                        article_title=None,
+                        clause=None,
+                        point=None,
+                        content=content,
+                        page_start=min(pages) if pages else 1,
+                        page_end=max(pages) if pages else 1,
+                        chunk_type="appendix",
+                        document=self.document,
+                        section_type="appendix",
+                        appendix_title=title,
+                    )
+                )
+                self.appendix_chunks += 1
+
 
     @staticmethod
     def _clean_structure_title(title: str, kind: str) -> str:
@@ -313,6 +513,9 @@ class LegalStructureParser:
         self.state.article_title = article_title_text or None
         self.state.article_page = line_info.page
         self.seen_articles[article_number] = article_title_text
+        self._article_occurrences[article_number] = (
+            self._article_occurrences.get(article_number, 0) + 1
+        )
 
         new_i = self._collect_multiline_article_title(i, classified)
 
@@ -488,9 +691,34 @@ class LegalStructureParser:
         elif self.state.clause is not None:
             self.state.clause_parts.append(text)
             self.state.clause_pages.append(page)
+        elif self.state.article is None and not self.seen_articles:
+            self.state.preamble.append(text)
+            self.state.preamble_pages.append(page)
         else:
             self.state.article_intro.append(text)
             self.state.article_intro_pages.append(page)
+
+    def _emit_preamble(self):
+        content = join_text(self.state.preamble)
+        if content:
+            pages = self.state.preamble_pages
+            self.chunks.append(make_chunk(
+                chapter=None,
+                chapter_title=None,
+                section=None,
+                section_title=None,
+                article=None,
+                article_title=None,
+                clause=None,
+                point=None,
+                content=content,
+                page_start=min(pages) if pages else 1,
+                page_end=max(pages) if pages else 1,
+                chunk_type="preamble",
+                document=self.document,
+            ))
+        self.state.preamble = []
+        self.state.preamble_pages = []
 
     def _emit_article_intro(self):
         content = join_text(self.state.article_intro)
@@ -508,7 +736,8 @@ class LegalStructureParser:
                 content=content,
                 page_start=min(pages),
                 page_end=max(pages),
-                chunk_type="article_intro"
+                chunk_type="article_intro",
+                document=self.document,
             ))
         self.state.article_intro = []
         self.state.article_intro_pages = []
@@ -529,7 +758,8 @@ class LegalStructureParser:
                 content=content,
                 page_start=min(pages),
                 page_end=max(pages),
-                chunk_type="clause_intro"
+                chunk_type="clause_intro",
+                document=self.document,
             ))
         self.state.clause_intro = []
         self.state.clause_intro_pages = []
@@ -551,7 +781,8 @@ class LegalStructureParser:
                     content=content,
                     page_start=min(pages),
                     page_end=max(pages),
-                    chunk_type="clause"
+                    chunk_type="clause",
+                    document=self.document,
                 ))
         elif self.state.clause is not None and self.state.clause_has_points:
             self._emit_clause_intro()
@@ -575,7 +806,8 @@ class LegalStructureParser:
                     content=content,
                     page_start=min(pages),
                     page_end=max(pages),
-                    chunk_type="point"
+                    chunk_type="point",
+                    document=self.document,
                 ))
         self.state.reset_point()
 
@@ -586,9 +818,12 @@ class LegalStructureParser:
         self.state.reset_article()
 
     def _close_all(self):
+        self._emit_preamble()
         self._close_article()
 
 
-def parse_legal_structure(lines: List[dict]) -> List[Dict[str, Any]]:
-    parser = LegalStructureParser()
+def parse_legal_structure(
+    lines: List[dict], document: Optional[DocumentMeta] = None
+) -> ParseResult:
+    parser = LegalStructureParser(document)
     return parser.parse(lines)

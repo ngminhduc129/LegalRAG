@@ -51,6 +51,14 @@ gpu = [
 cpu = [
     "faiss-cpu>=1.7",
 ]
+ocr = [
+    "easyocr>=1.7",
+    "pytesseract>=0.3",
+]
+ocr-paddle = [
+    "paddleocr>=2.7",
+    "paddlepaddle>=2.6",
+]
 
 [project.scripts]
 legal-rag = "legal_rag.cli.main:app"

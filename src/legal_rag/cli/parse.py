@@ -41,11 +41,13 @@ def pdf(
     """Parse PDF into structured legal corpus (JSONL + CSV), applying page patches."""
     from legal_rag.corpus.extractor import extract_pdf_lines, save_corpus
     from legal_rag.corpus.patches import PatchError, apply_page_patches, load_patches
+    from legal_rag.corpus.registry import resolve_document
     from legal_rag.parsing.parser import parse_legal_structure
 
     console.print(f"[bold]Parsing PDF:[/bold] {pdf_path}")
     console.print(f"[bold]Output:[/bold] {output_dir}")
 
+    document = resolve_document(document_id)
     try:
         with Progress(
             SpinnerColumn(),
@@ -66,7 +68,8 @@ def pdf(
                     f"{report['replaced_lines']} extracted lines -> "
                     f"{report['inserted_lines']} verified lines{coverage_text}"
                 )
-            chunks = parse_legal_structure(lines)
+            result = parse_legal_structure(lines, document)
+            chunks = result.chunks
             progress.update(task, description=f"Parsed {len(chunks)} chunks")
 
             task2 = progress.add_task("Saving corpus...", total=None)
@@ -79,6 +82,12 @@ def pdf(
     console.print(f"[green]✓[/green] JSONL: {jsonl_path}")
     console.print(f"[green]✓[/green] CSV:   {csv_path}")
     console.print(f"[bold]Total chunks:[/bold] {len(chunks)}")
+    if result.missing_articles:
+        console.print(
+            f"[yellow]Missing articles:[/yellow] {result.missing_articles}"
+        )
+    if result.appendix_chunks:
+        console.print(f"[cyan]Appendix chunks:[/cyan] {result.appendix_chunks}")
 
 
 @app.command()

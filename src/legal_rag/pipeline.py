@@ -16,6 +16,7 @@ from legal_rag.chunking.legal_aware import LegalAwareChunker, save_csv, save_jso
 from legal_rag.chunking.validator import validate_chunks
 from legal_rag.corpus.extractor import extract_pdf_lines, save_corpus
 from legal_rag.corpus.patches import apply_page_patches, load_patches
+from legal_rag.corpus.registry import resolve_document
 from legal_rag.parsing.parser import parse_legal_structure
 
 
@@ -61,6 +62,7 @@ def run_pipeline(
     pdf_path = Path(pdf_path)
     corpus_dir = Path(corpus_dir)
     chunks_dir = Path(chunks_dir)
+    document = resolve_document(document_id)
 
     corpus_jsonl = corpus_dir / f"{document_id}_{run_id}_corpus.jsonl"
     run_dir = chunks_dir / f"legal_aware_{run_id}"
@@ -74,12 +76,13 @@ def run_pipeline(
     patches = load_patches(list(patch_paths or []), document_id=document_id)
     lines, patch_reports = apply_page_patches(raw_lines, patches)
 
-    corpus_chunks = parse_legal_structure(lines)
+    parse_result = parse_legal_structure(lines, document)
+    corpus_chunks = parse_result.chunks
     corpus_jsonl, corpus_csv = save_corpus(
         corpus_chunks, corpus_dir, f"{document_id}_{run_id}"
     )
 
-    chunker = LegalAwareChunker(document_id=document_id)
+    chunker = LegalAwareChunker(document_id=document)
     final_chunks = chunker.chunk(corpus_chunks)
 
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -87,6 +90,23 @@ def run_pipeline(
     chunks_csv = run_dir / f"{document_id}_legal_aware.csv"
     save_jsonl(final_chunks, chunks_jsonl)
     save_csv(final_chunks, chunks_csv)
+
+    parse_report = {
+        "document_id": document.document_id,
+        "document_name": document.document_name,
+        "document_number": document.document_number,
+        "warnings": parse_result.warnings,
+        "dropped_lines": parse_result.dropped_lines,
+        "articles_seen": parse_result.articles_seen,
+        "missing_articles": parse_result.missing_articles,
+        "duplicate_article_numbers": parse_result.duplicate_article_numbers,
+        "signature_lines": parse_result.signature_lines,
+        "appendix_chunks": parse_result.appendix_chunks,
+    }
+    parse_report_path = run_dir / "parse_report.json"
+    parse_report_path.write_text(
+        json.dumps(parse_report, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
     validation = None
     if do_validate:
@@ -106,7 +126,9 @@ def run_pipeline(
 
     manifest = {
         "run_id": run_id,
-        "document_id": document_id,
+        "document_id": document.document_id,
+        "document_name": document.document_name,
+        "document_number": document.document_number,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "git_commit": _git_commit(),
         "pdf": {
@@ -120,6 +142,7 @@ def run_pipeline(
             "corpus_chunks": len(corpus_chunks),
             "final_chunks": len(final_chunks),
         },
+        "parse_report": str(parse_report_path),
         "validation": validation,
         "outputs": {
             "corpus_jsonl": str(corpus_jsonl),
@@ -142,8 +165,11 @@ def run_pipeline(
         "corpus_chunks": len(corpus_chunks),
         "final_chunks": len(final_chunks),
         "chunk_types": dict(Counter(c["chunk_type"] for c in final_chunks).most_common()),
+        "articles_seen": len(parse_result.articles_seen),
+        "missing_articles": parse_result.missing_articles,
         "validation": validation,
         "manifest_path": manifest_path,
+        "parse_report_path": parse_report_path,
         "corpus_jsonl": corpus_jsonl,
         "chunks_jsonl": chunks_jsonl,
     }

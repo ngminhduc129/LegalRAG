@@ -19,6 +19,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+import sys
 import traceback
 from collections import Counter
 from dataclasses import dataclass, field
@@ -125,6 +126,7 @@ def _resolve_ocr_pages(
     ocr_cache: Path,
     dpi: int,
     force_ocr: bool,
+    ocr_workers: int = 1,
 ) -> tuple[Dict[int, List[str]], int, Optional[str]]:
     """Return OCR text for pages lacking a text layer.
 
@@ -153,6 +155,7 @@ def _resolve_ocr_pages(
                     cache_root=ocr_cache,
                     dpi=dpi,
                     force=force_ocr,
+                    workers=ocr_workers,
                 )
                 pages.update(fresh)
             except Exception as exc:  # pragma: no cover - engine dependent
@@ -187,6 +190,7 @@ def build_document(
     ocr_cache: Path = Path("data/ocr"),
     dpi: int = DEFAULT_DPI,
     force_ocr: bool = False,
+    ocr_workers: int = 1,
 ) -> tuple[DocumentBuildResult, List[Dict[str, Any]]]:
     """Build one document; never raises for per-document failures."""
     result = DocumentBuildResult(
@@ -207,7 +211,7 @@ def build_document(
     result.pages_ocr_required = len(audit.pages_without_text)
 
     ocr_pages, ocr_used, ocr_error = _resolve_ocr_pages(
-        document, audit, engine, Path(ocr_cache), dpi, force_ocr
+        document, audit, engine, Path(ocr_cache), dpi, force_ocr, ocr_workers
     )
     result.pages_ocr_used = ocr_used
     if ocr_error:
@@ -306,6 +310,7 @@ def run_corpus_build(
     dpi: int = DEFAULT_DPI,
     force_ocr: bool = False,
     include_inactive: bool = True,
+    ocr_workers: int = 1,
 ) -> Dict[str, Any]:
     """Build all selected documents into a fresh run directory."""
     if strategy not in STRATEGIES:
@@ -335,7 +340,8 @@ def run_corpus_build(
 
     results: List[DocumentBuildResult] = []
     all_chunks: List[Dict[str, Any]] = []
-    for document in documents:
+    total_documents = len(documents)
+    for index, document in enumerate(documents, 1):
         result, chunks = build_document(
             document,
             by_document_dir,
@@ -345,12 +351,20 @@ def run_corpus_build(
             ocr_cache=ocr_cache,
             dpi=dpi,
             force_ocr=force_ocr,
+            ocr_workers=ocr_workers,
         )
         results.append(result)
         for chunk in chunks:
             chunk["run_id"] = run_id
             chunk["strategy"] = strategy
         all_chunks.extend(chunks)
+        print(
+            f"[{index}/{total_documents}] {document.document_id}: "
+            f"{result.status} pages={result.pages} ocr={result.pages_ocr_used} "
+            f"chunks={result.final_chunks}",
+            file=sys.stderr,
+            flush=True,
+        )
 
     all_chunks_path = run_dir / f"all_{strategy}.jsonl"
     save_jsonl(all_chunks, all_chunks_path)
@@ -411,6 +425,7 @@ def run_corpus_build(
         "ocr_engine": engine.name if engine else None,
         "ocr_engine_error": engine_error,
         "dpi": dpi,
+        "ocr_workers": ocr_workers,
         "documents_requested": len(documents),
         "documents_built": sum(1 for result in results if result.final_chunks),
         "status_counts": dict(status_counts),

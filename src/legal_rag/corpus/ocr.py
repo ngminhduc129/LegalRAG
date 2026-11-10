@@ -299,16 +299,22 @@ def ocr_document(
     cache_root: Path = CACHE_ROOT,
     dpi: int = DEFAULT_DPI,
     force: bool = False,
+    workers: int = 1,
 ) -> Dict[int, List[str]]:
-    """OCR selected pages (default: every page) and return page -> lines."""
+    """OCR selected pages (default: every page) and return page -> lines.
+
+    ``workers`` > 1 runs pages in parallel threads.  Each page is an
+    independent Tesseract subprocess, so the GIL is not a bottleneck; the
+    per-process OpenMP thread count is pinned to 1 to avoid oversubscription.
+    """
     document_id = document_id or Path(pdf_path).stem
     with fitz.open(pdf_path) as pdf:
         page_count = pdf.page_count
     selected: Sequence[int] = (
         list(pages) if pages is not None else list(range(1, page_count + 1))
     )
-    result: Dict[int, List[str]] = {}
-    for page in selected:
+
+    def _one(page: int) -> tuple[int, List[str]]:
         payload = ocr_page(
             pdf_path,
             page,
@@ -318,5 +324,20 @@ def ocr_document(
             dpi=dpi,
             force=force,
         )
-        result[page] = [str(line) for line in payload.get("lines", [])]  # type: ignore[arg-type]
+        return page, [str(line) for line in payload.get("lines", [])]  # type: ignore[arg-type]
+
+    result: Dict[int, List[str]] = {}
+    if workers and workers > 1:
+        import os
+        from concurrent.futures import ThreadPoolExecutor
+
+        os.environ.setdefault("OMP_THREAD_LIMIT", "1")
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for page, lines in pool.map(_one, selected):
+                result[page] = lines
+        return result
+
+    for page in selected:
+        page, lines = _one(page)
+        result[page] = lines
     return result

@@ -92,6 +92,11 @@ def build(
     force_ocr: bool = typer.Option(
         False, "--force-ocr", help="Ignore the OCR cache"
     ),
+    ocr_workers: int = typer.Option(
+        1,
+        "--ocr-workers",
+        help="Parallel OCR page workers (Tesseract subprocesses; try 4 on a laptop)",
+    ),
     patches: Optional[List[Path]] = typer.Option(
         None, "--patches", "-p", help="Page patch files or directories"
     ),
@@ -116,6 +121,7 @@ def build(
                 ocr_cache=ocr_cache,
                 dpi=dpi,
                 force_ocr=force_ocr,
+                ocr_workers=ocr_workers,
             )
             progress.update(task, description="Done")
     except (FileExistsError, FileNotFoundError, ValueError) as exc:

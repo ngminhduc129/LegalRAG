@@ -309,7 +309,7 @@ class PostParseValidator:
                     article=article,
                 ))
 
-        if chunk_type != "preamble" and not _chunk_articles(chunk):
+        if chunk_type not in {"preamble", "appendix"} and not _chunk_articles(chunk):
             self.issues.append(ValidationIssue(
                 severity="ERROR",
                 code="MISSING_METADATA",

@@ -563,6 +563,26 @@ class TestValidator:
         missing_fields = [i for i in report.issues if i.code == "MISSING_METADATA"]
         assert len(missing_fields) > 0
 
+    def test_appendix_without_article_is_valid(self):
+        """Appendices have no article by design, so no article is required."""
+        chunks = [
+            {
+                "chunk_id": "test_appendix_1",
+                "document_id": "test",
+                "document_name": "Test",
+                "document_number": "1",
+                "chunk_type": "appendix",
+                "content": "Appendix table.",
+                "page_start": 2,
+                "page_end": 2,
+            }
+        ]
+        report = validate_chunks(chunks)
+        assert report.errors == 0
+        assert not [
+            issue for issue in report.issues if issue.code == "MISSING_METADATA"
+        ]
+
     def test_validate_invalid_page_range(self):
         chunks = [
             {

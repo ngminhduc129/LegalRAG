@@ -190,6 +190,8 @@ class DenseIndex:
         idx.doc_ids = data["doc_ids"]
         idx.embeddings = data["embeddings"]
         idx.is_built = data["is_built"]
+        idx.vector_count = data.get("vector_count")
+        idx.oversized_chunk_count = int(data.get("oversized_chunk_count", 0) or 0)
 
         print(f"Dense index loaded from {path}: {len(idx.documents)} docs")
         return idx

@@ -62,7 +62,15 @@ class DenseIndex:
     def add_documents(self, chunks: List[Dict[str, Any]]):
         """Add documents and compute embeddings."""
         self.documents = chunks
-        self.doc_ids = [c["chunk_id"] for c in chunks]
+        self.doc_ids = []
+        for idx, chunk in enumerate(chunks):
+            chunk_id = chunk.get("chunk_id")
+            if not chunk_id:
+                raise ValueError(
+                    f"Chunk at index {idx} is missing a 'chunk_id'; "
+                    "every chunk must have a deterministic chunk_id before embedding"
+                )
+            self.doc_ids.append(chunk_id)
 
         # Prepare texts for embedding
         texts = []

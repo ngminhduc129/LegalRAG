@@ -133,6 +133,27 @@ class TestEdgeCases:
         articles = {c["article"] for c in chunks if c.get("article")}
         assert "Điều 5" not in articles
 
+    def test_ref_like_title_keeps_real_titles(self):
+        from legal_rag.parsing.parser import is_ref_like_title
+
+        assert not is_ref_like_title("Quy định chuyển tiếp")
+        assert not is_ref_like_title("Quy định chung")
+        assert not is_ref_like_title("Quy định về xử phạt vi phạm hành chính")
+        assert is_ref_like_title("Quy định tại Điều 5")
+        assert is_ref_like_title("Quy định của Bộ luật này")
+        assert is_ref_like_title("của Bộ luật này;")
+
+    def test_article_title_starting_with_quy_dinh(self):
+        lines = [
+            {"text": "Điều 49. Sửa đổi, bổ sung", "page": 1},
+            {"text": "1. Nội dung sửa đổi.", "page": 1},
+            {"text": "Điều 50. Quy định chuyển tiếp", "page": 2},
+            {"text": "1. Nội dung chuyển tiếp.", "page": 2},
+        ]
+        result = parse_legal_structure(lines)
+        assert 49 in result.articles_seen
+        assert 50 in result.articles_seen
+
     def test_empty_lines_skipped(self):
         lines = [
             {"text": "Điều 1. Title", "page": 1},

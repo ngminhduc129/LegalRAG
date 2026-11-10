@@ -60,6 +60,7 @@ class DocumentBuildResult:
     pages_with_text: int = 0
     pages_ocr_required: int = 0
     pages_ocr_used: int = 0
+    pages_ocr_empty: int = 0
     corpus_chunks: int = 0
     final_chunks: int = 0
     articles_seen: int = 0
@@ -78,6 +79,7 @@ class DocumentBuildResult:
             "pages_with_text": self.pages_with_text,
             "pages_ocr_required": self.pages_ocr_required,
             "pages_ocr_used": self.pages_ocr_used,
+            "pages_ocr_empty": self.pages_ocr_empty,
             "corpus_chunks": self.corpus_chunks,
             "final_chunks": self.final_chunks,
             "articles_seen": self.articles_seen,
@@ -214,6 +216,12 @@ def build_document(
         document, audit, engine, Path(ocr_cache), dpi, force_ocr, ocr_workers
     )
     result.pages_ocr_used = ocr_used
+    empty_ocr_pages = [
+        page for page in audit.pages_without_text if not ocr_pages.get(page)
+    ]
+    result.pages_ocr_empty = len(empty_ocr_pages)
+    if empty_ocr_pages:
+        result.warnings.append(f"OCR_EMPTY_PAGES: {empty_ocr_pages}")
     if ocr_error:
         result.warnings.append(f"OCR_ERROR: {ocr_error}")
 
@@ -262,13 +270,15 @@ def build_document(
     if result.articles_seen == 0:
         if result.appendix_chunks:
             result.status = "appendix_only"
-        elif result.pages_ocr_required and not ocr_pages:
+        elif result.pages_ocr_required and (
+            not ocr_pages or result.pages_ocr_empty
+        ):
             result.status = (
                 "ocr_required" if result.pages_with_text == 0 else "partial_text"
             )
         else:
             result.status = "empty"
-    elif result.pages_ocr_required and not ocr_pages:
+    elif result.pages_ocr_required and (not ocr_pages or result.pages_ocr_empty):
         result.status = "partial_text"
     else:
         result.status = "ok"

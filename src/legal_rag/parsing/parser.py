@@ -20,7 +20,9 @@ def is_ref_like_title(title: str) -> bool:
     """True if a heading title is actually a cross-reference fragment.
 
     Compares whole words (not prefixes): "Làm thêm giờ" must NOT match
-    the starter "là".
+    the starter "là".  "Quy định chuyển tiếp" is a real article title, so
+    "quy định" only counts as a reference when it points somewhere
+    ("Quy định tại Điều 5", "Quy định của Bộ luật này").
     """
     cleaned = title.strip().lstrip("\"'“”‘’([{").lower()
     words = cleaned.split()
@@ -28,7 +30,16 @@ def is_ref_like_title(title: str) -> bool:
         return False
     if words[0] in ("của", "tại", "theo", "và", "hoặc", "trong", "như", "là"):
         return True
-    return " ".join(words[:2]) in ("quy định", "đối với", "căn cứ")
+    first_two = " ".join(words[:2])
+    if first_two in ("quy định", "đối với", "căn cứ"):
+        if first_two != "quy định":
+            return True
+        rest = words[2:4]
+        return any(
+            word in ("tại", "của", "này", "theo", "điều", "khoản", "mục", "chương")
+            for word in rest
+        )
+    return False
 
 
 @dataclass

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "plugin": [
+    "file:///E:/LegalRAG/.kilo/plugins/graphify.js"
+  ]
+}

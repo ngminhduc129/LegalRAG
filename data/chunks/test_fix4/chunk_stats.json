@@ -1,0 +1,18 @@
+{
+  "run_id": "test_fix4",
+  "strategy": "legal_aware",
+  "total_chunks": 0,
+  "retrieval_eligible": 0,
+  "chunk_types": {},
+  "by_document": {
+    "nd_70_2023": 0
+  },
+  "per_document": [
+    {
+      "document_id": "nd_70_2023",
+      "status": "parse_failed",
+      "chunks": 0,
+      "articles_seen": 0
+    }
+  ]
+}

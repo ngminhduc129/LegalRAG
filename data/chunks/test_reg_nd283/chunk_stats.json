@@ -1,0 +1,25 @@
+{
+  "run_id": "test_reg_nd283",
+  "strategy": "legal_aware",
+  "total_chunks": 1104,
+  "retrieval_eligible": 1104,
+  "chunk_types": {
+    "point": 757,
+    "clause_intro": 190,
+    "clause": 143,
+    "article_intro": 12,
+    "preamble": 1,
+    "chapter_intro": 1
+  },
+  "by_document": {
+    "nd_283_2026": 1104
+  },
+  "per_document": [
+    {
+      "document_id": "nd_283_2026",
+      "status": "ok",
+      "chunks": 1104,
+      "articles_seen": 68
+    }
+  ]
+}

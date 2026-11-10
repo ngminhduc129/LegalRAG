@@ -3,16 +3,18 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Any, Tuple
 from pathlib import Path
 
+from legal_rag.corpus.extractor import extract_pdf_lines
 from legal_rag.corpus.registry import DocumentMeta, resolve_document
 from legal_rag.parsing.classifier import (
     LineInfo, LineClassifier, CHAPTER_RE, SECTION_RE,
     ARTICLE_RE, CLAUSE_RE, POINT_RE,
-    clean_line, is_page_number, extract_pdf_lines,
+    clean_line, is_page_number,
     is_legal_reference_continuation, is_article_intro_start,
     extract_article_number, match_article_heading,
     is_noise_line, is_signature_start, is_signature_title,
     has_signature_title_anywhere,
     is_appendix_start, is_appendix_heading, is_signature_end, VBHN_SIGNATURE_RE,
+    is_likely_legal_reference_in_content,
 )
 
 
@@ -69,10 +71,28 @@ class ParserState:
     preamble: List[str] = field(default_factory=list)
     preamble_pages: List[int] = field(default_factory=list)
 
+    # Structure instance tracking (requirement 4.2)
+    _structure_counter: int = field(default_factory=int)
+    _structure_stack: List[Dict[str, Any]] = field(default_factory=list)
+    # Role of the current structure block: main | amendment | quoted_replacement | appendix
+    _structure_role: str = "main"
+    # Whether we are inside a quoted replacement block (e.g. "Điều 4. ..." inside amendment)
+    _in_quoted_replacement: bool = False
+    # Identity of the current amendment operation (op_N), only set when a
+    # confidently-supported pattern ("Sửa đổi Điều X như sau") is detected.
+    operation_id: Optional[str] = None
+    _operation_counter: int = field(default_factory=int)
+    # Direct instance id references (avoid stack lookup complexity)
+    article_instance_id: Optional[str] = None
+    clause_instance_id: Optional[str] = None
+    point_instance_id: Optional[str] = None
+
     def reset_article(self):
         self.article = None
         self.article_title = None
         self.article_page = None
+        self.article_instance_id = None
+        self.operation_id = None
         self.article_intro = []
         self.article_intro_pages = []
         self.clause = None
@@ -89,6 +109,7 @@ class ParserState:
         self.clause = None
         self.clause_parts = []
         self.clause_pages = []
+        self.clause_instance_id = None
         self.clause_intro = []
         self.clause_intro_pages = []
         self.clause_has_points = False
@@ -100,6 +121,45 @@ class ParserState:
         self.point = None
         self.point_parts = []
         self.point_pages = []
+        self.point_instance_id = None
+
+    def _next_instance_id(self) -> str:
+        self._structure_counter += 1
+        return f"si{self._structure_counter}"
+
+    def _current_instance(self) -> Optional[Dict[str, Any]]:
+        return self._structure_stack[-1] if self._structure_stack else None
+
+    def push_structure(self, kind: str, number: str, role: str = "main") -> str:
+        """Push a new structure instance onto the stack. Returns its instance id."""
+        instance_id = self._next_instance_id()
+        parent = self._current_instance()
+        self._structure_stack.append({
+            "instance_id": instance_id,
+            "kind": kind,  # chapter | section | article | clause | point
+            "number": number,
+            "role": role,
+            "parent_id": parent["instance_id"] if parent else None,
+        })
+        # Store direct reference for emit methods
+        if kind == "article":
+            self.article_instance_id = instance_id
+        elif kind == "clause":
+            self.clause_instance_id = instance_id
+        elif kind == "point":
+            self.point_instance_id = instance_id
+        return instance_id
+
+    def pop_structure(self) -> Optional[Dict[str, Any]]:
+        if self._structure_stack:
+            return self._structure_stack.pop()
+        return None
+
+    def set_structure_role(self, role: str) -> None:
+        self._structure_role = role
+
+    def set_quoted_replacement(self, active: bool) -> None:
+        self._in_quoted_replacement = active
 
 
 @dataclass
@@ -114,6 +174,7 @@ class ParseResult:
     duplicate_article_numbers: List[int] = field(default_factory=list)
     signature_lines: int = 0
     appendix_chunks: int = 0
+    review_lines: List[Dict[str, Any]] = field(default_factory=list)
 
 
 def join_text(parts: List[str]) -> str:
@@ -167,6 +228,7 @@ class LegalStructureParser:
         self.dropped_lines = 0
         self.signature_lines = 0
         self.appendix_chunks = 0
+        self.review_lines: List[Dict[str, Any]] = []
 
     def parse(self, lines: List[dict]) -> ParseResult:
         self.state = ParserState()
@@ -177,6 +239,7 @@ class LegalStructureParser:
         self._article_occurrences = {}
         self.signature_lines = 0
         self.appendix_chunks = 0
+        self.review_lines = []
 
         main_lines, signature_lines, appendix_lines = self._split_document(lines)
 
@@ -244,6 +307,7 @@ class LegalStructureParser:
             duplicate_article_numbers=duplicate_numbers,
             signature_lines=self.signature_lines,
             appendix_chunks=self.appendix_chunks,
+            review_lines=self.review_lines,
         )
 
     @staticmethod
@@ -437,10 +501,14 @@ class LegalStructureParser:
 
         self.state.chapter = f"Chương {match.group(1)}"
         self.state.chapter_title = None
-        # Sections belong to the previous chapter: a new chapter starts
-        # without a section until a Mục heading appears.
         self.state.section = None
         self.state.section_title = None
+        # New chapter resets structure role to main.
+        self.state.set_structure_role("main")
+        self.state.set_quoted_replacement(False)
+
+        instance_id = self.state.push_structure("chapter", match.group(1), "main")
+        chapter_instance_id = instance_id
 
         title, new_i = self._collect_structure_title(i, classified, "chapter")
         if title:
@@ -458,6 +526,9 @@ class LegalStructureParser:
         self.state.section = f"Mục {match.group(1)}"
         self.state.section_title = None
 
+        instance_id = self.state.push_structure("section", match.group(1), "main")
+        section_instance_id = instance_id
+
         title, new_i = self._collect_structure_title(i, classified, "section")
         if title:
             self.state.section_title = title
@@ -470,15 +541,18 @@ class LegalStructureParser:
 
         features = line_info.features
 
-        # Only reject if there's STRONG evidence it's a legal reference
-        # Legal refs typically: continue previous sentence, or follow "theo quy định tại"
+        article_number = features.get("article_number", 0)
+        # Article numbers > 999 are unreasonable for Vietnamese legal docs;
+        # reject as false positive (e.g. OCR money amount "110.000.000").
+        if article_number > 999:
+            return False
+
+        # Only reject if there's STRONG evidence it's a legal reference.
         if features.get("preceded_by_legal_ref"):
             return False
 
-        # If previous line doesn't end with period, it might be a continuation
-        # But only reject if previous line looks like a legal ref prefix
+        # If previous line doesn't end with period, it might be a continuation.
         if features.get("prev_line_incomplete"):
-            # Additional check: is previous line a clause/point? If so, this is likely a ref
             if i > 0:
                 prev = classified[i - 1]
                 if prev.is_structural_candidate and prev.candidate_type in ("clause", "point"):
@@ -497,46 +571,68 @@ class LegalStructureParser:
         # Default: if it matches article pattern, treat as article
         return True
 
+    def _is_quoted_replacement_start(self, line_info: LineInfo, i: int, classified: List[LineInfo]) -> bool:
+        """Detect if this article heading is inside a quoted replacement block.
+
+        Pattern: "1. Sửa đổi Điều 4 như sau:" followed by "Điều 4. ..."
+        The second "Điều 4" belongs to the quoted replacement, not the main doc.
+        """
+        text = line_info.text.strip()
+        text_upper = text.upper()
+
+        # If previous line looks like an amendment intro ("Sửa đổi Điều X như sau")
+        # and current line starts with "Điều <same number>", it's a quoted replacement.
+        if i > 0:
+            prev = classified[i - 1]
+            prev_text = prev.text.upper().strip()
+            if re.search(r"SỬA\s+ĐỔI\s+ĐIỀU\s+\d+\s+NHƯ\s+SAU", prev_text):
+                # Current article number matches the one mentioned in prev line
+                prev_num_match = re.search(r"ĐIỀU\s+(\d+)", prev_text)
+                if prev_num_match:
+                    curr_match = ARTICLE_RE.match(line_info.text)
+                    if curr_match and int(curr_match.group(1)) == int(prev_num_match.group(1)):
+                        return True
+
+        # If we are already inside a quoted replacement, subsequent headings
+        # with lower/equal article numbers likely belong to it.
+        if self.state._in_quoted_replacement:
+            return True
+
+        return False
+
     def _handle_article(self, line_info: LineInfo, i: int, classified: List[LineInfo]) -> int:
         parsed = match_article_heading(line_info.text)
         if parsed is None:
             return i
         article_number, article_title_text = parsed[0], parsed[1]
 
-        # Cross-reference fragments (e.g. "của Bộ luật này;") are content,
-        # not new articles. Returning i routes the line to _handle_content.
+        # Reject titles that are just punctuation (e.g. ";", ".", ",").
+        if article_title_text and not re.search(r"[\wÀ-ỹà-ỹđĐ]", article_title_text):
+            return i
+
+        # Cross-reference fragments (e.g. "của Bộ luật này;") are content.
         if is_ref_like_title(article_title_text):
             return i
 
-        # Article numbers are unique: any repeat is a page-header reprint
-        # (drop the line) or an in-text reference (keep as content).
-        if article_number in self.seen_articles:
-            if self.state.article == f"Điều {article_number}":
-                return i + 1
-            return i
+        # Determine structure role: main vs quoted_replacement
+        is_quoted = self._is_quoted_replacement_start(line_info, i, classified)
+        role = "quoted_replacement" if is_quoted else "main"
+        if is_quoted:
+            self.state.set_quoted_replacement(True)
+            # Assign a distinct operation_id for each confidently detected
+            # amendment operation.
+            self.state._operation_counter += 1
+            self.state.operation_id = f"op{self.state._operation_counter}"
+        else:
+            # A new main article exits quoted replacement context.
+            self.state.set_quoted_replacement(False)
+            self.state.operation_id = None
 
-        if not self._should_start_new_article(line_info, i, classified):
-            return i
+        # Close previous article before starting a new one.
+        self._close_article()
 
         candidate_article = f"Điều {article_number}"
-
-        same_article = (
-            self.state.article is not None
-            and self.state.article == candidate_article
-            and (
-                self.state.article_title is None
-                or not article_title_text
-                or (
-                    self.state.article_title.strip().casefold()
-                    == article_title_text.strip().casefold()
-                )
-            )
-        )
-
-        if same_article:
-            return i + 1
-
-        self._close_article()
+        instance_id = self.state.push_structure("article", str(article_number), role)
 
         self.state.article = candidate_article
         self.state.article_title = article_title_text or None
@@ -547,18 +643,9 @@ class LegalStructureParser:
         )
 
         new_i = self._collect_multiline_article_title(i, classified)
-
         return new_i
 
     def _is_title_continuation(self, text: str) -> bool:
-        """True if a line right after a heading continues the title.
-
-        Titles wrap mid-phrase, so a continuation starts lowercase or with
-        a digit (e.g. "15 tuổi đến chưa đủ 18 tuổi" completing "...từ đủ").
-        A genuine intro/content sentence starts uppercase or with a quote —
-        never lowercase. (Digit-start structural lines like "1. ..." are
-        filtered by stop_patterns before this check runs.)
-        """
         stripped = text.strip().lstrip("\"'“”‘’([{")
         if not stripped:
             return False
@@ -567,13 +654,6 @@ class LegalStructureParser:
         return stripped[0].islower() or stripped[0].isdigit()
 
     def _is_structure_title_continuation(self, current_title: str, text: str) -> bool:
-        """Continuation rule for chapter/section titles (stricter context).
-
-        Same as article titles, plus two extras safe here because chapter
-        and section titles are always ALL-CAPS phrases: a dangling comma
-        means the title is incomplete, and a short ALL-CAPS line is another
-        header fragment (body text is Title Case, never ALL-CAPS).
-        """
         stripped = text.strip().lstrip("\"'“”‘’([{")
         if not stripped or len(stripped) > 100:
             return False
@@ -656,6 +736,8 @@ class LegalStructureParser:
 
         if features.get("is_number_only") or features.get("looks_like_money_date"):
             return False
+        if features.get("is_likely_money_amount"):
+            return False
 
         if features.get("preceded_by_article_intro"):
             return True
@@ -677,13 +759,24 @@ class LegalStructureParser:
         if self.state.article_intro and self.state.clause is None:
             self._emit_article_intro()
 
+        # Emit any pending point before starting a new clause
         self._emit_point()
+
+        # Emit clause_intro BEFORE starting the new clause (requirement 4.4)
+        if self.state.clause_intro and self.state.clause is not None:
+            self._emit_clause_intro()
+
+        # Close previous clause
         self._emit_clause()
 
         self.state.clause = match.group(1)
         self.state.clause_parts = [match.group(2)]
         self.state.clause_pages = [line_info.page]
         self.state.clause_has_points = False
+
+        # Push clause instance
+        role = "quoted_replacement" if self.state._in_quoted_replacement else "main"
+        self.state.push_structure("clause", match.group(1), role)
 
         return i + 1
 
@@ -702,11 +795,19 @@ class LegalStructureParser:
             self.state.clause_pages = []
             self.state.clause_has_points = True
 
+        # Emit clause_intro before first point (requirement 4.4)
+        if self.state.clause_intro:
+            self._emit_clause_intro()
+
         self._emit_point()
 
         self.state.point = match.group(1).lower()
         self.state.point_parts = [match.group(2)]
         self.state.point_pages = [line_info.page]
+
+        # Push point instance
+        role = "quoted_replacement" if self.state._in_quoted_replacement else "main"
+        self.state.push_structure("point", match.group(1).lower(), role)
 
         return i + 1
 
@@ -714,18 +815,46 @@ class LegalStructureParser:
         text = line_info.text
         page = line_info.page
 
+        # Route content to the correct bucket based on current structure state.
         if self.state.point is not None:
             self.state.point_parts.append(text)
             self.state.point_pages.append(page)
         elif self.state.clause is not None:
             self.state.clause_parts.append(text)
             self.state.clause_pages.append(page)
-        elif self.state.article is None and not self.seen_articles:
+        elif self.state.article is not None:
+            # Inside an article but before any clause -> article intro
+            self.state.article_intro.append(text)
+            self.state.article_intro_pages.append(page)
+        elif self.state.section is not None:
+            # Inside a section but before any article -> section intro
+            if not hasattr(self.state, 'section_intro'):
+                self.state.section_intro = []
+                self.state.section_intro_pages = []
+            self.state.section_intro.append(text)
+            self.state.section_intro_pages.append(page)
+        elif self.state.chapter is not None:
+            # Inside a chapter but before any section/article -> chapter intro
+            if not hasattr(self.state, 'chapter_intro'):
+                self.state.chapter_intro = []
+                self.state.chapter_intro_pages = []
+            self.state.chapter_intro.append(text)
+            self.state.chapter_intro_pages.append(page)
+        elif not self.seen_articles:
+            # Before any article -> preamble
             self.state.preamble.append(text)
             self.state.preamble_pages.append(page)
         else:
-            self.state.article_intro.append(text)
-            self.state.article_intro_pages.append(page)
+            # After all articles but before signature -> treat as article intro
+            # of the last known article, or preamble if no article yet.
+            if self.state.article:
+                self.state.article_intro.append(text)
+                self.state.article_intro_pages.append(page)
+            else:
+                self.state.preamble.append(text)
+                self.state.preamble_pages.append(page)
+
+    # ── Emit methods ──────────────────────────────────────────────────────
 
     def _emit_preamble(self):
         content = join_text(self.state.preamble)
@@ -745,9 +874,56 @@ class LegalStructureParser:
                 page_end=max(pages) if pages else 1,
                 chunk_type="preamble",
                 document=self.document,
+                structure_role="main",
             ))
         self.state.preamble = []
         self.state.preamble_pages = []
+
+    def _emit_section_intro(self):
+        content = join_text(getattr(self.state, 'section_intro', []))
+        if content and self.state.section is not None:
+            pages = getattr(self.state, 'section_intro_pages', [])
+            self.chunks.append(make_chunk(
+                chapter=self.state.chapter,
+                chapter_title=self.state.chapter_title,
+                section=self.state.section,
+                section_title=self.state.section_title,
+                article=None,
+                article_title=None,
+                clause=None,
+                point=None,
+                content=content,
+                page_start=min(pages) if pages else 1,
+                page_end=max(pages) if pages else 1,
+                chunk_type="section_intro",
+                document=self.document,
+                structure_role=self.state._structure_role,
+            ))
+        self.state.section_intro = []
+        self.state.section_intro_pages = []
+
+    def _emit_chapter_intro(self):
+        content = join_text(getattr(self.state, 'chapter_intro', []))
+        if content and self.state.chapter is not None:
+            pages = getattr(self.state, 'chapter_intro_pages', [])
+            self.chunks.append(make_chunk(
+                chapter=self.state.chapter,
+                chapter_title=self.state.chapter_title,
+                section=None,
+                section_title=None,
+                article=None,
+                article_title=None,
+                clause=None,
+                point=None,
+                content=content,
+                page_start=min(pages) if pages else 1,
+                page_end=max(pages) if pages else 1,
+                chunk_type="chapter_intro",
+                document=self.document,
+                structure_role=self.state._structure_role,
+            ))
+        self.state.chapter_intro = []
+        self.state.chapter_intro_pages = []
 
     def _emit_article_intro(self):
         content = join_text(self.state.article_intro)
@@ -767,13 +943,17 @@ class LegalStructureParser:
                 page_end=max(pages),
                 chunk_type="article_intro",
                 document=self.document,
+                structure_instance_id=self.state.article_instance_id,
+                parent_instance_id=self.state._current_instance()["parent_id"] if self.state._current_instance() else None,
+                structure_role=self.state._structure_role,
+                operation_id=self.state.operation_id,
             ))
         self.state.article_intro = []
         self.state.article_intro_pages = []
 
     def _emit_clause_intro(self):
         content = join_text(self.state.clause_intro)
-        if content and self.state.article is not None:
+        if content and self.state.article is not None and self.state.clause is not None:
             pages = self.state.clause_intro_pages
             self.chunks.append(make_chunk(
                 chapter=self.state.chapter,
@@ -789,6 +969,10 @@ class LegalStructureParser:
                 page_end=max(pages),
                 chunk_type="clause_intro",
                 document=self.document,
+                structure_instance_id=self.state.clause_instance_id,
+                parent_instance_id=self.state.article_instance_id,
+                structure_role=self.state._structure_role,
+                operation_id=self.state.operation_id,
             ))
         self.state.clause_intro = []
         self.state.clause_intro_pages = []
@@ -812,6 +996,10 @@ class LegalStructureParser:
                     page_end=max(pages),
                     chunk_type="clause",
                     document=self.document,
+                    structure_instance_id=self.state.clause_instance_id,
+                    parent_instance_id=self.state.article_instance_id,
+                    structure_role=self.state._structure_role,
+                    operation_id=self.state.operation_id,
                 ))
         elif self.state.clause is not None and self.state.clause_has_points:
             self._emit_clause_intro()
@@ -837,6 +1025,10 @@ class LegalStructureParser:
                     page_end=max(pages),
                     chunk_type="point",
                     document=self.document,
+                    structure_instance_id=self.state.point_instance_id,
+                    parent_instance_id=self.state.clause_instance_id,
+                    structure_role=self.state._structure_role,
+                    operation_id=self.state.operation_id,
                 ))
         self.state.reset_point()
 
@@ -848,6 +1040,8 @@ class LegalStructureParser:
 
     def _close_all(self):
         self._emit_preamble()
+        self._emit_section_intro()
+        self._emit_chapter_intro()
         self._close_article()
 
 

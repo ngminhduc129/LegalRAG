@@ -1,0 +1,29 @@
+{
+  "run_id": "test_fix6",
+  "strategy": "legal_aware",
+  "documents": [
+    {
+      "document_id": "nd_12_2022",
+      "document_name": "Nghị định 12/2022/NĐ-CP",
+      "status": "ok",
+      "pdf": "E:\\LegalRAG\\data\\raw\\Nghị-định-12-2022-NĐ-CP.pdf",
+      "pages": 83,
+      "pages_with_text": 0,
+      "pages_ocr_required": 83,
+      "pages_ocr_used": 83,
+      "pages_ocr_empty": 0,
+      "corpus_chunks": 796,
+      "final_chunks": 796,
+      "articles_seen": 64,
+      "missing_articles": 0,
+      "appendix_chunks": 0,
+      "warnings": [
+        "Dropped 0 noise lines"
+      ],
+      "error": null
+    }
+  ],
+  "status_counts": {
+    "ok": 1
+  }
+}

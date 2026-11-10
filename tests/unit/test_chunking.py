@@ -1,6 +1,8 @@
 """Unit tests for chunking module."""
 
 import pytest
+from typing import Any, Dict, Optional
+
 from legal_rag.chunking.legal_aware import (
     LegalAwareChunker,
     FixedSizeChunker,
@@ -11,6 +13,11 @@ from legal_rag.chunking.legal_aware import (
     _safe_id_part,
 )
 from legal_rag.chunking.cleaner import clean_chunk, clean_content, is_page_number
+from legal_rag.chunking.identity import (
+    StructureRegistry,
+    IdentityResolver,
+    OperationDetector,
+)
 from legal_rag.chunking.validator import validate_chunks, ValidationIssue
 
 
@@ -682,6 +689,310 @@ class TestSafeIdPart:
         assert _safe_id_part("Điều 1") == "điều_1"
         assert _safe_id_part("Chương I") == "chương_i"
         assert _safe_id_part("a/b") == "a_b"
+
+
+class TestStructureIdentity:
+    """Tests A–J for structure-identity-aware chunking."""
+
+    def _identity_chunk(
+        self,
+        instance_id: str,
+        parent_instance_id: Optional[str],
+        structure_role: str,
+        operation_id: Optional[str] = None,
+        **kwargs,
+    ) -> Dict[str, Any]:
+        base = _parser_chunk(**kwargs)
+        base.update({
+            "structure_instance_id": instance_id,
+            "parent_instance_id": parent_instance_id,
+            "structure_role": structure_role,
+        })
+        if operation_id is not None:
+            base["operation_id"] = operation_id
+        return base
+
+    # ── Test A — Identity propagation ──────────────────────────────────
+
+    def test_identity_propagation(self):
+        """Every output chunk preserves its parser instance IDs and role."""
+        corpus_chunks = [
+            self._identity_chunk("si1", None, "main",
+                article="Điều 1", article_title="Title", chunk_type="article_intro", content="Intro"),
+            self._identity_chunk("si2", "si1", "main",
+                article="Điều 1", clause="1", chunk_type="clause_intro", content="Clause intro"),
+            self._identity_chunk("si3", "si2", "main",
+                article="Điều 1", clause="1", point="a", chunk_type="point", content="Point A"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        by_id = {
+            c["structure_instance_id"]: c
+            for c in chunks if c.get("structure_instance_id")
+        }
+        assert by_id["si1"]["structure_instance_id"] == "si1"
+        assert by_id["si1"]["parent_instance_id"] is None
+        assert by_id["si1"]["structure_role"] == "main"
+        assert by_id["si2"]["structure_instance_id"] == "si2"
+        assert by_id["si2"]["parent_instance_id"] == "si1"
+        assert by_id["si2"]["structure_role"] == "main"
+        assert by_id["si3"]["structure_instance_id"] == "si3"
+        assert by_id["si3"]["parent_instance_id"] == "si2"
+        assert by_id["si3"]["structure_role"] == "main"
+
+    # ── Test B — Duplicate article numbers ─────────────────────────────
+
+    def test_duplicate_article_numbers(self):
+        """Same article number, different instance IDs stay separate."""
+        corpus_chunks = [
+            self._identity_chunk("si1", None, "main",
+                article="Điều 35", article_title="Title", chunk_type="article_intro", content="Intro A"),
+            self._identity_chunk("si2", "si1", "main",
+                article="Điều 35", clause="1", chunk_type="clause", content="Clause A"),
+            self._identity_chunk("si3", None, "main",
+                article="Điều 35", article_title="Quoted", chunk_type="article_intro", content="Intro B"),
+            self._identity_chunk("si4", "si3", "main",
+                article="Điều 35", clause="1", chunk_type="clause", content="Clause B"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        article_intros = [c for c in chunks if c.get("chunk_type") == "article_intro"]
+        assert len(article_intros) == 2
+        ids = {c["structure_instance_id"] for c in article_intros}
+        assert ids == {"si1", "si3"}
+        clauses = [c for c in chunks if c.get("chunk_type") == "clause"]
+        si2_parent = [c for c in clauses if c.get("structure_instance_id") == "si2"][0]
+        si4_parent = [c for c in clauses if c.get("structure_instance_id") == "si4"][0]
+        assert si2_parent["parent_instance_id"] == "si1"
+        assert si4_parent["parent_instance_id"] == "si3"
+        assert si2_parent["parent_instance_id"] != si4_parent["parent_instance_id"]
+
+    # ── Test C — Quoted replacement ────────────────────────────────────
+
+    def test_quoted_replacement(self):
+        """Quoted replacement has distinct role and identity from outer article."""
+        corpus_chunks = [
+            self._identity_chunk("si1", None, "main",
+                article="Điều 1", article_title="Sửa đổi", chunk_type="article_intro", content="Outer amendment"),
+            self._identity_chunk("si2", "si1", "quoted_replacement",
+                article="Điều 4", article_title="Quoted replacement", chunk_type="article_intro", content="Quoted Art 4"),
+            self._identity_chunk("si3", "si2", "quoted_replacement",
+                article="Điều 4", clause="1", chunk_type="clause", content="Quoted clause"),
+            self._identity_chunk("si4", "si3", "quoted_replacement",
+                article="Điều 4", clause="1", point="a", chunk_type="point", content="Quoted point a"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        quoted = [c for c in chunks if c.get("structure_role") == "quoted_replacement"]
+        assert len(quoted) == 3  # article_intro, clause, point
+        # Quoted replacement article_intro points to outer article (si1)
+        quoted_intro = [c for c in quoted if c.get("chunk_type") == "article_intro"][0]
+        assert quoted_intro["parent_instance_id"] == "si1"
+        # Point's parent_instance_id is the quoted clause (si3)
+        quoted_point = [c for c in quoted if c.get("chunk_type") == "point"][0]
+        assert quoted_point["parent_instance_id"] == "si3"
+        # No cross-role merge: main article_intro stays separate
+        main_intros = [c for c in chunks if c.get("structure_role") == "main" and c.get("chunk_type") == "article_intro"]
+        assert len(main_intros) == 1
+        assert main_intros[0]["structure_instance_id"] == "si1"
+
+    # ── Test D — Multiple amendment operations ─────────────────────────
+
+    def test_multiple_amendment_operations(self):
+        """Two operations modifying different articles get different op IDs."""
+        corpus_chunks = [
+            self._identity_chunk("si1", None, "main",
+                article="Điều 1", article_title="Sửa đổi", chunk_type="article_intro", content="Outer",
+                operation_id="op1"),
+            self._identity_chunk("si2", "si1", "quoted_replacement",
+                article="Điều 4", article_title="Quoted 4", chunk_type="article_intro", content="Q4",
+                operation_id="op1"),
+            self._identity_chunk("si3", "si2", "quoted_replacement",
+                article="Điều 4", clause="1", chunk_type="clause", content="Q4 c1",
+                operation_id="op1"),
+            self._identity_chunk("si4", None, "main",
+                article="Điều 2", article_title="Sửa đổi", chunk_type="article_intro", content="Outer 2",
+                operation_id="op2"),
+            self._identity_chunk("si5", "si4", "quoted_replacement",
+                article="Điều 5", article_title="Quoted 5", chunk_type="article_intro", content="Q5",
+                operation_id="op2"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        op1_chunks = [c for c in chunks if c.get("operation_id") == "op1"]
+        op2_chunks = [c for c in chunks if c.get("operation_id") == "op2"]
+        assert len(op1_chunks) == 3  # si1, si2, si3
+        assert len(op2_chunks) == 2  # si4, si5
+        # Chunks within the same operation share its ID
+        assert all(c["operation_id"] == "op1" for c in op1_chunks)
+        assert all(c["operation_id"] == "op2" for c in op2_chunks)
+        # Different operations never merge
+        assert not any(c.get("operation_id") == "op1" for c in op2_chunks)
+
+    def test_unsupported_operation_null_id(self):
+        """Unsupported operations retain null operation_id."""
+        corpus_chunks = [
+            self._identity_chunk("si1", None, "main",
+                article="Điều 1", article_title="Title", chunk_type="article_intro", content="Normal"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        assert chunks[0].get("operation_id") is None
+
+    # ── Test E — Parent resolution ─────────────────────────────────────
+
+    def test_parent_resolution_uses_instance_id(self):
+        """Parent resolution uses parent_instance_id, not article/clause tuples."""
+        corpus_chunks = [
+            self._identity_chunk("si1", None, "main",
+                article="Điều 1", article_title="Title", chunk_type="article_intro", content="Intro"),
+            self._identity_chunk("si2", "si1", "main",
+                article="Điều 1", clause="1", chunk_type="clause_intro", content="Clause intro"),
+            self._identity_chunk("si3", "si2", "main",
+                article="Điều 1", clause="1", point="a", chunk_type="point", content="Point A"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        point = [c for c in chunks if c.get("chunk_type") == "point"][0]
+        clause_intro = [c for c in chunks if c.get("chunk_type") == "clause_intro"][0]
+        # parent_id resolves to the clause_intro's chunk_id
+        assert point["parent_id"] == clause_intro["chunk_id"]
+        # parent_instance_id preserved as legal structure metadata
+        assert point["parent_instance_id"] == "si2"
+        # parent_id is distinct from parent_instance_id
+        assert point["parent_id"] != point["parent_instance_id"]
+
+    def test_invalid_parent_reference_detected(self):
+        """Invalid parent references are detected (warning), not silently fixed."""
+        corpus_chunks = [
+            self._identity_chunk("si1", "si_missing", "main",
+                article="Điều 1", article_title="Title", chunk_type="article_intro", content="Intro"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        # Chunk is preserved even though parent is missing
+        assert chunks[0]["structure_instance_id"] == "si1"
+        assert chunks[0]["parent_instance_id"] == "si_missing"
+        # parent_id cannot be resolved (parent not in registry)
+        assert chunks[0]["parent_id"] is None
+
+    def test_missing_parent_metadata_no_data_loss(self):
+        """Missing parent metadata does not cause data loss."""
+        corpus_chunks = [
+            {
+                "article": "Điều 1",
+                "article_title": "Title",
+                "clause": "1",
+                "point": "a",
+                "chunk_type": "point",
+                "content": "Point content",
+                "page_start": 1,
+                "page_end": 1,
+                # No instance IDs at all
+            },
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        assert len(chunks) == 1
+        assert chunks[0]["content"] == "Point content"
+        assert chunks[0]["parent_id"] is None
+        assert chunks[0].get("structure_instance_id") is None
+
+    # ── Test F — Multiple chunks per structure ─────────────────────────
+
+    def test_multiple_chunks_per_structure(self):
+        """One structure can produce multiple chunks; all share instance ID."""
+        corpus_chunks = [
+            self._identity_chunk("si1", None, "main",
+                article="Điều 1", article_title="Title", chunk_type="article_intro", content="Intro part 1"),
+            self._identity_chunk("si1", None, "main",
+                article="Điều 1", article_title="Title", chunk_type="article_intro", content="Intro part 2"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        intros = [c for c in chunks if c.get("chunk_type") == "article_intro"]
+        assert len(intros) == 2
+        assert all(c["structure_instance_id"] == "si1" for c in intros)
+        assert len({c["chunk_id"] for c in intros}) == 2  # chunk IDs remain unique
+
+    # ── Test G — Intro metadata ────────────────────────────────────────
+
+    def test_intro_metadata_preserved(self):
+        """Preamble, chapter/section/article/clause intro metadata preserved."""
+        corpus_chunks = [
+            {
+                "article": None, "clause": None, "point": None,
+                "chunk_type": "preamble", "content": "Preamble text",
+                "page_start": 1, "page_end": 1,
+                "structure_role": "main",
+                "document_id": "test",
+            },
+            self._identity_chunk("si_a1", None, "main",
+                article="Điều 1", article_title="Title", chunk_type="article_intro", content="Article intro"),
+            self._identity_chunk("si_s1", "si_a1", "main",
+                article=None, clause=None, point=None,
+                chunk_type="section_intro", content="Section intro", page_start=1, page_end=1),
+            self._identity_chunk("si_c1", "si_a1", "main",
+                article="Điều 1", clause="1", chunk_type="clause_intro", content="Clause intro"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        types = [c["chunk_type"] for c in chunks]
+        assert "preamble" in types
+        assert "article_intro" in types
+        assert "section_intro" in types
+        assert "clause_intro" in types
+        # Source order maintained: preamble before article_intro
+        assert types.index("preamble") < types.index("article_intro")
+        # Identity metadata preserved
+        article_intro = [c for c in chunks if c.get("chunk_type") == "article_intro"][0]
+        assert article_intro["structure_instance_id"] == "si_a1"
+        assert article_intro["structure_role"] == "main"
+        section_intro = [c for c in chunks if c.get("chunk_type") == "section_intro"][0]
+        assert section_intro["structure_instance_id"] == "si_s1"
+        assert section_intro["parent_instance_id"] == "si_a1"
+
+    def test_cross_role_isolation(self):
+        """main, amendment, quoted_replacement, appendix do not merge."""
+        corpus_chunks = [
+            self._identity_chunk("si1", None, "main",
+                article="Điều 1", article_title="Main", chunk_type="article_intro", content="Main content"),
+            self._identity_chunk("si2", "si1", "quoted_replacement",
+                article="Điều 4", article_title="Quoted", chunk_type="article_intro", content="Quoted content"),
+            {
+                "article": None, "clause": None, "point": None,
+                "chunk_type": "appendix", "content": "Appendix table",
+                "page_start": 9, "page_end": 9,
+                "structure_role": "appendix",
+            },
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        roles = {c.get("structure_role") for c in chunks if c.get("structure_role")}
+        assert "main" in roles
+        assert "quoted_replacement" in roles
+        assert "appendix" in roles
+        # No cross-role merge: each chunk keeps its own role
+        main = [c for c in chunks if c.get("structure_role") == "main"]
+        quoted = [c for c in chunks if c.get("structure_role") == "quoted_replacement"]
+        appendix = [c for c in chunks if c.get("chunk_type") == "appendix"]
+        assert len(main) == 1
+        assert len(quoted) == 1
+        assert len(appendix) == 1
+        assert main[0]["content"] == "Main content"
+        assert quoted[0]["content"] == "Quoted content"
+        assert appendix[0]["content"] == "Appendix table"
+
+    # ── Test I — Backward compatibility ────────────────────────────────
+
+    def test_legacy_chunks_without_instance_ids(self):
+        """Legacy parser chunks without instance IDs do not crash."""
+        corpus_chunks = [
+            _parser_chunk(article="Điều 1", article_title="Title", chunk_type="article_intro", content="Intro"),
+            _parser_chunk(article="Điều 1", clause="1", chunk_type="clause_intro", content="Clause intro"),
+            _parser_chunk(article="Điều 1", clause="1", point="a", chunk_type="point", content="Point A"),
+        ]
+        chunks = LegalAwareChunker(document_id="test").chunk(corpus_chunks)
+        assert len(chunks) == 3
+        # Content remains available
+        assert chunks[0]["content"] == "Intro"
+        assert chunks[2]["content"] == "Point A"
+        # Missing identity is explicitly absent (not fabricated)
+        assert chunks[0].get("structure_instance_id") is None
+        assert chunks[0].get("parent_instance_id") is None
+        # parent_id for points resolves via clause_intro string-key fallback
+        point = chunks[2]
+        clause_intro = chunks[1]
+        assert point["parent_id"] == clause_intro["chunk_id"]
 
 
 if __name__ == "__main__":

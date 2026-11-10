@@ -1,0 +1,24 @@
+{
+  "run_id": "test_reg_labor",
+  "strategy": "legal_aware",
+  "total_chunks": 982,
+  "retrieval_eligible": 982,
+  "chunk_types": {
+    "clause": 572,
+    "point": 285,
+    "clause_intro": 75,
+    "article_intro": 49,
+    "preamble": 1
+  },
+  "by_document": {
+    "labor_code_2019": 982
+  },
+  "per_document": [
+    {
+      "document_id": "labor_code_2019",
+      "status": "ok",
+      "chunks": 982,
+      "articles_seen": 220
+    }
+  ]
+}

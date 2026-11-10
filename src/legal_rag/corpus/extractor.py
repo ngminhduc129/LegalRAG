@@ -1,15 +1,15 @@
 """PDF extraction and legal structure parsing for corpus processing."""
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 import fitz  # PyMuPDF
 
-from legal_rag.chunking.legal_aware import save_csv, save_jsonl
 from legal_rag.corpus.patches import apply_page_patches
 from legal_rag.corpus.registry import DocumentMeta, resolve_document
 from legal_rag.parsing.classifier import clean_line, is_page_number
-from legal_rag.parsing.parser import ParseResult, parse_legal_structure
 
 
 def _page_lines(text: str, page_num: int, source: str) -> List[Dict[str, Any]]:
@@ -67,6 +67,7 @@ def parse_corpus(
     lines = extract_pdf_lines(pdf_path, ocr_pages=ocr_pages)
     if patches:
         lines, _ = apply_page_patches(lines, patches)
+    from legal_rag.parsing.parser import parse_legal_structure, ParseResult
     return parse_legal_structure(lines, meta)
 
 
@@ -76,6 +77,7 @@ def save_corpus(
     document_id: str = "unknown",
 ):
     """Save corpus chunks to JSONL and CSV."""
+    from legal_rag.chunking.legal_aware import save_csv, save_jsonl
     output_dir.mkdir(parents=True, exist_ok=True)
     jsonl_path = output_dir / f"{document_id}_corpus.jsonl"
     csv_path = output_dir / f"{document_id}_corpus_preview.csv"
@@ -101,6 +103,7 @@ def main():  # pragma: no cover - manual entry point
     print(f"Extracted lines: {len(lines)}")
 
     print("Parsing legal structure...")
+    from legal_rag.parsing.parser import parse_legal_structure
     result = parse_legal_structure(lines)
     print(f"Total chunks: {len(result.chunks)}")
 

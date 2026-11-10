@@ -15,10 +15,15 @@ import fitz  # PyMuPDF
 
 from legal_rag.parsing.classifier import (
     CHAPTER_RE, SECTION_RE, ARTICLE_RE, CLAUSE_RE, POINT_RE,
-    clean_line, is_page_number, extract_pdf_lines,
+    clean_line, is_page_number,
 )
+from legal_rag.corpus.extractor import extract_pdf_lines
 from legal_rag.corpus.registry import DocumentMeta, resolve_document
 from legal_rag.chunking.base import BaseChunker
+from legal_rag.chunking.identity import (
+    StructureRegistry,
+    IdentityResolver,
+)
 
 
 STRUCTURE_FIELDS = (
@@ -137,11 +142,15 @@ def make_chunk(
     document: Optional[DocumentMeta] = None,
     document_id: Optional[str] = None,
     parent_id: Optional[str] = None,
+    structure_instance_id: Optional[str] = None,
+    parent_instance_id: Optional[str] = None,
+    structure_role: Optional[str] = None,
+    operation_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Create a standardized chunk record."""
     doc = resolve_document(document or document_id)
     chunk_id = f"{doc.document_id}_{_safe_id_part(article)}_{_safe_id_part(clause)}_{_safe_id_part(point)}_{chunk_type}"
-    return {
+    record: Dict[str, Any] = {
         **doc.as_metadata(),
         "chunk_id": chunk_id,
         "document_id": doc.document_id,
@@ -160,6 +169,15 @@ def make_chunk(
         "parent_id": parent_id,
         "structure_occurrence": 1,
     }
+    if structure_instance_id is not None:
+        record["structure_instance_id"] = structure_instance_id
+    if parent_instance_id is not None:
+        record["parent_instance_id"] = parent_instance_id
+    if structure_role is not None:
+        record["structure_role"] = structure_role
+    if operation_id is not None:
+        record["operation_id"] = operation_id
+    return record
 
 
 # =========================================================
@@ -189,14 +207,23 @@ class LegalAwareChunker(BaseChunker):
         """
         Transform parser output chunks into final chunks with IDs and parent links.
 
+        Parser-generated structure identity
+        (``structure_instance_id``, ``parent_instance_id``, ``structure_role``,
+        ``operation_id``) is the authoritative source for legal hierarchy.
+        Chunk-level ``parent_id`` is resolved separately from
+        ``parent_instance_id`` and is never conflated with it.
+
         Args:
             corpus_chunks: List of chunks from LegalStructureParser with fields:
                 document_name, document_number, chapter, chapter_title,
                 section, section_title, article, article_title, clause, point,
-                chunk_type, content, page_start, page_end
+                chunk_type, content, page_start, page_end,
+                structure_instance_id, parent_instance_id, structure_role,
+                operation_id
 
         Returns:
-            List of transformed chunks with added chunk_id, document_id, parent_id
+            List of transformed chunks with added chunk_id, document_id,
+            parent_id and preserved structure identity metadata.
         """
         if not corpus_chunks:
             return []
@@ -212,6 +239,53 @@ class LegalAwareChunker(BaseChunker):
             chunk for chunk in corpus_chunks
             if chunk.get("chunk_type") != "appendix"
         ]
+
+        # Pass 1: register every structure in the registry and generate stable
+        # chunk_ids.  Registering all structures first allows parent resolution
+        # even when a parent structure appears later in the input.
+        registry = StructureRegistry()
+        chunk_ids_by_index: Dict[int, str] = {}
+        seen_ids: set[str] = set()
+        # Legacy fallback: chunks without parser instance IDs (legacy parser
+        # output) use (article, clause) string keys for parent resolution.
+        # This is explicitly a fallback, not authoritative parser identity.
+        legacy_clause_intro_map: Dict[tuple[str, str], str] = {}
+        for index, chunk in enumerate(body_chunks):
+            # Ensure document_id is set for parent resolution.
+            if not chunk.get("document_id"):
+                chunk["document_id"] = self.document_id
+            chunk_type = chunk.get("chunk_type", "unknown")
+            instance_id = chunk.get("structure_instance_id")
+            article = chunk.get("article")
+            clause = chunk.get("clause")
+
+            chunk_id = (
+                f"{self.document_id}_"
+                f"{_safe_id_part(article)}_"
+                f"{_safe_id_part(clause)}_"
+                f"{_safe_id_part(chunk.get('point'))}_"
+                f"{chunk_type}"
+            )
+            occurrence = 1
+            unique_id = chunk_id
+            while unique_id in seen_ids:
+                occurrence += 1
+                unique_id = f"{chunk_id}__occ{occurrence}"
+            seen_ids.add(unique_id)
+            chunk_ids_by_index[index] = unique_id
+            chunk["chunk_id"] = unique_id
+            chunk["structure_occurrence"] = occurrence
+
+            if instance_id:
+                registry.register(
+                    instance_id=instance_id,
+                    parent_instance_id=chunk.get("parent_instance_id"),
+                    structure_role=chunk.get("structure_role", "main"),
+                    operation_id=chunk.get("operation_id"),
+                )
+                registry.add_chunk_id(instance_id, unique_id)
+            elif chunk_type == "clause_intro" and article and clause:
+                legacy_clause_intro_map.setdefault((article, clause), unique_id)
 
         # Find first article chunk to identify preamble
         first_article_idx = None
@@ -231,14 +305,25 @@ class LegalAwareChunker(BaseChunker):
             body_chunks[first_article_idx:] if first_article_idx is not None else []
         )
 
-        result_chunks = []
+        result_chunks: List[Dict[str, Any]] = []
 
-        # 1. Emit preamble (merge all pre-article chunks into one)
+        # 1. Emit preamble (merge all pre-article chunks into one).
+        # A merged preamble has no single structure_instance_id; preserve
+        # structure_role only when all preamble chunks agree on it.
         if preamble_chunks:
-            preamble_content = "\n".join(c["content"] for c in preamble_chunks if c.get("content"))
+            preamble_content = "\n".join(
+                c["content"] for c in preamble_chunks if c.get("content")
+            )
             if preamble_content.strip():
-                pages = [c["page_start"] for c in preamble_chunks] + [c["page_end"] for c in preamble_chunks]
-                result_chunks.append(make_chunk(
+                pages = [
+                    c["page_start"] for c in preamble_chunks
+                ] + [c["page_end"] for c in preamble_chunks]
+                roles = {
+                    c.get("structure_role") for c in preamble_chunks
+                    if c.get("structure_role") is not None
+                }
+                preamble_role = roles.pop() if len(roles) == 1 else None
+                preamble_chunk = make_chunk(
                     chapter=None,
                     chapter_title=None,
                     section=None,
@@ -252,44 +337,41 @@ class LegalAwareChunker(BaseChunker):
                     page_end=max(pages),
                     chunk_type="preamble",
                     document=self.document,
-                ))
+                    structure_role=preamble_role,
+                )
+                # If the merged preamble's chunk_id collides with one already
+                # seen in pass 1 (e.g. a preamble-type input chunk), suffix it.
+                if preamble_chunk["chunk_id"] in seen_ids:
+                    occurrence = 1
+                    base_id = preamble_chunk["chunk_id"]
+                    while preamble_chunk["chunk_id"] in seen_ids:
+                        occurrence += 1
+                        preamble_chunk["chunk_id"] = f"{base_id}__occ{occurrence}"
+                seen_ids.add(preamble_chunk["chunk_id"])
+                result_chunks.append(preamble_chunk)
 
-        # 2. Process article chunks - add IDs and parent links.
-        # Two passes: clause_intro chunks are emitted AFTER their points by
-        # the parser, so a single forward pass can never link them.
-        # Pass 1: collect all clause_intro chunk_ids keyed by (article, clause).
-        clause_intro_map = {}  # (article, clause) -> chunk_id of clause_intro
-        for chunk in article_chunks:
+        # 2. Process article chunks - resolve parent links from parser identity.
+        resolver = IdentityResolver(registry)
+        for index, chunk in enumerate(article_chunks):
             chunk_type = chunk.get("chunk_type", "unknown")
-            if chunk_type == "clause_intro" and chunk.get("clause") and chunk.get("article"):
-                chunk_id = f"{self.document_id}_{_safe_id_part(chunk.get('article'))}_{_safe_id_part(chunk.get('clause'))}_{_safe_id_part(chunk.get('point'))}_{chunk_type}"
-                clause_intro_map.setdefault((chunk["article"], chunk["clause"]), chunk_id)
+            chunk_id = chunk_ids_by_index[index]
+            instance_id = chunk.get("structure_instance_id")
 
-        # Pass 2: emit chunks with parent links resolved.
-        # Quoted amendments (e.g. Dieu 219 quoting other laws' own
-        # khoản/điểm numbering) can repeat a structure key with DIFFERENT
-        # content. chunk_ids must stay unique for traceability, so repeats
-        # get an occurrence suffix.
-        seen_ids = set()
-        for chunk in article_chunks:
-            # Generate stable chunk_id with document_id
-            chunk_type = chunk.get("chunk_type", "unknown")
-            chunk_id = f"{self.document_id}_{_safe_id_part(chunk.get('article'))}_{_safe_id_part(chunk.get('clause'))}_{_safe_id_part(chunk.get('point'))}_{chunk_type}"
-
-            # Determine parent_id for points
-            parent_id = None
-            if chunk_type == "point" and chunk.get("clause") and chunk.get("article"):
-                parent_key = (chunk["article"], chunk["clause"])
-                parent_id = clause_intro_map.get(parent_key)
-
-            # Ensure chunk_id uniqueness across quoted-numbering repeats.
-            occurrence = 1
-            unique_id = chunk_id
-            while unique_id in seen_ids:
-                occurrence += 1
-                unique_id = f"{chunk_id}__occ{occurrence}"
-            seen_ids.add(unique_id)
-            chunk_id = unique_id
+            # Resolve chunk-level parent_id from parent_instance_id, never from
+            # (article, clause) tuples.  parent_instance_id itself is preserved
+            # unchanged as legal structure metadata.
+            parent_id: Optional[str] = None
+            if instance_id and instance_id in registry.records:
+                parent_id = resolver.resolve_parent_chunk_id(
+                    instance_id,
+                    chunk_type,
+                    self.document_id,
+                    body_chunks,
+                )
+            elif chunk_type == "point" and article and clause:
+                # Legacy fallback: resolve point's parent via (article, clause)
+                # string key.  Marked explicitly as fallback, not parser identity.
+                parent_id = legacy_clause_intro_map.get((article, clause))
 
             # Build transformed chunk, filling any missing document metadata
             # from the registry entry instead of hard-coded constants.
@@ -301,9 +383,9 @@ class LegalAwareChunker(BaseChunker):
                 "chunk_id": chunk_id,
                 "document_id": self.document_id,
                 "parent_id": parent_id,
-                # Quoted amendments repeat article/clause/point numbering;
-                # the occurrence makes the structure key unique.
-                "structure_occurrence": occurrence,
+                "structure_occurrence": chunk.get("structure_occurrence", 1),
+                # structure_instance_id, parent_instance_id, structure_role and
+                # operation_id are preserved from the parser input via {**chunk}.
             })
             result_chunks.append(transformed)
 

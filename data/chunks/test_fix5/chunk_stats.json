@@ -1,0 +1,25 @@
+{
+  "run_id": "test_fix5",
+  "strategy": "legal_aware",
+  "total_chunks": 75,
+  "retrieval_eligible": 66,
+  "chunk_types": {
+    "point": 44,
+    "clause": 12,
+    "appendix": 9,
+    "clause_intro": 8,
+    "article_intro": 1,
+    "preamble": 1
+  },
+  "by_document": {
+    "nd_70_2023": 75
+  },
+  "per_document": [
+    {
+      "document_id": "nd_70_2023",
+      "status": "ok",
+      "chunks": 75,
+      "articles_seen": 3
+    }
+  ]
+}

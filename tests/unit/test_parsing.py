@@ -5,13 +5,13 @@ from legal_rag.parsing.classifier import (
     LineClassifier,
     clean_line,
     is_page_number,
-    extract_pdf_lines,
     CHAPTER_RE,
     SECTION_RE,
     ARTICLE_RE,
     CLAUSE_RE,
     POINT_RE,
 )
+from legal_rag.corpus.extractor import extract_pdf_lines
 from legal_rag.parsing.parser import LegalStructureParser, parse_legal_structure
 
 

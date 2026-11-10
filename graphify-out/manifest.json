@@ -1,0 +1,4643 @@
+{
+  "configs/base.yaml": {
+    "mtime": 1794210948.1637156,
+    "seen": 1794330696.8156927,
+    "ast_hash": "68aef5fdc84753deb60c6344f7b6da4e",
+    "semantic_hash": "68aef5fdc84753deb60c6344f7b6da4e"
+  },
+  "configs/chunking/article.yaml": {
+    "mtime": 1791358321.169618,
+    "seen": 1794330696.8156927,
+    "ast_hash": "f90b9ee9086d71277a4b85249ad31652",
+    "semantic_hash": "f90b9ee9086d71277a4b85249ad31652",
+    "ast_empty": true
+  },
+  "configs/chunking/clause.yaml": {
+    "mtime": 1791358327.781278,
+    "seen": 1794330696.8156927,
+    "ast_hash": "c1ca24adc5df0d0ab4043547a35a7a12",
+    "semantic_hash": "c1ca24adc5df0d0ab4043547a35a7a12",
+    "ast_empty": true
+  },
+  "configs/chunking/fixed_size.yaml": {
+    "mtime": 1791358308.9588816,
+    "seen": 1794330696.8156927,
+    "ast_hash": "58481ffee4dce43a2181517e4a173515",
+    "semantic_hash": "58481ffee4dce43a2181517e4a173515"
+  },
+  "configs/chunking/legal_aware.yaml": {
+    "mtime": 1791358293.2833962,
+    "seen": 1794330696.8167598,
+    "ast_hash": "34be6886a48a944e36af5bfa379be94d",
+    "semantic_hash": "34be6886a48a944e36af5bfa379be94d"
+  },
+  "configs/chunking/paragraph.yaml": {
+    "mtime": 1791358316.4627812,
+    "seen": 1794330696.8167598,
+    "ast_hash": "2391754554e49177300382ef93273707",
+    "semantic_hash": "2391754554e49177300382ef93273707",
+    "ast_empty": true
+  },
+  "configs/corpus/documents.yaml": {
+    "mtime": 1794272650.6684923,
+    "seen": 1794330696.8167598,
+    "ast_hash": "182b9d4f2abd5edbccde62c89ebb89a2",
+    "semantic_hash": "182b9d4f2abd5edbccde62c89ebb89a2"
+  },
+  "configs/default.yaml": {
+    "mtime": 1794210948.1705134,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d4049d02a2a005a73e8e09d21019618e",
+    "semantic_hash": "d4049d02a2a005a73e8e09d21019618e"
+  },
+  "configs/evaluation.yaml": {
+    "mtime": 1791358370.8970733,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b3ee49dc1b2b13811957a05ff62fa920",
+    "semantic_hash": "b3ee49dc1b2b13811957a05ff62fa920"
+  },
+  "configs/experiment.yaml": {
+    "mtime": 1791358391.5787342,
+    "seen": 1794330696.8167598,
+    "ast_hash": "5672fca0ed97eec69f7ffda5ed8a80c8",
+    "semantic_hash": "5672fca0ed97eec69f7ffda5ed8a80c8",
+    "ast_empty": true
+  },
+  "configs/generation.yaml": {
+    "mtime": 1791358362.334118,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d4b6260eee9404e30557658d4a062f23",
+    "semantic_hash": "d4b6260eee9404e30557658d4a062f23"
+  },
+  "configs/retrieval/bm25.yaml": {
+    "mtime": 1791358334.6401513,
+    "seen": 1794330696.8167598,
+    "ast_hash": "da617503d3600faa368e68308d87a279",
+    "semantic_hash": "da617503d3600faa368e68308d87a279",
+    "ast_empty": true
+  },
+  "configs/retrieval/dense.yaml": {
+    "mtime": 1794210931.7155094,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f56dafe59fc963abe2a8b5165230f6a1",
+    "semantic_hash": "f56dafe59fc963abe2a8b5165230f6a1",
+    "ast_empty": true
+  },
+  "configs/retrieval/dense_bge_m3.yaml": {
+    "mtime": 1794210931.7207737,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f95af58f1042e67d73ac1edc98b38e27",
+    "semantic_hash": "f95af58f1042e67d73ac1edc98b38e27",
+    "ast_empty": true
+  },
+  "configs/retrieval/hybrid.yaml": {
+    "mtime": 1791358345.929782,
+    "seen": 1794330696.8167598,
+    "ast_hash": "2563e5ba9dfddd210d2e17af50f9c58b",
+    "semantic_hash": "2563e5ba9dfddd210d2e17af50f9c58b",
+    "ast_empty": true
+  },
+  "configs/retrieval/reranker.yaml": {
+    "mtime": 1791358353.50625,
+    "seen": 1794330696.8167598,
+    "ast_hash": "433efd4ea1d2222ede0c19f20485e221",
+    "semantic_hash": "433efd4ea1d2222ede0c19f20485e221",
+    "ast_empty": true
+  },
+  "data/chunks/legal_aware_run06/build_manifest.json": {
+    "mtime": 1792227291.75625,
+    "seen": 1794330696.8167598,
+    "ast_hash": "967cc6a9592fcacb49a32d0aae539e84",
+    "semantic_hash": "967cc6a9592fcacb49a32d0aae539e84",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/chunk_stats.json": {
+    "mtime": 1794273817.3834126,
+    "seen": 1794330696.8167598,
+    "ast_hash": "05904ab7930bc8d43edb887f18dd14e2",
+    "semantic_hash": "05904ab7930bc8d43edb887f18dd14e2",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/corpus_status.json": {
+    "mtime": 1794273817.38207,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8448e0781a0262e0c51333853563194b",
+    "semantic_hash": "8448e0781a0262e0c51333853563194b",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/labor_code_2019.json": {
+    "mtime": 1794273784.3939762,
+    "seen": 1794330696.8167598,
+    "ast_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "semantic_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/nd_161_2026.json": {
+    "mtime": 1794273784.9043734,
+    "seen": 1794330696.8167598,
+    "ast_hash": "99e8b181de056ad8c0b841e0c145abaa",
+    "semantic_hash": "99e8b181de056ad8c0b841e0c145abaa",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/nd_283_2026.json": {
+    "mtime": 1794273793.9136662,
+    "seen": 1794330696.8167598,
+    "ast_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "semantic_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/nd_70_2023.json": {
+    "mtime": 1794273795.2722948,
+    "seen": 1794330696.8167598,
+    "ast_hash": "5eef0706d438a5a5ed30ad5b71e19d67",
+    "semantic_hash": "5eef0706d438a5a5ed30ad5b71e19d67",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/nd_74_2024.json": {
+    "mtime": 1794273795.3026414,
+    "seen": 1794330696.8167598,
+    "ast_hash": "ecc1d22341a7a2e7677055f720339ccc",
+    "semantic_hash": "ecc1d22341a7a2e7677055f720339ccc",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/qd_582_2026.json": {
+    "mtime": 1794273796.151446,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d6c9696506103143079557e6b99ba31b",
+    "semantic_hash": "d6c9696506103143079557e6b99ba31b",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/tt_09_2020.json": {
+    "mtime": 1794273797.3712106,
+    "seen": 1794330696.8167598,
+    "ast_hash": "cfc688e38d4259a4239fd5af3bbe129e",
+    "semantic_hash": "cfc688e38d4259a4239fd5af3bbe129e",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/tt_10_2020.json": {
+    "mtime": 1794273798.6493556,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "semantic_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/tt_11_2020.json": {
+    "mtime": 1794273807.2499921,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f64d35128770fd17305d62ec28edf151",
+    "semantic_hash": "f64d35128770fd17305d62ec28edf151",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/tt_13_2026.json": {
+    "mtime": 1794273807.5613446,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "semantic_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/tt_18_2021.json": {
+    "mtime": 1794273816.8071537,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f371767cc3bcb573e20fb1c193d7a4ba",
+    "semantic_hash": "f371767cc3bcb573e20fb1c193d7a4ba",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/parse_reports/tt_19_2021.json": {
+    "mtime": 1794273817.3038259,
+    "seen": 1794330696.8167598,
+    "ast_hash": "788cde6078031333c2887f86bda7ff6d",
+    "semantic_hash": "788cde6078031333c2887f86bda7ff6d",
+    "ast_empty": true
+  },
+  "data/chunks/run08_textonly/run_manifest.json": {
+    "mtime": 1794273817.6739466,
+    "seen": 1794330696.8167598,
+    "ast_hash": "19acd1ebb51a11d9eb54316364fb9f77",
+    "semantic_hash": "19acd1ebb51a11d9eb54316364fb9f77",
+    "ast_empty": true
+  },
+  "data/chunks/run09_ocr/parse_reports/labor_code_2019.json": {
+    "mtime": 1794274438.5490415,
+    "seen": 1794330696.8167598,
+    "ast_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "semantic_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "ast_empty": true
+  },
+  "data/chunks/run10_ocr/parse_reports/labor_code_2019.json": {
+    "mtime": 1794275211.8180232,
+    "seen": 1794330696.8167598,
+    "ast_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "semantic_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "ast_empty": true
+  },
+  "data/chunks/run10_ocr/parse_reports/nd_10_2024.json": {
+    "mtime": 1794275444.692162,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9624c4526e13a6deb93ae1b92e527a86",
+    "semantic_hash": "9624c4526e13a6deb93ae1b92e527a86",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/chunk_stats.json": {
+    "mtime": 1794276676.0070946,
+    "seen": 1794330696.8167598,
+    "ast_hash": "53a91b7f8f9d24710f91ee8f57edb6b4",
+    "semantic_hash": "53a91b7f8f9d24710f91ee8f57edb6b4",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/corpus_status.json": {
+    "mtime": 1794276676.0051777,
+    "seen": 1794330696.8167598,
+    "ast_hash": "adca20fbbe73718bf424488b10712a5c",
+    "semantic_hash": "adca20fbbe73718bf424488b10712a5c",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/labor_code_2019.json": {
+    "mtime": 1794275732.0593762,
+    "seen": 1794330696.8167598,
+    "ast_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "semantic_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_10_2024.json": {
+    "mtime": 1794275732.4217904,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "semantic_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_12_2022.json": {
+    "mtime": 1794275917.0624459,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f8d737bce6a709f6d45597af60a62048",
+    "semantic_hash": "f8d737bce6a709f6d45597af60a62048",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_135_2020.json": {
+    "mtime": 1794275941.3680823,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e17bb2cf76f16ca42a369f7b08d41b55",
+    "semantic_hash": "e17bb2cf76f16ca42a369f7b08d41b55",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_152_2020.json": {
+    "mtime": 1794276451.0509937,
+    "seen": 1794330696.8167598,
+    "ast_hash": "fad03357eb4dd80fc3ae5c7a7005696a",
+    "semantic_hash": "fad03357eb4dd80fc3ae5c7a7005696a",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_161_2026.json": {
+    "mtime": 1794276472.7671833,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "semantic_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_283_2026.json": {
+    "mtime": 1794276480.2756636,
+    "seen": 1794330696.8167598,
+    "ast_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "semantic_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_337_2025.json": {
+    "mtime": 1794276532.3301666,
+    "seen": 1794330696.8167598,
+    "ast_hash": "caeab72e9e5a7f387c3ca76d20b1c731",
+    "semantic_hash": "caeab72e9e5a7f387c3ca76d20b1c731",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_38_2022.json": {
+    "mtime": 1794276543.7255652,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c368c887695f6e82e396ff8accbacdc7",
+    "semantic_hash": "c368c887695f6e82e396ff8accbacdc7",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_70_2023.json": {
+    "mtime": 1794276544.8212814,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9572eb5a4fd223e8bebf1576341da57d",
+    "semantic_hash": "9572eb5a4fd223e8bebf1576341da57d",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/nd_74_2024.json": {
+    "mtime": 1794276567.626397,
+    "seen": 1794330696.8167598,
+    "ast_hash": "cee665eb59d68c5744a94ceaf289b6ec",
+    "semantic_hash": "cee665eb59d68c5744a94ceaf289b6ec",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/qd_582_2026.json": {
+    "mtime": 1794276568.369048,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d6c9696506103143079557e6b99ba31b",
+    "semantic_hash": "d6c9696506103143079557e6b99ba31b",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/tt_01_bld.json": {
+    "mtime": 1794276675.9107995,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "semantic_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/tt_08_2026.json": {
+    "mtime": 1794276621.3453948,
+    "seen": 1794330696.8167598,
+    "ast_hash": "262a479e6fbe504bdcfc71f0e72f12ee",
+    "semantic_hash": "262a479e6fbe504bdcfc71f0e72f12ee",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/tt_09_2020.json": {
+    "mtime": 1794276622.8304265,
+    "seen": 1794330696.8167598,
+    "ast_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "semantic_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/tt_10_2020.json": {
+    "mtime": 1794276625.3103871,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "semantic_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/tt_11_2020.json": {
+    "mtime": 1794276633.5251021,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f64d35128770fd17305d62ec28edf151",
+    "semantic_hash": "f64d35128770fd17305d62ec28edf151",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/tt_13_2026.json": {
+    "mtime": 1794276633.8454416,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "semantic_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/tt_18_2021.json": {
+    "mtime": 1794276646.7834742,
+    "seen": 1794330696.8167598,
+    "ast_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "semantic_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/tt_19_2021.json": {
+    "mtime": 1794276647.2726786,
+    "seen": 1794330696.8167598,
+    "ast_hash": "788cde6078031333c2887f86bda7ff6d",
+    "semantic_hash": "788cde6078031333c2887f86bda7ff6d",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/parse_reports/tt_24_2022.json": {
+    "mtime": 1794276667.2084844,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "semantic_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "ast_empty": true
+  },
+  "data/chunks/run11_ocr/run_manifest.json": {
+    "mtime": 1794276676.3296955,
+    "seen": 1794330696.8167598,
+    "ast_hash": "7ce0b385f05c1da20d8e6e0a96effd4d",
+    "semantic_hash": "7ce0b385f05c1da20d8e6e0a96effd4d",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/chunk_stats.json": {
+    "mtime": 1794277439.6728604,
+    "seen": 1794330696.8167598,
+    "ast_hash": "bed13ce3a3fdac6f8bb22f1b26b2cc86",
+    "semantic_hash": "bed13ce3a3fdac6f8bb22f1b26b2cc86",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/corpus_status.json": {
+    "mtime": 1794277439.6711407,
+    "seen": 1794330696.8167598,
+    "ast_hash": "7e31c74b27600e2a98cdeed40372e567",
+    "semantic_hash": "7e31c74b27600e2a98cdeed40372e567",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/labor_code_2019.json": {
+    "mtime": 1794277423.2801626,
+    "seen": 1794330696.8167598,
+    "ast_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "semantic_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_10_2024.json": {
+    "mtime": 1794277423.5133624,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "semantic_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_12_2022.json": {
+    "mtime": 1794277423.6991198,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "semantic_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_135_2020.json": {
+    "mtime": 1794277423.7137687,
+    "seen": 1794330696.8167598,
+    "ast_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "semantic_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_152_2020.json": {
+    "mtime": 1794277424.0375469,
+    "seen": 1794330696.8167598,
+    "ast_hash": "452649a8c38c685d25c793d06e399f0e",
+    "semantic_hash": "452649a8c38c685d25c793d06e399f0e",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_161_2026.json": {
+    "mtime": 1794277424.1066217,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "semantic_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_283_2026.json": {
+    "mtime": 1794277428.6865067,
+    "seen": 1794330696.8167598,
+    "ast_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "semantic_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_337_2025.json": {
+    "mtime": 1794277428.7183833,
+    "seen": 1794330696.8167598,
+    "ast_hash": "654514295a5ac7c882978247d6cea2b8",
+    "semantic_hash": "654514295a5ac7c882978247d6cea2b8",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_38_2022.json": {
+    "mtime": 1794277428.739423,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c368c887695f6e82e396ff8accbacdc7",
+    "semantic_hash": "c368c887695f6e82e396ff8accbacdc7",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_70_2023.json": {
+    "mtime": 1794277429.3273008,
+    "seen": 1794330696.8167598,
+    "ast_hash": "7b5d9797fb28110c926dc116ac599161",
+    "semantic_hash": "7b5d9797fb28110c926dc116ac599161",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/nd_74_2024.json": {
+    "mtime": 1794277432.822074,
+    "seen": 1794330696.8167598,
+    "ast_hash": "93b82905e3ae137141cdbf25fd6dab73",
+    "semantic_hash": "93b82905e3ae137141cdbf25fd6dab73",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/qd_582_2026.json": {
+    "mtime": 1794277433.2679856,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d6c9696506103143079557e6b99ba31b",
+    "semantic_hash": "d6c9696506103143079557e6b99ba31b",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/tt_01_bld.json": {
+    "mtime": 1794277439.615095,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "semantic_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/tt_08_2026.json": {
+    "mtime": 1794277433.2997181,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "semantic_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/tt_09_2020.json": {
+    "mtime": 1794277433.9153028,
+    "seen": 1794330696.8167598,
+    "ast_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "semantic_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/tt_10_2020.json": {
+    "mtime": 1794277434.50549,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "semantic_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/tt_11_2020.json": {
+    "mtime": 1794277438.4784338,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f64d35128770fd17305d62ec28edf151",
+    "semantic_hash": "f64d35128770fd17305d62ec28edf151",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/tt_13_2026.json": {
+    "mtime": 1794277438.7318132,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "semantic_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/tt_18_2021.json": {
+    "mtime": 1794277439.241104,
+    "seen": 1794330696.8167598,
+    "ast_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "semantic_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/tt_19_2021.json": {
+    "mtime": 1794277439.5750215,
+    "seen": 1794330696.8167598,
+    "ast_hash": "788cde6078031333c2887f86bda7ff6d",
+    "semantic_hash": "788cde6078031333c2887f86bda7ff6d",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/parse_reports/tt_24_2022.json": {
+    "mtime": 1794277439.6006627,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "semantic_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "ast_empty": true
+  },
+  "data/chunks/run12_ocr/run_manifest.json": {
+    "mtime": 1794277439.916361,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3c21fe1d2b56f1d6a9c7252cb3ad74c2",
+    "semantic_hash": "3c21fe1d2b56f1d6a9c7252cb3ad74c2",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/chunk_stats.json": {
+    "mtime": 1794277638.7402685,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e81e70825290c9bed0bcfe7915e27cc6",
+    "semantic_hash": "e81e70825290c9bed0bcfe7915e27cc6",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/corpus_status.json": {
+    "mtime": 1794277638.7392325,
+    "seen": 1794330696.8167598,
+    "ast_hash": "178a84999ba8598e068647c55762f8c6",
+    "semantic_hash": "178a84999ba8598e068647c55762f8c6",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/labor_code_2019.json": {
+    "mtime": 1794277626.9138117,
+    "seen": 1794330696.8167598,
+    "ast_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "semantic_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_10_2024.json": {
+    "mtime": 1794277627.0959828,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "semantic_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_12_2022.json": {
+    "mtime": 1794277627.2371316,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "semantic_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_135_2020.json": {
+    "mtime": 1794277627.2502556,
+    "seen": 1794330696.8167598,
+    "ast_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "semantic_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_152_2020.json": {
+    "mtime": 1794277627.4849074,
+    "seen": 1794330696.8167598,
+    "ast_hash": "452649a8c38c685d25c793d06e399f0e",
+    "semantic_hash": "452649a8c38c685d25c793d06e399f0e",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_161_2026.json": {
+    "mtime": 1794277627.5358768,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "semantic_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_283_2026.json": {
+    "mtime": 1794277631.2387626,
+    "seen": 1794330696.8167598,
+    "ast_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "semantic_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_337_2025.json": {
+    "mtime": 1794277631.264828,
+    "seen": 1794330696.8167598,
+    "ast_hash": "654514295a5ac7c882978247d6cea2b8",
+    "semantic_hash": "654514295a5ac7c882978247d6cea2b8",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_38_2022.json": {
+    "mtime": 1794277631.2803648,
+    "seen": 1794330696.8167598,
+    "ast_hash": "1fea2c310906792e02374ccba66b3c3e",
+    "semantic_hash": "1fea2c310906792e02374ccba66b3c3e",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_70_2023.json": {
+    "mtime": 1794277631.8329697,
+    "seen": 1794330696.8167598,
+    "ast_hash": "58563b94ef6db038b7c5976c62b2f68e",
+    "semantic_hash": "58563b94ef6db038b7c5976c62b2f68e",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/nd_74_2024.json": {
+    "mtime": 1794277631.8485262,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8601e98975d7edcfb52f2a6b5312ad4f",
+    "semantic_hash": "8601e98975d7edcfb52f2a6b5312ad4f",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/qd_582_2026.json": {
+    "mtime": 1794277632.2421322,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d6c9696506103143079557e6b99ba31b",
+    "semantic_hash": "d6c9696506103143079557e6b99ba31b",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/tt_01_bld.json": {
+    "mtime": 1794277638.6871488,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "semantic_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/tt_08_2026.json": {
+    "mtime": 1794277632.2696216,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "semantic_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/tt_09_2020.json": {
+    "mtime": 1794277632.8124437,
+    "seen": 1794330696.8167598,
+    "ast_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "semantic_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/tt_10_2020.json": {
+    "mtime": 1794277633.3354273,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "semantic_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/tt_11_2020.json": {
+    "mtime": 1794277637.6451972,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f64d35128770fd17305d62ec28edf151",
+    "semantic_hash": "f64d35128770fd17305d62ec28edf151",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/tt_13_2026.json": {
+    "mtime": 1794277637.8427026,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "semantic_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/tt_18_2021.json": {
+    "mtime": 1794277638.326064,
+    "seen": 1794330696.8167598,
+    "ast_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "semantic_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/tt_19_2021.json": {
+    "mtime": 1794277638.6497548,
+    "seen": 1794330696.8167598,
+    "ast_hash": "788cde6078031333c2887f86bda7ff6d",
+    "semantic_hash": "788cde6078031333c2887f86bda7ff6d",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/parse_reports/tt_24_2022.json": {
+    "mtime": 1794277638.6758833,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "semantic_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "ast_empty": true
+  },
+  "data/chunks/run13_ocr/run_manifest.json": {
+    "mtime": 1794277638.977322,
+    "seen": 1794330696.8167598,
+    "ast_hash": "32ac7e51d0f58ce2614d920cc6af5d72",
+    "semantic_hash": "32ac7e51d0f58ce2614d920cc6af5d72",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/chunk_stats.json": {
+    "mtime": 1794277912.3599284,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8c05c62a1a4495a315922f7defae0e06",
+    "semantic_hash": "8c05c62a1a4495a315922f7defae0e06",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/corpus_status.json": {
+    "mtime": 1794277912.358968,
+    "seen": 1794330696.8167598,
+    "ast_hash": "6ee6e024566d195f23053ba4af9717ab",
+    "semantic_hash": "6ee6e024566d195f23053ba4af9717ab",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/labor_code_2019.json": {
+    "mtime": 1794277894.351526,
+    "seen": 1794330696.8167598,
+    "ast_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "semantic_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_10_2024.json": {
+    "mtime": 1794277894.6283016,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "semantic_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_12_2022.json": {
+    "mtime": 1794277894.8601172,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "semantic_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_135_2020.json": {
+    "mtime": 1794277894.8788898,
+    "seen": 1794330696.8167598,
+    "ast_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "semantic_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_152_2020.json": {
+    "mtime": 1794277895.1752658,
+    "seen": 1794330696.8167598,
+    "ast_hash": "452649a8c38c685d25c793d06e399f0e",
+    "semantic_hash": "452649a8c38c685d25c793d06e399f0e",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_161_2026.json": {
+    "mtime": 1794277895.2551713,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "semantic_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_283_2026.json": {
+    "mtime": 1794277901.6237917,
+    "seen": 1794330696.8167598,
+    "ast_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "semantic_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_337_2025.json": {
+    "mtime": 1794277901.6680596,
+    "seen": 1794330696.8167598,
+    "ast_hash": "654514295a5ac7c882978247d6cea2b8",
+    "semantic_hash": "654514295a5ac7c882978247d6cea2b8",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_38_2022.json": {
+    "mtime": 1794277901.692309,
+    "seen": 1794330696.8167598,
+    "ast_hash": "1fea2c310906792e02374ccba66b3c3e",
+    "semantic_hash": "1fea2c310906792e02374ccba66b3c3e",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_70_2023.json": {
+    "mtime": 1794277902.5790138,
+    "seen": 1794330696.8167598,
+    "ast_hash": "58563b94ef6db038b7c5976c62b2f68e",
+    "semantic_hash": "58563b94ef6db038b7c5976c62b2f68e",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/nd_74_2024.json": {
+    "mtime": 1794277902.6026356,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8601e98975d7edcfb52f2a6b5312ad4f",
+    "semantic_hash": "8601e98975d7edcfb52f2a6b5312ad4f",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/qd_582_2026.json": {
+    "mtime": 1794277903.2393644,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d6c9696506103143079557e6b99ba31b",
+    "semantic_hash": "d6c9696506103143079557e6b99ba31b",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/tt_01_bld.json": {
+    "mtime": 1794277912.283993,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "semantic_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/tt_08_2026.json": {
+    "mtime": 1794277903.282212,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "semantic_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/tt_09_2020.json": {
+    "mtime": 1794277904.16342,
+    "seen": 1794330696.8167598,
+    "ast_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "semantic_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/tt_10_2020.json": {
+    "mtime": 1794277905.021398,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "semantic_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/tt_11_2020.json": {
+    "mtime": 1794277910.7735586,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f64d35128770fd17305d62ec28edf151",
+    "semantic_hash": "f64d35128770fd17305d62ec28edf151",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/tt_13_2026.json": {
+    "mtime": 1794277911.0536427,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "semantic_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/tt_18_2021.json": {
+    "mtime": 1794277911.7562113,
+    "seen": 1794330696.8167598,
+    "ast_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "semantic_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/tt_19_2021.json": {
+    "mtime": 1794277912.2325954,
+    "seen": 1794330696.8167598,
+    "ast_hash": "788cde6078031333c2887f86bda7ff6d",
+    "semantic_hash": "788cde6078031333c2887f86bda7ff6d",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/parse_reports/tt_24_2022.json": {
+    "mtime": 1794277912.2695823,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "semantic_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "ast_empty": true
+  },
+  "data/chunks/run14_ocr/run_manifest.json": {
+    "mtime": 1794277912.628658,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8cab27d521aa95e826c0906039a2dc01",
+    "semantic_hash": "8cab27d521aa95e826c0906039a2dc01",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/chunk_stats.json": {
+    "mtime": 1794278111.1754506,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9e388445a7cfb667c85881cb4b0098c3",
+    "semantic_hash": "9e388445a7cfb667c85881cb4b0098c3",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/corpus_status.json": {
+    "mtime": 1794278111.17382,
+    "seen": 1794330696.8167598,
+    "ast_hash": "39319e05cd3e623593406d61c12f34f6",
+    "semantic_hash": "39319e05cd3e623593406d61c12f34f6",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/labor_code_2019.json": {
+    "mtime": 1794278090.5941143,
+    "seen": 1794330696.8167598,
+    "ast_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "semantic_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_10_2024.json": {
+    "mtime": 1794278090.88752,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "semantic_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_12_2022.json": {
+    "mtime": 1794278091.1252854,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "semantic_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_135_2020.json": {
+    "mtime": 1794278091.1452544,
+    "seen": 1794330696.8167598,
+    "ast_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "semantic_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_152_2020.json": {
+    "mtime": 1794278091.4955387,
+    "seen": 1794330696.8167598,
+    "ast_hash": "452649a8c38c685d25c793d06e399f0e",
+    "semantic_hash": "452649a8c38c685d25c793d06e399f0e",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_161_2026.json": {
+    "mtime": 1794278091.6056464,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "semantic_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_283_2026.json": {
+    "mtime": 1794278098.604318,
+    "seen": 1794330696.8167598,
+    "ast_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "semantic_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_337_2025.json": {
+    "mtime": 1794278098.650357,
+    "seen": 1794330696.8167598,
+    "ast_hash": "654514295a5ac7c882978247d6cea2b8",
+    "semantic_hash": "654514295a5ac7c882978247d6cea2b8",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_38_2022.json": {
+    "mtime": 1794278098.6856008,
+    "seen": 1794330696.8167598,
+    "ast_hash": "1fea2c310906792e02374ccba66b3c3e",
+    "semantic_hash": "1fea2c310906792e02374ccba66b3c3e",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_70_2023.json": {
+    "mtime": 1794278099.7030644,
+    "seen": 1794330696.8167598,
+    "ast_hash": "58563b94ef6db038b7c5976c62b2f68e",
+    "semantic_hash": "58563b94ef6db038b7c5976c62b2f68e",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/nd_74_2024.json": {
+    "mtime": 1794278099.727414,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8601e98975d7edcfb52f2a6b5312ad4f",
+    "semantic_hash": "8601e98975d7edcfb52f2a6b5312ad4f",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/qd_582_2026.json": {
+    "mtime": 1794278100.433368,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d6c9696506103143079557e6b99ba31b",
+    "semantic_hash": "d6c9696506103143079557e6b99ba31b",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/tt_01_bld.json": {
+    "mtime": 1794278111.0720215,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "semantic_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/tt_08_2026.json": {
+    "mtime": 1794278100.4806426,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "semantic_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/tt_09_2020.json": {
+    "mtime": 1794278101.450694,
+    "seen": 1794330696.8167598,
+    "ast_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "semantic_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/tt_10_2020.json": {
+    "mtime": 1794278102.4065332,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "semantic_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/tt_11_2020.json": {
+    "mtime": 1794278109.013073,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f64d35128770fd17305d62ec28edf151",
+    "semantic_hash": "f64d35128770fd17305d62ec28edf151",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/tt_13_2026.json": {
+    "mtime": 1794278109.3975742,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "semantic_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/tt_18_2021.json": {
+    "mtime": 1794278110.4487603,
+    "seen": 1794330696.8167598,
+    "ast_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "semantic_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/tt_19_2021.json": {
+    "mtime": 1794278111.0016484,
+    "seen": 1794330696.8167598,
+    "ast_hash": "788cde6078031333c2887f86bda7ff6d",
+    "semantic_hash": "788cde6078031333c2887f86bda7ff6d",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/parse_reports/tt_24_2022.json": {
+    "mtime": 1794278111.0513184,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "semantic_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "ast_empty": true
+  },
+  "data/chunks/run15_ocr/run_manifest.json": {
+    "mtime": 1794278111.5085049,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d581da802f1c662e525eb50a15748f05",
+    "semantic_hash": "d581da802f1c662e525eb50a15748f05",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/chunk_stats.json": {
+    "mtime": 1794278216.3923924,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4609592d15b0d2ac6f0bc9ecd5ae2559",
+    "semantic_hash": "4609592d15b0d2ac6f0bc9ecd5ae2559",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/corpus_status.json": {
+    "mtime": 1794278216.3901908,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f32c06d9f9d910238b37b0a92a05b7f6",
+    "semantic_hash": "f32c06d9f9d910238b37b0a92a05b7f6",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/labor_code_2019.json": {
+    "mtime": 1794278195.9962935,
+    "seen": 1794330696.8167598,
+    "ast_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "semantic_hash": "708063152c1208ecfa3b9f1056e4a8e0",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_10_2024.json": {
+    "mtime": 1794278196.3022318,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "semantic_hash": "4357c1ab6400ee257c2a802224bd333a",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_12_2022.json": {
+    "mtime": 1794278196.5564828,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "semantic_hash": "b38040b8d401db8cd9623a1020f3ccb5",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_135_2020.json": {
+    "mtime": 1794278196.576596,
+    "seen": 1794330696.8167598,
+    "ast_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "semantic_hash": "229e4482a084fb73e094b1ba1e7856a5",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_152_2020.json": {
+    "mtime": 1794278196.933519,
+    "seen": 1794330696.8167598,
+    "ast_hash": "452649a8c38c685d25c793d06e399f0e",
+    "semantic_hash": "452649a8c38c685d25c793d06e399f0e",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_161_2026.json": {
+    "mtime": 1794278197.0261729,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "semantic_hash": "3bd3602abbbc2bde7a1f0cf6ce0f3bcd",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_283_2026.json": {
+    "mtime": 1794278204.0984,
+    "seen": 1794330696.8167598,
+    "ast_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "semantic_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_337_2025.json": {
+    "mtime": 1794278204.1470928,
+    "seen": 1794330696.8167598,
+    "ast_hash": "654514295a5ac7c882978247d6cea2b8",
+    "semantic_hash": "654514295a5ac7c882978247d6cea2b8",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_38_2022.json": {
+    "mtime": 1794278204.17333,
+    "seen": 1794330696.8167598,
+    "ast_hash": "1fea2c310906792e02374ccba66b3c3e",
+    "semantic_hash": "1fea2c310906792e02374ccba66b3c3e",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_70_2023.json": {
+    "mtime": 1794278205.147012,
+    "seen": 1794330696.8167598,
+    "ast_hash": "58563b94ef6db038b7c5976c62b2f68e",
+    "semantic_hash": "58563b94ef6db038b7c5976c62b2f68e",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/nd_74_2024.json": {
+    "mtime": 1794278205.172099,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8601e98975d7edcfb52f2a6b5312ad4f",
+    "semantic_hash": "8601e98975d7edcfb52f2a6b5312ad4f",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/qd_582_2026.json": {
+    "mtime": 1794278205.853367,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d6c9696506103143079557e6b99ba31b",
+    "semantic_hash": "d6c9696506103143079557e6b99ba31b",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/tt_01_bld.json": {
+    "mtime": 1794278216.3039632,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "semantic_hash": "a42ae289d01335a40cc9dfb65e44101b",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/tt_08_2026.json": {
+    "mtime": 1794278205.8987,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "semantic_hash": "e6d5103ac4344b52b9fec362221af53c",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/tt_09_2020.json": {
+    "mtime": 1794278206.8528297,
+    "seen": 1794330696.8167598,
+    "ast_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "semantic_hash": "707ed3f1be22c3b3303d3d26108d8797",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/tt_10_2020.json": {
+    "mtime": 1794278207.8183227,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "semantic_hash": "a6cb30138586a1dcacb56fa0356cc91b",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/tt_11_2020.json": {
+    "mtime": 1794278214.3911862,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f64d35128770fd17305d62ec28edf151",
+    "semantic_hash": "f64d35128770fd17305d62ec28edf151",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/tt_13_2026.json": {
+    "mtime": 1794278214.7062426,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "semantic_hash": "b4ee013a92ada256965b6ec0dc2dd1db",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/tt_18_2021.json": {
+    "mtime": 1794278215.600438,
+    "seen": 1794330696.8167598,
+    "ast_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "semantic_hash": "db17ece1dc29150af3f83a1ee1443af2",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/tt_19_2021.json": {
+    "mtime": 1794278216.245721,
+    "seen": 1794330696.8167598,
+    "ast_hash": "788cde6078031333c2887f86bda7ff6d",
+    "semantic_hash": "788cde6078031333c2887f86bda7ff6d",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/parse_reports/tt_24_2022.json": {
+    "mtime": 1794278216.286403,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "semantic_hash": "c095f1327422b8fe57b0ad85e33ea9c7",
+    "ast_empty": true
+  },
+  "data/chunks/run16_ocr/run_manifest.json": {
+    "mtime": 1794278216.6954558,
+    "seen": 1794330696.8167598,
+    "ast_hash": "60dcd624e7ede46b0718162f5740a44e",
+    "semantic_hash": "60dcd624e7ede46b0718162f5740a44e",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix2/chunk_stats.json": {
+    "mtime": 1794302327.571848,
+    "seen": 1794330696.8167598,
+    "ast_hash": "90f5ad269aa27e710b7f527d76fc07b3",
+    "semantic_hash": "90f5ad269aa27e710b7f527d76fc07b3",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix2/corpus_status.json": {
+    "mtime": 1794302327.5703661,
+    "seen": 1794330696.8167598,
+    "ast_hash": "610cd23e9ae021558077f1dd3dd5d88c",
+    "semantic_hash": "610cd23e9ae021558077f1dd3dd5d88c",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix2/parse_reports/nd_12_2022.json": {
+    "mtime": 1794302327.5565438,
+    "seen": 1794330696.8167598,
+    "ast_hash": "49f66ab7eab19c9f66c394b3ce56f8e3",
+    "semantic_hash": "49f66ab7eab19c9f66c394b3ce56f8e3",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix2/run_manifest.json": {
+    "mtime": 1794302327.6558185,
+    "seen": 1794330696.8167598,
+    "ast_hash": "dd32e6d72256af0d8f4b84fc455629a3",
+    "semantic_hash": "dd32e6d72256af0d8f4b84fc455629a3",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix4/chunk_stats.json": {
+    "mtime": 1794303837.952684,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f380642b100a20df056ad8a5ad9c9f7d",
+    "semantic_hash": "f380642b100a20df056ad8a5ad9c9f7d",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix4/corpus_status.json": {
+    "mtime": 1794303837.952684,
+    "seen": 1794330696.8167598,
+    "ast_hash": "aa8ff3e430c69afc31d9f2a85f3cdda3",
+    "semantic_hash": "aa8ff3e430c69afc31d9f2a85f3cdda3",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix4/run_manifest.json": {
+    "mtime": 1794303838.0144997,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b83d47bd4e51e7b5957b7c7b2cad30cc",
+    "semantic_hash": "b83d47bd4e51e7b5957b7c7b2cad30cc",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix5/chunk_stats.json": {
+    "mtime": 1794303905.1589181,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e679011c91d78efdc8528bfff5bbe7dd",
+    "semantic_hash": "e679011c91d78efdc8528bfff5bbe7dd",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix5/corpus_status.json": {
+    "mtime": 1794303905.1589181,
+    "seen": 1794330696.8167598,
+    "ast_hash": "fd11988566a9a9e9166893294e13dda2",
+    "semantic_hash": "fd11988566a9a9e9166893294e13dda2",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix5/parse_reports/nd_70_2023.json": {
+    "mtime": 1794303905.1589181,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9c2677e1122fa70a5eb7d98c9967c8d2",
+    "semantic_hash": "9c2677e1122fa70a5eb7d98c9967c8d2",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix5/run_manifest.json": {
+    "mtime": 1794303905.2209668,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e8f8e02d72c4bdf830d6ae39bd390e5e",
+    "semantic_hash": "e8f8e02d72c4bdf830d6ae39bd390e5e",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix6/chunk_stats.json": {
+    "mtime": 1794303922.348743,
+    "seen": 1794330696.8167598,
+    "ast_hash": "7a8d7395fb316393be934cee33654a43",
+    "semantic_hash": "7a8d7395fb316393be934cee33654a43",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix6/corpus_status.json": {
+    "mtime": 1794303922.3471751,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d601f3c1b1060a13640e3a0b90d4f4db",
+    "semantic_hash": "d601f3c1b1060a13640e3a0b90d4f4db",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix6/parse_reports/nd_12_2022.json": {
+    "mtime": 1794303922.3276925,
+    "seen": 1794330696.8167598,
+    "ast_hash": "2da8f3fbe36732737ab0b562687f3084",
+    "semantic_hash": "2da8f3fbe36732737ab0b562687f3084",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix6/run_manifest.json": {
+    "mtime": 1794303922.4303038,
+    "seen": 1794330696.8167598,
+    "ast_hash": "858c88041f781bb8cd7a763c68aad87c",
+    "semantic_hash": "858c88041f781bb8cd7a763c68aad87c",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix/chunk_stats.json": {
+    "mtime": 1794302287.344148,
+    "seen": 1794330696.8167598,
+    "ast_hash": "ce4fc0478bd66755d095ee2062399fe8",
+    "semantic_hash": "ce4fc0478bd66755d095ee2062399fe8",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix/corpus_status.json": {
+    "mtime": 1794302287.344148,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8a79f42904c2bc11c671245a68f593d4",
+    "semantic_hash": "8a79f42904c2bc11c671245a68f593d4",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix/parse_reports/nd_70_2023.json": {
+    "mtime": 1794302287.3402467,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9c2677e1122fa70a5eb7d98c9967c8d2",
+    "semantic_hash": "9c2677e1122fa70a5eb7d98c9967c8d2",
+    "ast_empty": true
+  },
+  "data/chunks/test_fix/run_manifest.json": {
+    "mtime": 1794302287.3825488,
+    "seen": 1794330696.8167598,
+    "ast_hash": "6dd6e24ae0350dfd471fc4adc2d8abf4",
+    "semantic_hash": "6dd6e24ae0350dfd471fc4adc2d8abf4",
+    "ast_empty": true
+  },
+  "data/chunks/test_reg_labor/chunk_stats.json": {
+    "mtime": 1794304058.214031,
+    "seen": 1794330696.8167598,
+    "ast_hash": "18a402c5e294fbd39c1901517b7bcbbe",
+    "semantic_hash": "18a402c5e294fbd39c1901517b7bcbbe",
+    "ast_empty": true
+  },
+  "data/chunks/test_reg_labor/corpus_status.json": {
+    "mtime": 1794304058.214031,
+    "seen": 1794330696.8167598,
+    "ast_hash": "30cde380df51324e8290c3b5491e345c",
+    "semantic_hash": "30cde380df51324e8290c3b5491e345c",
+    "ast_empty": true
+  },
+  "data/chunks/test_reg_labor/parse_reports/labor_code_2019.json": {
+    "mtime": 1794304058.1899052,
+    "seen": 1794330696.8167598,
+    "ast_hash": "bc15fbac76f365a3de8f0b8ceb9bf821",
+    "semantic_hash": "bc15fbac76f365a3de8f0b8ceb9bf821",
+    "ast_empty": true
+  },
+  "data/chunks/test_reg_labor/run_manifest.json": {
+    "mtime": 1794304058.2907958,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f04f6ab49a969f2b1b1ed2ee0d06c3f8",
+    "semantic_hash": "f04f6ab49a969f2b1b1ed2ee0d06c3f8",
+    "ast_empty": true
+  },
+  "data/chunks/test_reg_nd283/chunk_stats.json": {
+    "mtime": 1794304081.4330933,
+    "seen": 1794330696.8167598,
+    "ast_hash": "7746a89fdb28c644cd76717744cddf23",
+    "semantic_hash": "7746a89fdb28c644cd76717744cddf23",
+    "ast_empty": true
+  },
+  "data/chunks/test_reg_nd283/corpus_status.json": {
+    "mtime": 1794304081.431094,
+    "seen": 1794330696.8167598,
+    "ast_hash": "37c7d2fd18a985fdf73bcb7d7b247f86",
+    "semantic_hash": "37c7d2fd18a985fdf73bcb7d7b247f86",
+    "ast_empty": true
+  },
+  "data/chunks/test_reg_nd283/parse_reports/nd_283_2026.json": {
+    "mtime": 1794304081.4018328,
+    "seen": 1794330696.8167598,
+    "ast_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "semantic_hash": "064690b1cf5886c4da7aa44507725e2d",
+    "ast_empty": true
+  },
+  "data/chunks/test_reg_nd283/run_manifest.json": {
+    "mtime": 1794304081.5087233,
+    "seen": 1794330696.8167598,
+    "ast_hash": "6084938a738098f332e95d69c544dc91",
+    "semantic_hash": "6084938a738098f332e95d69c544dc91",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-001.json": {
+    "mtime": 1794274445.4904132,
+    "seen": 1794330696.8167598,
+    "ast_hash": "128b398cf09ccd8a71507743a20b6882",
+    "semantic_hash": "128b398cf09ccd8a71507743a20b6882",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-002.json": {
+    "mtime": 1794274454.15,
+    "seen": 1794330696.8167598,
+    "ast_hash": "443579288a3d7426904d7fb726e96627",
+    "semantic_hash": "443579288a3d7426904d7fb726e96627",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-003.json": {
+    "mtime": 1794274460.2274463,
+    "seen": 1794330696.8167598,
+    "ast_hash": "fbb5ab3b7d34dc29118a49c72ffbbacc",
+    "semantic_hash": "fbb5ab3b7d34dc29118a49c72ffbbacc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-004.json": {
+    "mtime": 1794274467.038191,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9479288eb7e9f6f012ea9b4aa151237b",
+    "semantic_hash": "9479288eb7e9f6f012ea9b4aa151237b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-005.json": {
+    "mtime": 1794274471.0489252,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f257885ae93435eb87cdade438681aac",
+    "semantic_hash": "f257885ae93435eb87cdade438681aac",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-006.json": {
+    "mtime": 1794274476.132619,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3ca0e7422dd1062b84ac62ef163e4740",
+    "semantic_hash": "3ca0e7422dd1062b84ac62ef163e4740",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-007.json": {
+    "mtime": 1794274481.9436238,
+    "seen": 1794330696.8167598,
+    "ast_hash": "81060b696250aa93a449cdd34d66ad0a",
+    "semantic_hash": "81060b696250aa93a449cdd34d66ad0a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-008.json": {
+    "mtime": 1794274488.5206752,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c4e11d8c121577285d974887a1baf7b0",
+    "semantic_hash": "c4e11d8c121577285d974887a1baf7b0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-009.json": {
+    "mtime": 1794274497.8040063,
+    "seen": 1794330696.8167598,
+    "ast_hash": "95f5e9bd946795ea848a242a7815588d",
+    "semantic_hash": "95f5e9bd946795ea848a242a7815588d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-010.json": {
+    "mtime": 1794274505.4435809,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a3f8cfd12da9566c1d530eb7f69c917e",
+    "semantic_hash": "a3f8cfd12da9566c1d530eb7f69c917e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-011.json": {
+    "mtime": 1794274513.5035088,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e5a01de1ed7341a3d2e5e593ad9b6e31",
+    "semantic_hash": "e5a01de1ed7341a3d2e5e593ad9b6e31",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-012.json": {
+    "mtime": 1794274523.1845262,
+    "seen": 1794330696.8167598,
+    "ast_hash": "016d97d7c8acb2c19a1171335697ffb0",
+    "semantic_hash": "016d97d7c8acb2c19a1171335697ffb0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-013.json": {
+    "mtime": 1794274530.3849018,
+    "seen": 1794330696.8167598,
+    "ast_hash": "0e2d43a5ea576080bfbf7d1e4008d1f9",
+    "semantic_hash": "0e2d43a5ea576080bfbf7d1e4008d1f9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-014.json": {
+    "mtime": 1794274538.95331,
+    "seen": 1794330696.8167598,
+    "ast_hash": "825960142e58402c83c68fd675eb7099",
+    "semantic_hash": "825960142e58402c83c68fd675eb7099",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-015.json": {
+    "mtime": 1794274548.4859498,
+    "seen": 1794330696.8167598,
+    "ast_hash": "66545aa9eccbe3b2c25556f24d33b410",
+    "semantic_hash": "66545aa9eccbe3b2c25556f24d33b410",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-016.json": {
+    "mtime": 1794274557.3423321,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9ff30b6c25dd7c3b63c5588eccf3adb5",
+    "semantic_hash": "9ff30b6c25dd7c3b63c5588eccf3adb5",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-017.json": {
+    "mtime": 1794274572.6612842,
+    "seen": 1794330696.8167598,
+    "ast_hash": "6a5059e80fefb62de96f868b7b8416d3",
+    "semantic_hash": "6a5059e80fefb62de96f868b7b8416d3",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-018.json": {
+    "mtime": 1794274582.0582693,
+    "seen": 1794330696.8167598,
+    "ast_hash": "762117a6f330deee857a1b95f200be1c",
+    "semantic_hash": "762117a6f330deee857a1b95f200be1c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-019.json": {
+    "mtime": 1794274591.2936792,
+    "seen": 1794330696.8167598,
+    "ast_hash": "43085c0ce927de2c1001584ae0aa83bc",
+    "semantic_hash": "43085c0ce927de2c1001584ae0aa83bc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-020.json": {
+    "mtime": 1794274602.3425121,
+    "seen": 1794330696.8167598,
+    "ast_hash": "0afd0fa0c143218733eea1fdab48626e",
+    "semantic_hash": "0afd0fa0c143218733eea1fdab48626e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-021.json": {
+    "mtime": 1794274614.0242534,
+    "seen": 1794330696.8167598,
+    "ast_hash": "ca0cfbae2feada47740adedc27d9e7f8",
+    "semantic_hash": "ca0cfbae2feada47740adedc27d9e7f8",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-022.json": {
+    "mtime": 1794274625.190549,
+    "seen": 1794330696.8167598,
+    "ast_hash": "94a7cb147c99121f09fdb6a2c9b1794b",
+    "semantic_hash": "94a7cb147c99121f09fdb6a2c9b1794b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-023.json": {
+    "mtime": 1794274635.366207,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b72b415c8769edf9eaf34022c9b76f73",
+    "semantic_hash": "b72b415c8769edf9eaf34022c9b76f73",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-024.json": {
+    "mtime": 1794274647.393394,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8f3505ddecf45dcce2da7202f57de3ef",
+    "semantic_hash": "8f3505ddecf45dcce2da7202f57de3ef",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-025.json": {
+    "mtime": 1794274662.3870602,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4f778246a5fcacce7c58045e8514fe52",
+    "semantic_hash": "4f778246a5fcacce7c58045e8514fe52",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-026.json": {
+    "mtime": 1794274677.3587873,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4e1c1a3ea0394765c0f32aa5ddb6024f",
+    "semantic_hash": "4e1c1a3ea0394765c0f32aa5ddb6024f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-027.json": {
+    "mtime": 1794274692.2484725,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a1e5ef11adff0a6be914cfe184ae1de5",
+    "semantic_hash": "a1e5ef11adff0a6be914cfe184ae1de5",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-028.json": {
+    "mtime": 1794274702.0584445,
+    "seen": 1794330696.8167598,
+    "ast_hash": "0b3c0e697430b12f31dce8cb3cba6a8a",
+    "semantic_hash": "0b3c0e697430b12f31dce8cb3cba6a8a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-029.json": {
+    "mtime": 1794274714.6017072,
+    "seen": 1794330696.8167598,
+    "ast_hash": "94146907a7e0e8aa89f4b3176f05d306",
+    "semantic_hash": "94146907a7e0e8aa89f4b3176f05d306",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-030.json": {
+    "mtime": 1794275276.5332782,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9fd55b8f2130a8864d604609d8a7310c",
+    "semantic_hash": "9fd55b8f2130a8864d604609d8a7310c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-031.json": {
+    "mtime": 1794275275.1668243,
+    "seen": 1794330696.8167598,
+    "ast_hash": "c07634fa91dd58d5eddc77a05aaa5242",
+    "semantic_hash": "c07634fa91dd58d5eddc77a05aaa5242",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-032.json": {
+    "mtime": 1794275270.1344316,
+    "seen": 1794330696.8167598,
+    "ast_hash": "ccfb7169686826a80586e2efe50b0a3b",
+    "semantic_hash": "ccfb7169686826a80586e2efe50b0a3b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-033.json": {
+    "mtime": 1794275278.6349814,
+    "seen": 1794330696.8167598,
+    "ast_hash": "58caea9c14d6b32a0ea066591330d38c",
+    "semantic_hash": "58caea9c14d6b32a0ea066591330d38c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-034.json": {
+    "mtime": 1794275273.0131414,
+    "seen": 1794330696.8167598,
+    "ast_hash": "24fac8eaa379df4e123186641d552609",
+    "semantic_hash": "24fac8eaa379df4e123186641d552609",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-035.json": {
+    "mtime": 1794275265.5180755,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a5c73067b27dff6b997a26a4ec789618",
+    "semantic_hash": "a5c73067b27dff6b997a26a4ec789618",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-036.json": {
+    "mtime": 1794275320.3194919,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8328eb7bc3c8fb02b659b65f18c41510",
+    "semantic_hash": "8328eb7bc3c8fb02b659b65f18c41510",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-037.json": {
+    "mtime": 1794275327.8830898,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b677218d5e954ae673724a1f50c5c1f2",
+    "semantic_hash": "b677218d5e954ae673724a1f50c5c1f2",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-038.json": {
+    "mtime": 1794275323.2814898,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3c2eeaf81a798a94864b25da501024f6",
+    "semantic_hash": "3c2eeaf81a798a94864b25da501024f6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-039.json": {
+    "mtime": 1794275317.121613,
+    "seen": 1794330696.8167598,
+    "ast_hash": "ccfb9b364680c545e7f85d65d770482b",
+    "semantic_hash": "ccfb9b364680c545e7f85d65d770482b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-040.json": {
+    "mtime": 1794275325.2999067,
+    "seen": 1794330696.8167598,
+    "ast_hash": "ecfabeab54d36134e8725299e0ee58a0",
+    "semantic_hash": "ecfabeab54d36134e8725299e0ee58a0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-041.json": {
+    "mtime": 1794275321.7126703,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4a491e9bc8a3b2b6263bc45714d85867",
+    "semantic_hash": "4a491e9bc8a3b2b6263bc45714d85867",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-042.json": {
+    "mtime": 1794275382.6419923,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d90c10344955c114d075ea691a04e51f",
+    "semantic_hash": "d90c10344955c114d075ea691a04e51f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-043.json": {
+    "mtime": 1794275388.4998455,
+    "seen": 1794330696.8167598,
+    "ast_hash": "ffe3b66cfde646ee69edaf26e88fcf15",
+    "semantic_hash": "ffe3b66cfde646ee69edaf26e88fcf15",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-044.json": {
+    "mtime": 1794275379.1045082,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b900b3143b2afa8e985614ee6eb40b90",
+    "semantic_hash": "b900b3143b2afa8e985614ee6eb40b90",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-045.json": {
+    "mtime": 1794275374.8115318,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f4c4f25d1cd393ddf4e92a6cb7156abb",
+    "semantic_hash": "f4c4f25d1cd393ddf4e92a6cb7156abb",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-046.json": {
+    "mtime": 1794275391.1536424,
+    "seen": 1794330696.8167598,
+    "ast_hash": "3a90843c69cccdae113700e6e77faa42",
+    "semantic_hash": "3a90843c69cccdae113700e6e77faa42",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-047.json": {
+    "mtime": 1794275382.6384573,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4b21b365a9bf790f039dde4e11fcdbf7",
+    "semantic_hash": "4b21b365a9bf790f039dde4e11fcdbf7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-048.json": {
+    "mtime": 1794275444.1534934,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4ca8147254cadc5061004406a1f30089",
+    "semantic_hash": "4ca8147254cadc5061004406a1f30089",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-049.json": {
+    "mtime": 1794275444.307494,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9421570a424524170c1f80fc237c42fe",
+    "semantic_hash": "9421570a424524170c1f80fc237c42fe",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-050.json": {
+    "mtime": 1794275444.0304592,
+    "seen": 1794330696.8167598,
+    "ast_hash": "5235308627a18ff910250277d481bc15",
+    "semantic_hash": "5235308627a18ff910250277d481bc15",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-051.json": {
+    "mtime": 1794275441.839413,
+    "seen": 1794330696.8167598,
+    "ast_hash": "79f44d9523dac2e7fe7258959f5c1bf2",
+    "semantic_hash": "79f44d9523dac2e7fe7258959f5c1bf2",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-052.json": {
+    "mtime": 1794275442.3811994,
+    "seen": 1794330696.8167598,
+    "ast_hash": "680dc8ae8e6523497f1082075059c88f",
+    "semantic_hash": "680dc8ae8e6523497f1082075059c88f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_10_2024/page-053.json": {
+    "mtime": 1794275426.1511145,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d89867030a4437d3e2c48f573e340887",
+    "semantic_hash": "d89867030a4437d3e2c48f573e340887",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-001.json": {
+    "mtime": 1794275482.5939982,
+    "seen": 1794330696.8167598,
+    "ast_hash": "35947b94b42ce64317f4dc940a942709",
+    "semantic_hash": "35947b94b42ce64317f4dc940a942709",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-002.json": {
+    "mtime": 1794275484.3908758,
+    "seen": 1794330696.8167598,
+    "ast_hash": "7347bb018d0e92553dc9d6b705593abc",
+    "semantic_hash": "7347bb018d0e92553dc9d6b705593abc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-003.json": {
+    "mtime": 1794275486.9824283,
+    "seen": 1794330696.8167598,
+    "ast_hash": "0e499e75159497786beee1180c5a2be5",
+    "semantic_hash": "0e499e75159497786beee1180c5a2be5",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-004.json": {
+    "mtime": 1794275492.671494,
+    "seen": 1794330696.8167598,
+    "ast_hash": "044571fea5f58fee8d3547b949974fcf",
+    "semantic_hash": "044571fea5f58fee8d3547b949974fcf",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-005.json": {
+    "mtime": 1794275491.3148775,
+    "seen": 1794330696.8167598,
+    "ast_hash": "392bed35f7e0d753848054badd43138b",
+    "semantic_hash": "392bed35f7e0d753848054badd43138b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-006.json": {
+    "mtime": 1794275488.6409142,
+    "seen": 1794330696.8167598,
+    "ast_hash": "0b604e38519b6d89e0c39ff07e385a84",
+    "semantic_hash": "0b604e38519b6d89e0c39ff07e385a84",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-007.json": {
+    "mtime": 1794275524.626041,
+    "seen": 1794330696.8167598,
+    "ast_hash": "0f25e376eb763be1d4e7ffa9f8157fed",
+    "semantic_hash": "0f25e376eb763be1d4e7ffa9f8157fed",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-008.json": {
+    "mtime": 1794275530.0690556,
+    "seen": 1794330696.8167598,
+    "ast_hash": "fbe4c645ad7ffc6b4aa1bff4648d65a3",
+    "semantic_hash": "fbe4c645ad7ffc6b4aa1bff4648d65a3",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-009.json": {
+    "mtime": 1794275528.8034673,
+    "seen": 1794330696.8167598,
+    "ast_hash": "06fa156b1694ef6fc16610ce79a5d8f0",
+    "semantic_hash": "06fa156b1694ef6fc16610ce79a5d8f0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-010.json": {
+    "mtime": 1794275531.396255,
+    "seen": 1794330696.8167598,
+    "ast_hash": "d494dcfdac0a292c4ffc80c78a56bf5f",
+    "semantic_hash": "d494dcfdac0a292c4ffc80c78a56bf5f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-011.json": {
+    "mtime": 1794275527.0672393,
+    "seen": 1794330696.8167598,
+    "ast_hash": "218b7cd9bb70f9f304b54d15310a0c98",
+    "semantic_hash": "218b7cd9bb70f9f304b54d15310a0c98",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-012.json": {
+    "mtime": 1794275531.3977818,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f181959ada5d9be5240c2ebd3996a0a6",
+    "semantic_hash": "f181959ada5d9be5240c2ebd3996a0a6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-013.json": {
+    "mtime": 1794275574.7971225,
+    "seen": 1794330696.8167598,
+    "ast_hash": "bb7d7b243404b6ab94a1ef7a0a5e7b6e",
+    "semantic_hash": "bb7d7b243404b6ab94a1ef7a0a5e7b6e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-014.json": {
+    "mtime": 1794275573.0373821,
+    "seen": 1794330696.8167598,
+    "ast_hash": "6474b86525813133e130b38f4b8e3287",
+    "semantic_hash": "6474b86525813133e130b38f4b8e3287",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-015.json": {
+    "mtime": 1794275578.241183,
+    "seen": 1794330696.8167598,
+    "ast_hash": "7b44912862a465bddcb7e46f9d202666",
+    "semantic_hash": "7b44912862a465bddcb7e46f9d202666",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-016.json": {
+    "mtime": 1794275577.2288072,
+    "seen": 1794330696.8167598,
+    "ast_hash": "122cc306c1574da3e3143cc939b1eb62",
+    "semantic_hash": "122cc306c1574da3e3143cc939b1eb62",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-017.json": {
+    "mtime": 1794275574.7991195,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b0eafa9c64732000eb080906f8bf0273",
+    "semantic_hash": "b0eafa9c64732000eb080906f8bf0273",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-018.json": {
+    "mtime": 1794275578.241183,
+    "seen": 1794330696.8167598,
+    "ast_hash": "283931a28ce9b83e79c6c92eb8f74147",
+    "semantic_hash": "283931a28ce9b83e79c6c92eb8f74147",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-019.json": {
+    "mtime": 1794275606.5681777,
+    "seen": 1794330696.8167598,
+    "ast_hash": "50f9abbb20ab684dca7d54e697d6d5e7",
+    "semantic_hash": "50f9abbb20ab684dca7d54e697d6d5e7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-020.json": {
+    "mtime": 1794275608.0657487,
+    "seen": 1794330696.8167598,
+    "ast_hash": "ab51a641cd087d2b660c02ca581a82a9",
+    "semantic_hash": "ab51a641cd087d2b660c02ca581a82a9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-021.json": {
+    "mtime": 1794275610.7753804,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e559ba1aa9e76b0b072335cebd8e03bb",
+    "semantic_hash": "e559ba1aa9e76b0b072335cebd8e03bb",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-022.json": {
+    "mtime": 1794275609.575839,
+    "seen": 1794330696.8167598,
+    "ast_hash": "2cca65ebce8b7ba259ad094aca02dde0",
+    "semantic_hash": "2cca65ebce8b7ba259ad094aca02dde0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-023.json": {
+    "mtime": 1794275610.7753804,
+    "seen": 1794330696.8167598,
+    "ast_hash": "ab52986df321cbb41b398abbbe9af949",
+    "semantic_hash": "ab52986df321cbb41b398abbbe9af949",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-024.json": {
+    "mtime": 1794275612.781473,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9a5f0d1fe067a9ae0d9bcdf2feded455",
+    "semantic_hash": "9a5f0d1fe067a9ae0d9bcdf2feded455",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-025.json": {
+    "mtime": 1794275766.0102825,
+    "seen": 1794330696.8167598,
+    "ast_hash": "53ad46192e60287143988d36a1246ed9",
+    "semantic_hash": "53ad46192e60287143988d36a1246ed9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-026.json": {
+    "mtime": 1794275768.737477,
+    "seen": 1794330696.8167598,
+    "ast_hash": "dcd375b24217541b13cb282f126eb334",
+    "semantic_hash": "dcd375b24217541b13cb282f126eb334",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-027.json": {
+    "mtime": 1794275771.4691272,
+    "seen": 1794330696.8167598,
+    "ast_hash": "f98690b17b1b51c489751827face8d4b",
+    "semantic_hash": "f98690b17b1b51c489751827face8d4b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-028.json": {
+    "mtime": 1794275771.4700847,
+    "seen": 1794330696.8167598,
+    "ast_hash": "0eec3466e065eea3937ab5c0741fa4c6",
+    "semantic_hash": "0eec3466e065eea3937ab5c0741fa4c6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-029.json": {
+    "mtime": 1794275770.2403698,
+    "seen": 1794330696.8167598,
+    "ast_hash": "1964378a793d53bdfc90c0112dac3af8",
+    "semantic_hash": "1964378a793d53bdfc90c0112dac3af8",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-030.json": {
+    "mtime": 1794275771.467072,
+    "seen": 1794330696.8167598,
+    "ast_hash": "8cc1e785bb5e6b6c967326796cac15df",
+    "semantic_hash": "8cc1e785bb5e6b6c967326796cac15df",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-031.json": {
+    "mtime": 1794275792.6227796,
+    "seen": 1794330696.8167598,
+    "ast_hash": "612cda81a2958909a99dc0352ae53c9e",
+    "semantic_hash": "612cda81a2958909a99dc0352ae53c9e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-032.json": {
+    "mtime": 1794275789.8770401,
+    "seen": 1794330696.8167598,
+    "ast_hash": "4e880dd434877eaf6dc5c4d08c85afbc",
+    "semantic_hash": "4e880dd434877eaf6dc5c4d08c85afbc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-033.json": {
+    "mtime": 1794275790.8114388,
+    "seen": 1794330696.8167598,
+    "ast_hash": "46e2d4e8e4ee40da127a34305d191ccf",
+    "semantic_hash": "46e2d4e8e4ee40da127a34305d191ccf",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-034.json": {
+    "mtime": 1794275794.7511444,
+    "seen": 1794330696.8167598,
+    "ast_hash": "edf0863910b40e6a626727f65a967bf1",
+    "semantic_hash": "edf0863910b40e6a626727f65a967bf1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-035.json": {
+    "mtime": 1794275791.759632,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e107eefbc070f08d91b5c27f4e5948ad",
+    "semantic_hash": "e107eefbc070f08d91b5c27f4e5948ad",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-036.json": {
+    "mtime": 1794275795.676855,
+    "seen": 1794330696.8167598,
+    "ast_hash": "a1bc25ac23a01cf801dd8d3a6803d3fa",
+    "semantic_hash": "a1bc25ac23a01cf801dd8d3a6803d3fa",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-037.json": {
+    "mtime": 1794275810.2907965,
+    "seen": 1794330696.8167598,
+    "ast_hash": "19490ba3dd4e921b6203225b4cc7426f",
+    "semantic_hash": "19490ba3dd4e921b6203225b4cc7426f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-038.json": {
+    "mtime": 1794275809.2531955,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9ec4f2cb95f410c6ec23f86bb02c7dd9",
+    "semantic_hash": "9ec4f2cb95f410c6ec23f86bb02c7dd9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-039.json": {
+    "mtime": 1794275809.2531955,
+    "seen": 1794330696.8167598,
+    "ast_hash": "b5782aa2029a36bae7ad65d9e40d5127",
+    "semantic_hash": "b5782aa2029a36bae7ad65d9e40d5127",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-040.json": {
+    "mtime": 1794275807.399948,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e281bc4647cd5e7f829bdd28f95c050e",
+    "semantic_hash": "e281bc4647cd5e7f829bdd28f95c050e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-041.json": {
+    "mtime": 1794275810.7709243,
+    "seen": 1794330696.8167598,
+    "ast_hash": "e5f6d29051dedca34c2217f081b2343c",
+    "semantic_hash": "e5f6d29051dedca34c2217f081b2343c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-042.json": {
+    "mtime": 1794275808.5463028,
+    "seen": 1794330696.8167598,
+    "ast_hash": "9a187160fdf96bf16e93352822570006",
+    "semantic_hash": "9a187160fdf96bf16e93352822570006",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-043.json": {
+    "mtime": 1794275823.9445887,
+    "seen": 1794330696.8177657,
+    "ast_hash": "cdf57cf9f8c5d6166c57a15bac3e047e",
+    "semantic_hash": "cdf57cf9f8c5d6166c57a15bac3e047e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-044.json": {
+    "mtime": 1794275827.1355996,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a0f7392557e1da2c5f95b6546d05239e",
+    "semantic_hash": "a0f7392557e1da2c5f95b6546d05239e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-045.json": {
+    "mtime": 1794275824.7213,
+    "seen": 1794330696.8177657,
+    "ast_hash": "44a95a5b971132cf8921accb011b63eb",
+    "semantic_hash": "44a95a5b971132cf8921accb011b63eb",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-046.json": {
+    "mtime": 1794275825.5849588,
+    "seen": 1794330696.8177657,
+    "ast_hash": "1775ab05afd3df75cbee07174a1f45dc",
+    "semantic_hash": "1775ab05afd3df75cbee07174a1f45dc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-047.json": {
+    "mtime": 1794275826.2938237,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4f370fb7d9b3db245a3438d99b3e7fb1",
+    "semantic_hash": "4f370fb7d9b3db245a3438d99b3e7fb1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-048.json": {
+    "mtime": 1794275826.2938237,
+    "seen": 1794330696.8177657,
+    "ast_hash": "02c9089262bf15c77f4dadcb702d4fc1",
+    "semantic_hash": "02c9089262bf15c77f4dadcb702d4fc1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-049.json": {
+    "mtime": 1794275843.8962529,
+    "seen": 1794330696.8177657,
+    "ast_hash": "b96906e36984ae4e95f7f0d065476fee",
+    "semantic_hash": "b96906e36984ae4e95f7f0d065476fee",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-050.json": {
+    "mtime": 1794275844.345168,
+    "seen": 1794330696.8177657,
+    "ast_hash": "942922276faa5557ff8923d35a6e47ac",
+    "semantic_hash": "942922276faa5557ff8923d35a6e47ac",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-051.json": {
+    "mtime": 1794275842.4815054,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5e5a01c52f765207e9a06b0976601e27",
+    "semantic_hash": "5e5a01c52f765207e9a06b0976601e27",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-052.json": {
+    "mtime": 1794275843.0137744,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ac269025e843d316f1ac157826c461bf",
+    "semantic_hash": "ac269025e843d316f1ac157826c461bf",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-053.json": {
+    "mtime": 1794275841.6486897,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d295616159bfbc35c7805d1225083ab3",
+    "semantic_hash": "d295616159bfbc35c7805d1225083ab3",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-054.json": {
+    "mtime": 1794275842.4861841,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5a6b27811398c8cb6cdb5e7323d0c225",
+    "semantic_hash": "5a6b27811398c8cb6cdb5e7323d0c225",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-055.json": {
+    "mtime": 1794275860.688255,
+    "seen": 1794330696.8177657,
+    "ast_hash": "1c9e3e629d584d51c2c8f35ed988fa8b",
+    "semantic_hash": "1c9e3e629d584d51c2c8f35ed988fa8b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-056.json": {
+    "mtime": 1794275859.7115953,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7b3de7b87245f7b06f6aa6c034fa6f83",
+    "semantic_hash": "7b3de7b87245f7b06f6aa6c034fa6f83",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-057.json": {
+    "mtime": 1794275858.9795141,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d984324f22c582a7408827a053d8301c",
+    "semantic_hash": "d984324f22c582a7408827a053d8301c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-058.json": {
+    "mtime": 1794275859.8298855,
+    "seen": 1794330696.8177657,
+    "ast_hash": "8d37789fa0226dc066c7355dcf29a8b9",
+    "semantic_hash": "8d37789fa0226dc066c7355dcf29a8b9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-059.json": {
+    "mtime": 1794275861.379225,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4f0fe6375318fee8113b9e770097fe0b",
+    "semantic_hash": "4f0fe6375318fee8113b9e770097fe0b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-060.json": {
+    "mtime": 1794275859.7074027,
+    "seen": 1794330696.8177657,
+    "ast_hash": "15546bf492f838f16587f44302a0b343",
+    "semantic_hash": "15546bf492f838f16587f44302a0b343",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-061.json": {
+    "mtime": 1794275875.69858,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d8a2266e1b0ba64bbd44fbec887f2587",
+    "semantic_hash": "d8a2266e1b0ba64bbd44fbec887f2587",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-062.json": {
+    "mtime": 1794275874.3364637,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fcc816d01a4b3de702029edefef5aaf9",
+    "semantic_hash": "fcc816d01a4b3de702029edefef5aaf9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-063.json": {
+    "mtime": 1794275876.702461,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9772a4b1c57e1f39958fa4f5f15e9ae7",
+    "semantic_hash": "9772a4b1c57e1f39958fa4f5f15e9ae7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-064.json": {
+    "mtime": 1794275875.0345316,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a0bda5eca08996f43ce0d0011a7ccd54",
+    "semantic_hash": "a0bda5eca08996f43ce0d0011a7ccd54",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-065.json": {
+    "mtime": 1794275875.69858,
+    "seen": 1794330696.8177657,
+    "ast_hash": "30f71f89795e7c7f2bf1043f154ac4e6",
+    "semantic_hash": "30f71f89795e7c7f2bf1043f154ac4e6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-066.json": {
+    "mtime": 1794275877.1268828,
+    "seen": 1794330696.8177657,
+    "ast_hash": "cfa43d84572eef3b35e64406879269f4",
+    "semantic_hash": "cfa43d84572eef3b35e64406879269f4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-067.json": {
+    "mtime": 1794275891.0163033,
+    "seen": 1794330696.8177657,
+    "ast_hash": "b9424716d2b091743ca9ae8b617024bb",
+    "semantic_hash": "b9424716d2b091743ca9ae8b617024bb",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-068.json": {
+    "mtime": 1794275892.7873774,
+    "seen": 1794330696.8177657,
+    "ast_hash": "bd317423b427024c028fbf73c857270f",
+    "semantic_hash": "bd317423b427024c028fbf73c857270f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-069.json": {
+    "mtime": 1794275891.6901195,
+    "seen": 1794330696.8177657,
+    "ast_hash": "917f6caa517d2e7c162500c7df7db341",
+    "semantic_hash": "917f6caa517d2e7c162500c7df7db341",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-070.json": {
+    "mtime": 1794275892.2928202,
+    "seen": 1794330696.8177657,
+    "ast_hash": "f47a304ead897110044a3113f9a8d3ad",
+    "semantic_hash": "f47a304ead897110044a3113f9a8d3ad",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-071.json": {
+    "mtime": 1794275893.21577,
+    "seen": 1794330696.8177657,
+    "ast_hash": "316c7e5675dae834849652001f86f23f",
+    "semantic_hash": "316c7e5675dae834849652001f86f23f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-072.json": {
+    "mtime": 1794275890.308497,
+    "seen": 1794330696.8177657,
+    "ast_hash": "125d808116e2c0df60a453f95ef92b8f",
+    "semantic_hash": "125d808116e2c0df60a453f95ef92b8f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-073.json": {
+    "mtime": 1794275906.5676582,
+    "seen": 1794330696.8177657,
+    "ast_hash": "24e7c9829d932f67eb11f34631f49303",
+    "semantic_hash": "24e7c9829d932f67eb11f34631f49303",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-074.json": {
+    "mtime": 1794275905.7606497,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ce16f2a4e06f5536481f0dd69d33ec44",
+    "semantic_hash": "ce16f2a4e06f5536481f0dd69d33ec44",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-075.json": {
+    "mtime": 1794275904.9050872,
+    "seen": 1794330696.8177657,
+    "ast_hash": "43b9b093630e84759d2b857105b1bcde",
+    "semantic_hash": "43b9b093630e84759d2b857105b1bcde",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-076.json": {
+    "mtime": 1794275906.5661476,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4337a711a3cf1b6720ff640d540a6749",
+    "semantic_hash": "4337a711a3cf1b6720ff640d540a6749",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-077.json": {
+    "mtime": 1794275906.5661476,
+    "seen": 1794330696.8177657,
+    "ast_hash": "46a96d43abba4d2927a5f176c9872f8d",
+    "semantic_hash": "46a96d43abba4d2927a5f176c9872f8d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-078.json": {
+    "mtime": 1794275903.2436275,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9b2ccf3dde97703f0ae1cb5bcaf219bc",
+    "semantic_hash": "9b2ccf3dde97703f0ae1cb5bcaf219bc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-079.json": {
+    "mtime": 1794275910.108627,
+    "seen": 1794330696.8177657,
+    "ast_hash": "1f00720c22b0d464d8243fbdbe402b0c",
+    "semantic_hash": "1f00720c22b0d464d8243fbdbe402b0c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-080.json": {
+    "mtime": 1794275916.8731842,
+    "seen": 1794330696.8177657,
+    "ast_hash": "384c67f5f33a6594f12ddcb804a55c8a",
+    "semantic_hash": "384c67f5f33a6594f12ddcb804a55c8a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-081.json": {
+    "mtime": 1794275916.492541,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4f364408893078babef5c78a59520d65",
+    "semantic_hash": "4f364408893078babef5c78a59520d65",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-082.json": {
+    "mtime": 1794275916.3711517,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ee265d4757a6d8c50a3ea5d96eaaca09",
+    "semantic_hash": "ee265d4757a6d8c50a3ea5d96eaaca09",
+    "ast_empty": true
+  },
+  "data/ocr/nd_12_2022/page-083.json": {
+    "mtime": 1794275913.0292327,
+    "seen": 1794330696.8177657,
+    "ast_hash": "33cef0c7c386e5bb5dd505902dc84c63",
+    "semantic_hash": "33cef0c7c386e5bb5dd505902dc84c63",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-001.json": {
+    "mtime": 1794275929.732345,
+    "seen": 1794330696.8177657,
+    "ast_hash": "89fe7dc1a9f87f5f24c5d318665c8df1",
+    "semantic_hash": "89fe7dc1a9f87f5f24c5d318665c8df1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-002.json": {
+    "mtime": 1794275929.1011815,
+    "seen": 1794330696.8177657,
+    "ast_hash": "24335334d4c758e301daefc9d8b10803",
+    "semantic_hash": "24335334d4c758e301daefc9d8b10803",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-003.json": {
+    "mtime": 1794275930.2655315,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5ed72dff109d4391627ad71e1764d0f7",
+    "semantic_hash": "5ed72dff109d4391627ad71e1764d0f7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-004.json": {
+    "mtime": 1794275933.7088492,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e57c94f4bfd1ed7255de857d0e8eb1a9",
+    "semantic_hash": "e57c94f4bfd1ed7255de857d0e8eb1a9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-005.json": {
+    "mtime": 1794275934.4804084,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c7fd05d5632f379f91e9e81a832d73de",
+    "semantic_hash": "c7fd05d5632f379f91e9e81a832d73de",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-006.json": {
+    "mtime": 1794275927.5468152,
+    "seen": 1794330696.8177657,
+    "ast_hash": "8d875d1e8d4b8c25d0d5a6a41138726a",
+    "semantic_hash": "8d875d1e8d4b8c25d0d5a6a41138726a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-007.json": {
+    "mtime": 1794275930.974096,
+    "seen": 1794330696.8177657,
+    "ast_hash": "b336f9f0ad917a62e7df3da224417d53",
+    "semantic_hash": "b336f9f0ad917a62e7df3da224417d53",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-008.json": {
+    "mtime": 1794275936.2197566,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3f34dfe37d466ba1e6631d4c235df50d",
+    "semantic_hash": "3f34dfe37d466ba1e6631d4c235df50d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-009.json": {
+    "mtime": 1794275935.7056856,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0c4411f195e2a8370bd9e39181d4d951",
+    "semantic_hash": "0c4411f195e2a8370bd9e39181d4d951",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-010.json": {
+    "mtime": 1794275935.1572795,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7b83cfad83e8a276c628850d18da4d28",
+    "semantic_hash": "7b83cfad83e8a276c628850d18da4d28",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-011.json": {
+    "mtime": 1794275936.2242415,
+    "seen": 1794330696.8177657,
+    "ast_hash": "bfd6a449d27cc2ededde69980167adda",
+    "semantic_hash": "bfd6a449d27cc2ededde69980167adda",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-012.json": {
+    "mtime": 1794275941.355209,
+    "seen": 1794330696.8177657,
+    "ast_hash": "1a1466765351e8dc9f7dc12499957251",
+    "semantic_hash": "1a1466765351e8dc9f7dc12499957251",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-013.json": {
+    "mtime": 1794275938.2658472,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4e02c41b9ad18b2f281f3d3794c4c9f3",
+    "semantic_hash": "4e02c41b9ad18b2f281f3d3794c4c9f3",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-014.json": {
+    "mtime": 1794275937.807092,
+    "seen": 1794330696.8177657,
+    "ast_hash": "35673527d6a0fc5e9ad67a45faf14484",
+    "semantic_hash": "35673527d6a0fc5e9ad67a45faf14484",
+    "ast_empty": true
+  },
+  "data/ocr/nd_135_2020/page-015.json": {
+    "mtime": 1794275940.16148,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7d6d898fa551735b2ebd05cfda600c09",
+    "semantic_hash": "7d6d898fa551735b2ebd05cfda600c09",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-001.json": {
+    "mtime": 1794275944.2889254,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e5addfa039e24ec04140e7bc2009c719",
+    "semantic_hash": "e5addfa039e24ec04140e7bc2009c719",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-002.json": {
+    "mtime": 1794275944.8351245,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4d271f850d825694bed43d04a6ba1357",
+    "semantic_hash": "4d271f850d825694bed43d04a6ba1357",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-003.json": {
+    "mtime": 1794275945.1656947,
+    "seen": 1794330696.8177657,
+    "ast_hash": "cdaa66ee1710b165fc6b7fed3e4bdeb4",
+    "semantic_hash": "cdaa66ee1710b165fc6b7fed3e4bdeb4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-004.json": {
+    "mtime": 1794275945.1656947,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7dfc348475e979a7d08de8c1f1cb56ee",
+    "semantic_hash": "7dfc348475e979a7d08de8c1f1cb56ee",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-005.json": {
+    "mtime": 1794275945.2834878,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a7e99666f656a1b4489d2b832e92991a",
+    "semantic_hash": "a7e99666f656a1b4489d2b832e92991a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-006.json": {
+    "mtime": 1794275946.0622308,
+    "seen": 1794330696.8177657,
+    "ast_hash": "db620bd8972a5715f27fa9d3c6051cb8",
+    "semantic_hash": "db620bd8972a5715f27fa9d3c6051cb8",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-007.json": {
+    "mtime": 1794275946.39913,
+    "seen": 1794330696.8177657,
+    "ast_hash": "dafc4d38d9ba9b45bbda5b17e702bf7e",
+    "semantic_hash": "dafc4d38d9ba9b45bbda5b17e702bf7e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-008.json": {
+    "mtime": 1794275946.781281,
+    "seen": 1794330696.8177657,
+    "ast_hash": "90c29573e6d63026c41dd79cdd9be921",
+    "semantic_hash": "90c29573e6d63026c41dd79cdd9be921",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-009.json": {
+    "mtime": 1794275947.3888185,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e778d54efee30f749bc1bb8d4e5b3797",
+    "semantic_hash": "e778d54efee30f749bc1bb8d4e5b3797",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-010.json": {
+    "mtime": 1794275948.3640013,
+    "seen": 1794330696.8177657,
+    "ast_hash": "67ec264463db5d4c248f92c7e44168d5",
+    "semantic_hash": "67ec264463db5d4c248f92c7e44168d5",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-011.json": {
+    "mtime": 1794275947.9522011,
+    "seen": 1794330696.8177657,
+    "ast_hash": "010101eb72daa3fa6dee1c28249fcb0b",
+    "semantic_hash": "010101eb72daa3fa6dee1c28249fcb0b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-012.json": {
+    "mtime": 1794275947.945611,
+    "seen": 1794330696.8177657,
+    "ast_hash": "dca80c8e56a4959de6b8111f2ccc9481",
+    "semantic_hash": "dca80c8e56a4959de6b8111f2ccc9481",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-013.json": {
+    "mtime": 1794275948.3640013,
+    "seen": 1794330696.8177657,
+    "ast_hash": "feb905ce39217c020894f9971a185d9a",
+    "semantic_hash": "feb905ce39217c020894f9971a185d9a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-014.json": {
+    "mtime": 1794275949.270531,
+    "seen": 1794330696.8177657,
+    "ast_hash": "da91b51cb291a8ef52cfe4ef02834208",
+    "semantic_hash": "da91b51cb291a8ef52cfe4ef02834208",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-015.json": {
+    "mtime": 1794275949.7649927,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9d90fcbb54a27635f1e56cd9d479960e",
+    "semantic_hash": "9d90fcbb54a27635f1e56cd9d479960e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-016.json": {
+    "mtime": 1794275951.9018874,
+    "seen": 1794330696.8177657,
+    "ast_hash": "da3db215c600b067d9dcf1a9c9e54582",
+    "semantic_hash": "da3db215c600b067d9dcf1a9c9e54582",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-017.json": {
+    "mtime": 1794275951.220278,
+    "seen": 1794330696.8177657,
+    "ast_hash": "70a2c9ea6b9c19a401018b6536b04a13",
+    "semantic_hash": "70a2c9ea6b9c19a401018b6536b04a13",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-018.json": {
+    "mtime": 1794275950.864913,
+    "seen": 1794330696.8177657,
+    "ast_hash": "72a1b0695741194569ee8339969c9190",
+    "semantic_hash": "72a1b0695741194569ee8339969c9190",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-019.json": {
+    "mtime": 1794275950.3998077,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0a41f3e94f2b13ca4f4aae4582d94fec",
+    "semantic_hash": "0a41f3e94f2b13ca4f4aae4582d94fec",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-020.json": {
+    "mtime": 1794275951.5694988,
+    "seen": 1794330696.8177657,
+    "ast_hash": "acd41a67989a4f0b5e757427b706d1e6",
+    "semantic_hash": "acd41a67989a4f0b5e757427b706d1e6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-021.json": {
+    "mtime": 1794275952.2496254,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7302d572ac2475d92d22e6805cd554b3",
+    "semantic_hash": "7302d572ac2475d92d22e6805cd554b3",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-022.json": {
+    "mtime": 1794275952.2496254,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e43261c94c856f1510ae6bade39c1b94",
+    "semantic_hash": "e43261c94c856f1510ae6bade39c1b94",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-023.json": {
+    "mtime": 1794275953.5545888,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3758e1320706a4c5c89ac0a1724bc265",
+    "semantic_hash": "3758e1320706a4c5c89ac0a1724bc265",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-024.json": {
+    "mtime": 1794275953.103294,
+    "seen": 1794330696.8177657,
+    "ast_hash": "45661c148d333e437e057fa9fdcc1e14",
+    "semantic_hash": "45661c148d333e437e057fa9fdcc1e14",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-025.json": {
+    "mtime": 1794275954.0861795,
+    "seen": 1794330696.8177657,
+    "ast_hash": "6172cc12677200f0a4628f55275b029b",
+    "semantic_hash": "6172cc12677200f0a4628f55275b029b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-026.json": {
+    "mtime": 1794275954.0851784,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e005656d1c3c910d2d74994391dae1d9",
+    "semantic_hash": "e005656d1c3c910d2d74994391dae1d9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-027.json": {
+    "mtime": 1794275954.9037704,
+    "seen": 1794330696.8177657,
+    "ast_hash": "947cd61e50d6ad91a7c01d5fbe818fd8",
+    "semantic_hash": "947cd61e50d6ad91a7c01d5fbe818fd8",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-028.json": {
+    "mtime": 1794275955.3343852,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e7afef8e8c3db8d1f85673acc1e75422",
+    "semantic_hash": "e7afef8e8c3db8d1f85673acc1e75422",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-029.json": {
+    "mtime": 1794275955.8572352,
+    "seen": 1794330696.8177657,
+    "ast_hash": "b28ee66a1d66f85db77a3036999acffc",
+    "semantic_hash": "b28ee66a1d66f85db77a3036999acffc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-030.json": {
+    "mtime": 1794275955.856176,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9119837b7af3e643ca28d51cc2cabe67",
+    "semantic_hash": "9119837b7af3e643ca28d51cc2cabe67",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-031.json": {
+    "mtime": 1794275957.034525,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ef57eee750cf108e9328846eee2ec59d",
+    "semantic_hash": "ef57eee750cf108e9328846eee2ec59d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-032.json": {
+    "mtime": 1794275956.615916,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0ed9d0851d5104f16800840b45171e69",
+    "semantic_hash": "0ed9d0851d5104f16800840b45171e69",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-033.json": {
+    "mtime": 1794275957.5425818,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4ccf3306f86cc4447f1e73fafd25bc1c",
+    "semantic_hash": "4ccf3306f86cc4447f1e73fafd25bc1c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-034.json": {
+    "mtime": 1794275957.543446,
+    "seen": 1794330696.8177657,
+    "ast_hash": "af5f38261a1725c33e2e2102c953c4e9",
+    "semantic_hash": "af5f38261a1725c33e2e2102c953c4e9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-035.json": {
+    "mtime": 1794275958.2739663,
+    "seen": 1794330696.8177657,
+    "ast_hash": "2cf7fb07f9367b69d1852ddb6aa43be7",
+    "semantic_hash": "2cf7fb07f9367b69d1852ddb6aa43be7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-036.json": {
+    "mtime": 1794275958.2749662,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0bddd286f4fc8487f1a0251edf9b9ca2",
+    "semantic_hash": "0bddd286f4fc8487f1a0251edf9b9ca2",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-037.json": {
+    "mtime": 1794275959.0186973,
+    "seen": 1794330696.8177657,
+    "ast_hash": "f37fbbfbb084a8fbb46320fd65a18269",
+    "semantic_hash": "f37fbbfbb084a8fbb46320fd65a18269",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-038.json": {
+    "mtime": 1794275959.0186973,
+    "seen": 1794330696.8177657,
+    "ast_hash": "cca62f240f611f3fa77302594e8b92dc",
+    "semantic_hash": "cca62f240f611f3fa77302594e8b92dc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-039.json": {
+    "mtime": 1794275959.8621283,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0e9b8c3f194e7d8ccd6ea22538987229",
+    "semantic_hash": "0e9b8c3f194e7d8ccd6ea22538987229",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-040.json": {
+    "mtime": 1794275959.863127,
+    "seen": 1794330696.8177657,
+    "ast_hash": "08b120a6fb6bdcd9e0988768d207be2e",
+    "semantic_hash": "08b120a6fb6bdcd9e0988768d207be2e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-041.json": {
+    "mtime": 1794275960.6406574,
+    "seen": 1794330696.8177657,
+    "ast_hash": "aff90984a20b2839375f3ddf7edcde11",
+    "semantic_hash": "aff90984a20b2839375f3ddf7edcde11",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-042.json": {
+    "mtime": 1794275961.028006,
+    "seen": 1794330696.8177657,
+    "ast_hash": "87421465aa599f2e1d3c5f32a222c98d",
+    "semantic_hash": "87421465aa599f2e1d3c5f32a222c98d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-043.json": {
+    "mtime": 1794275961.4865708,
+    "seen": 1794330696.8177657,
+    "ast_hash": "6a34019a8496b09774b693b2b42ce12c",
+    "semantic_hash": "6a34019a8496b09774b693b2b42ce12c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-044.json": {
+    "mtime": 1794275961.4855728,
+    "seen": 1794330696.8177657,
+    "ast_hash": "2f4587174b139b5e484b5aef5ead5099",
+    "semantic_hash": "2f4587174b139b5e484b5aef5ead5099",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-045.json": {
+    "mtime": 1794275962.5461833,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ec8966d36fddd1b75fe62b7eb169b9db",
+    "semantic_hash": "ec8966d36fddd1b75fe62b7eb169b9db",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-046.json": {
+    "mtime": 1794275962.1815624,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9d23c326d473df770a877d2c473e8777",
+    "semantic_hash": "9d23c326d473df770a877d2c473e8777",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-047.json": {
+    "mtime": 1794275963.3590984,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c5ccf65fc8e006a5b3db8e9db9825dc8",
+    "semantic_hash": "c5ccf65fc8e006a5b3db8e9db9825dc8",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-048.json": {
+    "mtime": 1794275962.9952798,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4f3eee8b234d12527f85b1d81e80d95f",
+    "semantic_hash": "4f3eee8b234d12527f85b1d81e80d95f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-049.json": {
+    "mtime": 1794275963.7220864,
+    "seen": 1794330696.8177657,
+    "ast_hash": "25b7f6bb03e693c5cff707ae500aaa09",
+    "semantic_hash": "25b7f6bb03e693c5cff707ae500aaa09",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-050.json": {
+    "mtime": 1794275963.7220864,
+    "seen": 1794330696.8177657,
+    "ast_hash": "03d41d5333f7f5eb9462fa8937f6b734",
+    "semantic_hash": "03d41d5333f7f5eb9462fa8937f6b734",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-051.json": {
+    "mtime": 1794275964.4296534,
+    "seen": 1794330696.8177657,
+    "ast_hash": "8d222b4772f55164993ea10216f22ff7",
+    "semantic_hash": "8d222b4772f55164993ea10216f22ff7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-052.json": {
+    "mtime": 1794275964.8021662,
+    "seen": 1794330696.8177657,
+    "ast_hash": "44870ce3ab68a306ca03b6afaaf51957",
+    "semantic_hash": "44870ce3ab68a306ca03b6afaaf51957",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-053.json": {
+    "mtime": 1794275965.2489812,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5d86eaa5a91d03dc698b1da9786342d0",
+    "semantic_hash": "5d86eaa5a91d03dc698b1da9786342d0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-054.json": {
+    "mtime": 1794275965.414201,
+    "seen": 1794330696.8177657,
+    "ast_hash": "bb29ae3b2fb455092e177caebbba18bc",
+    "semantic_hash": "bb29ae3b2fb455092e177caebbba18bc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-055.json": {
+    "mtime": 1794275966.3719215,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ee67ce9c96d910297e213357bb7ec17b",
+    "semantic_hash": "ee67ce9c96d910297e213357bb7ec17b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-056.json": {
+    "mtime": 1794275965.9856923,
+    "seen": 1794330696.8177657,
+    "ast_hash": "52a951c2381c704f7c5c2997f315d572",
+    "semantic_hash": "52a951c2381c704f7c5c2997f315d572",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-057.json": {
+    "mtime": 1794275967.3943796,
+    "seen": 1794330696.8177657,
+    "ast_hash": "18e955f58919691b3d3ef0cc2810ccb1",
+    "semantic_hash": "18e955f58919691b3d3ef0cc2810ccb1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-058.json": {
+    "mtime": 1794275966.9006515,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d49e83375af7f5e12fddbac0ecabbdc2",
+    "semantic_hash": "d49e83375af7f5e12fddbac0ecabbdc2",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-059.json": {
+    "mtime": 1794275967.894752,
+    "seen": 1794330696.8177657,
+    "ast_hash": "29c87f1800b99831d324b46f224c80b6",
+    "semantic_hash": "29c87f1800b99831d324b46f224c80b6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-060.json": {
+    "mtime": 1794275967.894752,
+    "seen": 1794330696.8177657,
+    "ast_hash": "f625faaf68b1e3ae44c268005aa73e6a",
+    "semantic_hash": "f625faaf68b1e3ae44c268005aa73e6a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-061.json": {
+    "mtime": 1794275968.8863165,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e6e99fc13aafe34a31d41e6b53b1ceb8",
+    "semantic_hash": "e6e99fc13aafe34a31d41e6b53b1ceb8",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-062.json": {
+    "mtime": 1794275969.4671967,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e447d210da078d04855b983b36e1f660",
+    "semantic_hash": "e447d210da078d04855b983b36e1f660",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-063.json": {
+    "mtime": 1794275970.0613117,
+    "seen": 1794330696.8177657,
+    "ast_hash": "13bfc5a6ca4615c301b4ab079e9117a4",
+    "semantic_hash": "13bfc5a6ca4615c301b4ab079e9117a4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-064.json": {
+    "mtime": 1794275970.062326,
+    "seen": 1794330696.8177657,
+    "ast_hash": "84e64fcde9dc156089b8c48f7f5d0aca",
+    "semantic_hash": "84e64fcde9dc156089b8c48f7f5d0aca",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-065.json": {
+    "mtime": 1794275971.9447298,
+    "seen": 1794330696.8177657,
+    "ast_hash": "08c5d9f8227fa250e6f0af6d275a71a8",
+    "semantic_hash": "08c5d9f8227fa250e6f0af6d275a71a8",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-066.json": {
+    "mtime": 1794275971.1775506,
+    "seen": 1794330696.8177657,
+    "ast_hash": "1a4ae5e286381a62b18663191675b2b1",
+    "semantic_hash": "1a4ae5e286381a62b18663191675b2b1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-067.json": {
+    "mtime": 1794275973.365897,
+    "seen": 1794330696.8177657,
+    "ast_hash": "480bfbe510a7511d87bc83b5da25d1cc",
+    "semantic_hash": "480bfbe510a7511d87bc83b5da25d1cc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-068.json": {
+    "mtime": 1794275973.9778266,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3b4ffda75161b661636dfec43dd2e79f",
+    "semantic_hash": "3b4ffda75161b661636dfec43dd2e79f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-069.json": {
+    "mtime": 1794275974.629801,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ab52f35a6f22bdb8abe1a29ccd76691a",
+    "semantic_hash": "ab52f35a6f22bdb8abe1a29ccd76691a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-070.json": {
+    "mtime": 1794275974.628806,
+    "seen": 1794330696.8177657,
+    "ast_hash": "920aab3c1ffcb30082dc84c7844f44f7",
+    "semantic_hash": "920aab3c1ffcb30082dc84c7844f44f7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-071.json": {
+    "mtime": 1794275976.667843,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3188accfab39f7c46db4a6518906af7e",
+    "semantic_hash": "3188accfab39f7c46db4a6518906af7e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-072.json": {
+    "mtime": 1794275975.8943756,
+    "seen": 1794330696.8177657,
+    "ast_hash": "011f557c6ba38d2252879ff6e46a0ae3",
+    "semantic_hash": "011f557c6ba38d2252879ff6e46a0ae3",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-073.json": {
+    "mtime": 1794275978.0745966,
+    "seen": 1794330696.8177657,
+    "ast_hash": "b01e9d8c3d0094da9af609b7cbb27143",
+    "semantic_hash": "b01e9d8c3d0094da9af609b7cbb27143",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-074.json": {
+    "mtime": 1794275978.076119,
+    "seen": 1794330696.8177657,
+    "ast_hash": "f06fb87931dcb1f399c6bebcfe7e4184",
+    "semantic_hash": "f06fb87931dcb1f399c6bebcfe7e4184",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-075.json": {
+    "mtime": 1794275979.0956712,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9da6de97b286cf2b7356df11308e9980",
+    "semantic_hash": "9da6de97b286cf2b7356df11308e9980",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-076.json": {
+    "mtime": 1794275979.5752058,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5c62ce8b5ac3c6769b91390ecf8e1f1d",
+    "semantic_hash": "5c62ce8b5ac3c6769b91390ecf8e1f1d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-077.json": {
+    "mtime": 1794275980.084262,
+    "seen": 1794330696.8177657,
+    "ast_hash": "feb2f4f5232b0ede2c64192ad7de4082",
+    "semantic_hash": "feb2f4f5232b0ede2c64192ad7de4082",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-078.json": {
+    "mtime": 1794275980.0852573,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e8b82920539779531229440a5b37cf59",
+    "semantic_hash": "e8b82920539779531229440a5b37cf59",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-079.json": {
+    "mtime": 1794275980.8833928,
+    "seen": 1794330696.8177657,
+    "ast_hash": "682a58247a3a7d33b113066fa91e761e",
+    "semantic_hash": "682a58247a3a7d33b113066fa91e761e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-080.json": {
+    "mtime": 1794275981.337886,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fe05de4f92f6254cd1778f1b8f373b4f",
+    "semantic_hash": "fe05de4f92f6254cd1778f1b8f373b4f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-081.json": {
+    "mtime": 1794275981.8758705,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fc21f7b5454ad628cb0bde77119ead2a",
+    "semantic_hash": "fc21f7b5454ad628cb0bde77119ead2a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-082.json": {
+    "mtime": 1794275981.877384,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3e99dcd61f1233a883b3e07072a9a86f",
+    "semantic_hash": "3e99dcd61f1233a883b3e07072a9a86f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-083.json": {
+    "mtime": 1794275982.7432356,
+    "seen": 1794330696.8177657,
+    "ast_hash": "dba0d7d942b6dbe3affb830081f808e9",
+    "semantic_hash": "dba0d7d942b6dbe3affb830081f808e9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-084.json": {
+    "mtime": 1794275983.1360354,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0b2239fef6ebec9bc40d36cde8608645",
+    "semantic_hash": "0b2239fef6ebec9bc40d36cde8608645",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-085.json": {
+    "mtime": 1794275983.596474,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0ba2895aad0a65c0013779f8ba07c4fa",
+    "semantic_hash": "0ba2895aad0a65c0013779f8ba07c4fa",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-086.json": {
+    "mtime": 1794275983.5954745,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ffecfdbdb4c0512187409c3192828298",
+    "semantic_hash": "ffecfdbdb4c0512187409c3192828298",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-087.json": {
+    "mtime": 1794275984.6899915,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0e104c8ce98f851d522f0900c36a2680",
+    "semantic_hash": "0e104c8ce98f851d522f0900c36a2680",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-088.json": {
+    "mtime": 1794275984.3138673,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e8f84c7342bf122793954c2992c5505e",
+    "semantic_hash": "e8f84c7342bf122793954c2992c5505e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-089.json": {
+    "mtime": 1794275985.5214283,
+    "seen": 1794330696.8177657,
+    "ast_hash": "21fe27108af82dd0f1a951e5f7283929",
+    "semantic_hash": "21fe27108af82dd0f1a951e5f7283929",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-090.json": {
+    "mtime": 1794275985.1273217,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9a5d9e1b1a8d8ec29b6cabfd82608438",
+    "semantic_hash": "9a5d9e1b1a8d8ec29b6cabfd82608438",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-091.json": {
+    "mtime": 1794275985.9326124,
+    "seen": 1794330696.8177657,
+    "ast_hash": "037bc9aad795703925e8e547e360d2a0",
+    "semantic_hash": "037bc9aad795703925e8e547e360d2a0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-092.json": {
+    "mtime": 1794275986.3130717,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e21ce2f514ecc71e7bec13df541fa74c",
+    "semantic_hash": "e21ce2f514ecc71e7bec13df541fa74c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-093.json": {
+    "mtime": 1794275986.7426069,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9e362f51399398b75be0b08b10124603",
+    "semantic_hash": "9e362f51399398b75be0b08b10124603",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-094.json": {
+    "mtime": 1794275986.7416067,
+    "seen": 1794330696.8177657,
+    "ast_hash": "765044119de53199218a7d9be779a6d0",
+    "semantic_hash": "765044119de53199218a7d9be779a6d0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-095.json": {
+    "mtime": 1794275987.4895175,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fdd788e76c6e679d0dd20aad9403af32",
+    "semantic_hash": "fdd788e76c6e679d0dd20aad9403af32",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-096.json": {
+    "mtime": 1794275987.4895175,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ba037e2b552b28649a6adaf683a761d6",
+    "semantic_hash": "ba037e2b552b28649a6adaf683a761d6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-097.json": {
+    "mtime": 1794275988.5853612,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e052a574e85c5307e8bb7493d1bd033e",
+    "semantic_hash": "e052a574e85c5307e8bb7493d1bd033e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-098.json": {
+    "mtime": 1794275988.2129571,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a71683a1f30bec914638cd3b36dd0ea1",
+    "semantic_hash": "a71683a1f30bec914638cd3b36dd0ea1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-099.json": {
+    "mtime": 1794275989.1340935,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d559538efa3b3e74cb034b71649797a4",
+    "semantic_hash": "d559538efa3b3e74cb034b71649797a4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-100.json": {
+    "mtime": 1794275989.1331418,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d1a3713a8b3e50144814e49f6d1bf496",
+    "semantic_hash": "d1a3713a8b3e50144814e49f6d1bf496",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-101.json": {
+    "mtime": 1794275989.896074,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ae03461d5efa6ee0c82319726d2f9ac7",
+    "semantic_hash": "ae03461d5efa6ee0c82319726d2f9ac7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-102.json": {
+    "mtime": 1794275989.896074,
+    "seen": 1794330696.8177657,
+    "ast_hash": "622e32625889c0426727923922f3d7c7",
+    "semantic_hash": "622e32625889c0426727923922f3d7c7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-103.json": {
+    "mtime": 1794275990.6882603,
+    "seen": 1794330696.8177657,
+    "ast_hash": "b2f8b9c81e39aea567b735b91136cb1b",
+    "semantic_hash": "b2f8b9c81e39aea567b735b91136cb1b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-104.json": {
+    "mtime": 1794275991.1180813,
+    "seen": 1794330696.8177657,
+    "ast_hash": "1a7d90f736c71062c28efee2a2e4c8e4",
+    "semantic_hash": "1a7d90f736c71062c28efee2a2e4c8e4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-105.json": {
+    "mtime": 1794275991.9398706,
+    "seen": 1794330696.8177657,
+    "ast_hash": "42db8dcac4bc754cc384d824ed209bdd",
+    "semantic_hash": "42db8dcac4bc754cc384d824ed209bdd",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-106.json": {
+    "mtime": 1794275991.563008,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fc24296fccd6a5845fa671411fdbf53e",
+    "semantic_hash": "fc24296fccd6a5845fa671411fdbf53e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-107.json": {
+    "mtime": 1794275992.3085656,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7669006ef639545fae397d2a0c0230e4",
+    "semantic_hash": "7669006ef639545fae397d2a0c0230e4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-108.json": {
+    "mtime": 1794275992.7233872,
+    "seen": 1794330696.8177657,
+    "ast_hash": "2bcdd22674ad19c604eccc71889fba6d",
+    "semantic_hash": "2bcdd22674ad19c604eccc71889fba6d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-109.json": {
+    "mtime": 1794275993.0877025,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d3d895e8c34a0f3cecc95a656423446e",
+    "semantic_hash": "d3d895e8c34a0f3cecc95a656423446e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-110.json": {
+    "mtime": 1794275993.448724,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fb3c2e487205e15a58501962c260863d",
+    "semantic_hash": "fb3c2e487205e15a58501962c260863d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-111.json": {
+    "mtime": 1794275993.940296,
+    "seen": 1794330696.8177657,
+    "ast_hash": "468d9688a647a9a228914ad62eb9b9b0",
+    "semantic_hash": "468d9688a647a9a228914ad62eb9b9b0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-112.json": {
+    "mtime": 1794275993.9412384,
+    "seen": 1794330696.8177657,
+    "ast_hash": "38fc55ee0638b7a5a153b2b63004d834",
+    "semantic_hash": "38fc55ee0638b7a5a153b2b63004d834",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-113.json": {
+    "mtime": 1794275994.665685,
+    "seen": 1794330696.8177657,
+    "ast_hash": "aefa27184fb3f1f760ee1ace8e1438a6",
+    "semantic_hash": "aefa27184fb3f1f760ee1ace8e1438a6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-114.json": {
+    "mtime": 1794275994.665685,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5315444ab96d30440ea472cb28f21ab2",
+    "semantic_hash": "5315444ab96d30440ea472cb28f21ab2",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-115.json": {
+    "mtime": 1794275995.7905388,
+    "seen": 1794330696.8177657,
+    "ast_hash": "6820072c4e80d01eb13234f8b0db2552",
+    "semantic_hash": "6820072c4e80d01eb13234f8b0db2552",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-116.json": {
+    "mtime": 1794275995.3949187,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0dadc6506b61e529caff83ee701c0a36",
+    "semantic_hash": "0dadc6506b61e529caff83ee701c0a36",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-117.json": {
+    "mtime": 1794275996.2818673,
+    "seen": 1794330696.8177657,
+    "ast_hash": "eccbe552e0d5453fd2cf3d9bdd547be0",
+    "semantic_hash": "eccbe552e0d5453fd2cf3d9bdd547be0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-118.json": {
+    "mtime": 1794275996.2818673,
+    "seen": 1794330696.8177657,
+    "ast_hash": "1f437b8e61b043226ddef993432cc0e7",
+    "semantic_hash": "1f437b8e61b043226ddef993432cc0e7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-119.json": {
+    "mtime": 1794275996.38964,
+    "seen": 1794330696.8177657,
+    "ast_hash": "1c5e8ec93dc37ff9af20e6fb9560fc02",
+    "semantic_hash": "1c5e8ec93dc37ff9af20e6fb9560fc02",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-120.json": {
+    "mtime": 1794275996.3655818,
+    "seen": 1794330696.8177657,
+    "ast_hash": "59120295c954073d6a68bf67a8b70a75",
+    "semantic_hash": "59120295c954073d6a68bf67a8b70a75",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-121.json": {
+    "mtime": 1794275996.8998044,
+    "seen": 1794330696.8177657,
+    "ast_hash": "1c02e8a2c401b2ebf13be17f687dae5c",
+    "semantic_hash": "1c02e8a2c401b2ebf13be17f687dae5c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_145_2020/page-122.json": {
+    "mtime": 1794275996.9314027,
+    "seen": 1794330696.8177657,
+    "ast_hash": "550fe6ecc640b5079fa42b27ae957010",
+    "semantic_hash": "550fe6ecc640b5079fa42b27ae957010",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-001.json": {
+    "mtime": 1794276341.235454,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a3c188c53ce86f74e66eb6b49efd2651",
+    "semantic_hash": "a3c188c53ce86f74e66eb6b49efd2651",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-002.json": {
+    "mtime": 1794276339.926236,
+    "seen": 1794330696.8177657,
+    "ast_hash": "600ed20f4cb0385d0700890acc2f6e96",
+    "semantic_hash": "600ed20f4cb0385d0700890acc2f6e96",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-003.json": {
+    "mtime": 1794276341.66106,
+    "seen": 1794330696.8177657,
+    "ast_hash": "34071f4c1e8a391f4f66015e44a99c2c",
+    "semantic_hash": "34071f4c1e8a391f4f66015e44a99c2c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-004.json": {
+    "mtime": 1794276343.392103,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fd3f984f2675d632176988d7f1bf6c0c",
+    "semantic_hash": "fd3f984f2675d632176988d7f1bf6c0c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-005.json": {
+    "mtime": 1794276342.7598803,
+    "seen": 1794330696.8177657,
+    "ast_hash": "45cd18c0eebbc18ed3946e473c7ecec2",
+    "semantic_hash": "45cd18c0eebbc18ed3946e473c7ecec2",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-006.json": {
+    "mtime": 1794276347.4482868,
+    "seen": 1794330696.8177657,
+    "ast_hash": "368ef51fda70cc32b95258af2e63dcbf",
+    "semantic_hash": "368ef51fda70cc32b95258af2e63dcbf",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-007.json": {
+    "mtime": 1794276359.8482256,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3929785e8150380481ff670b7de545df",
+    "semantic_hash": "3929785e8150380481ff670b7de545df",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-008.json": {
+    "mtime": 1794276361.4715512,
+    "seen": 1794330696.8177657,
+    "ast_hash": "527ae909c6ce7ed42831c6dbc79c27a6",
+    "semantic_hash": "527ae909c6ce7ed42831c6dbc79c27a6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-009.json": {
+    "mtime": 1794276361.9318626,
+    "seen": 1794330696.8177657,
+    "ast_hash": "99a3776a5f9189dfe5a21f5cda2a2593",
+    "semantic_hash": "99a3776a5f9189dfe5a21f5cda2a2593",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-010.json": {
+    "mtime": 1794276364.3038218,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c94b776a370e2f348168d1c220531c42",
+    "semantic_hash": "c94b776a370e2f348168d1c220531c42",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-011.json": {
+    "mtime": 1794276366.5760145,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7d17984e751afb8666ccc66c89ca7776",
+    "semantic_hash": "7d17984e751afb8666ccc66c89ca7776",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-012.json": {
+    "mtime": 1794276369.7735069,
+    "seen": 1794330696.8177657,
+    "ast_hash": "77d27b844736b48f3fece08a08ce75c9",
+    "semantic_hash": "77d27b844736b48f3fece08a08ce75c9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-013.json": {
+    "mtime": 1794276372.529143,
+    "seen": 1794330696.8177657,
+    "ast_hash": "6cd8e030c442b52dcf5b9dd1687fe0a9",
+    "semantic_hash": "6cd8e030c442b52dcf5b9dd1687fe0a9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-014.json": {
+    "mtime": 1794276382.3844166,
+    "seen": 1794330696.8177657,
+    "ast_hash": "500834e8e38c00c2144a3de60d3e32e2",
+    "semantic_hash": "500834e8e38c00c2144a3de60d3e32e2",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-015.json": {
+    "mtime": 1794276376.023898,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9f46c1c397ad0ac9fe8c68b21af27cc5",
+    "semantic_hash": "9f46c1c397ad0ac9fe8c68b21af27cc5",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-016.json": {
+    "mtime": 1794276377.5705502,
+    "seen": 1794330696.8177657,
+    "ast_hash": "65cf5a84ed9240ef1a5ca81e1b004303",
+    "semantic_hash": "65cf5a84ed9240ef1a5ca81e1b004303",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-017.json": {
+    "mtime": 1794276379.7127743,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0f60f92ce822900267bff6bc6fc1b527",
+    "semantic_hash": "0f60f92ce822900267bff6bc6fc1b527",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-018.json": {
+    "mtime": 1794276382.9530256,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fc85014996d4a858b5aec2bb8acc8651",
+    "semantic_hash": "fc85014996d4a858b5aec2bb8acc8651",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-019.json": {
+    "mtime": 1794276386.4143386,
+    "seen": 1794330696.8177657,
+    "ast_hash": "56245d33d28ad1d4fd0b3d27bd904065",
+    "semantic_hash": "56245d33d28ad1d4fd0b3d27bd904065",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-020.json": {
+    "mtime": 1794276390.67655,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7a33ffa5fcf7aa2a1887a1a729e8b0ad",
+    "semantic_hash": "7a33ffa5fcf7aa2a1887a1a729e8b0ad",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-021.json": {
+    "mtime": 1794276393.0288153,
+    "seen": 1794330696.8177657,
+    "ast_hash": "388c564bffb6c9947ce6ada4906631c5",
+    "semantic_hash": "388c564bffb6c9947ce6ada4906631c5",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-022.json": {
+    "mtime": 1794276397.3452547,
+    "seen": 1794330696.8177657,
+    "ast_hash": "816948ad086521ee8921913a8941c765",
+    "semantic_hash": "816948ad086521ee8921913a8941c765",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-023.json": {
+    "mtime": 1794276405.237713,
+    "seen": 1794330696.8177657,
+    "ast_hash": "02c4f3f1bda13386eada4c67746e44fd",
+    "semantic_hash": "02c4f3f1bda13386eada4c67746e44fd",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-024.json": {
+    "mtime": 1794276404.669135,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0bbcab6721fda913a95d86e34d0bae38",
+    "semantic_hash": "0bbcab6721fda913a95d86e34d0bae38",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-025.json": {
+    "mtime": 1794276401.3884902,
+    "seen": 1794330696.8177657,
+    "ast_hash": "bc7fc3382d4bc153b2657b522d1ab214",
+    "semantic_hash": "bc7fc3382d4bc153b2657b522d1ab214",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-026.json": {
+    "mtime": 1794276396.591019,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5a39163b8bf707c42c8671a04a79dca7",
+    "semantic_hash": "5a39163b8bf707c42c8671a04a79dca7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-027.json": {
+    "mtime": 1794276407.5409534,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9b8d1fb9c2687b83a7e4277c4dfe50db",
+    "semantic_hash": "9b8d1fb9c2687b83a7e4277c4dfe50db",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-028.json": {
+    "mtime": 1794276414.6052444,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c260f86d6c43c111d3d8d963a0e65fa7",
+    "semantic_hash": "c260f86d6c43c111d3d8d963a0e65fa7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-029.json": {
+    "mtime": 1794276419.931368,
+    "seen": 1794330696.8177657,
+    "ast_hash": "66ee1a4e4bff0756a266f6be118f4057",
+    "semantic_hash": "66ee1a4e4bff0756a266f6be118f4057",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-030.json": {
+    "mtime": 1794276418.6901448,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7475e9de0601e7f1aece46a50f2e63e6",
+    "semantic_hash": "7475e9de0601e7f1aece46a50f2e63e6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-031.json": {
+    "mtime": 1794276417.3037815,
+    "seen": 1794330696.8177657,
+    "ast_hash": "37d2442352c7a495655f4cfee3acd30f",
+    "semantic_hash": "37d2442352c7a495655f4cfee3acd30f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-032.json": {
+    "mtime": 1794276421.5022497,
+    "seen": 1794330696.8177657,
+    "ast_hash": "943b31f40af9461493f015d3f2b87830",
+    "semantic_hash": "943b31f40af9461493f015d3f2b87830",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-033.json": {
+    "mtime": 1794276417.7037654,
+    "seen": 1794330696.8177657,
+    "ast_hash": "24a6ba47feacaab754a00b0a8b27f689",
+    "semantic_hash": "24a6ba47feacaab754a00b0a8b27f689",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-034.json": {
+    "mtime": 1794276421.024999,
+    "seen": 1794330696.8177657,
+    "ast_hash": "799684f1182faaa78fd2302fd744acf0",
+    "semantic_hash": "799684f1182faaa78fd2302fd744acf0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-035.json": {
+    "mtime": 1794276422.6617897,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a33cbb5e8c0c3d2877dc7bfe5315d285",
+    "semantic_hash": "a33cbb5e8c0c3d2877dc7bfe5315d285",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-036.json": {
+    "mtime": 1794276427.125096,
+    "seen": 1794330696.8177657,
+    "ast_hash": "755200bd30fe3f9c9fd3faee6907a92d",
+    "semantic_hash": "755200bd30fe3f9c9fd3faee6907a92d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-037.json": {
+    "mtime": 1794276426.4010503,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c2b42d8b5714ed6fc28368d4f76f8eb1",
+    "semantic_hash": "c2b42d8b5714ed6fc28368d4f76f8eb1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-038.json": {
+    "mtime": 1794276439.7776418,
+    "seen": 1794330696.8177657,
+    "ast_hash": "dce9a29eb0c72ef225611facec879af3",
+    "semantic_hash": "dce9a29eb0c72ef225611facec879af3",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-039.json": {
+    "mtime": 1794276432.8292992,
+    "seen": 1794330696.8177657,
+    "ast_hash": "39c7f956c7ee33c229d7f3df81e61cf4",
+    "semantic_hash": "39c7f956c7ee33c229d7f3df81e61cf4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-040.json": {
+    "mtime": 1794276437.1772258,
+    "seen": 1794330696.8177657,
+    "ast_hash": "03c30f1159e0abe46131b21de86fc1d4",
+    "semantic_hash": "03c30f1159e0abe46131b21de86fc1d4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-041.json": {
+    "mtime": 1794276438.3676546,
+    "seen": 1794330696.8177657,
+    "ast_hash": "f8e25d8e843ee503ccf3c5f1bf967048",
+    "semantic_hash": "f8e25d8e843ee503ccf3c5f1bf967048",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-042.json": {
+    "mtime": 1794276428.270528,
+    "seen": 1794330696.8177657,
+    "ast_hash": "bbb69f694da9de830616cf52b89ebbe9",
+    "semantic_hash": "bbb69f694da9de830616cf52b89ebbe9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-043.json": {
+    "mtime": 1794276436.2957666,
+    "seen": 1794330696.8177657,
+    "ast_hash": "763a1b84c9e0c3f9d2b7a45d5028af12",
+    "semantic_hash": "763a1b84c9e0c3f9d2b7a45d5028af12",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-044.json": {
+    "mtime": 1794276437.9077406,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e4be16246a8eda4dac8206abbcc2b2b1",
+    "semantic_hash": "e4be16246a8eda4dac8206abbcc2b2b1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-045.json": {
+    "mtime": 1794276437.495352,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4a469986f0d74618ac984ef016d5f1e6",
+    "semantic_hash": "4a469986f0d74618ac984ef016d5f1e6",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-046.json": {
+    "mtime": 1794276446.7807446,
+    "seen": 1794330696.8177657,
+    "ast_hash": "de3e0a5e0e0ea32574c9b73c90dda1cc",
+    "semantic_hash": "de3e0a5e0e0ea32574c9b73c90dda1cc",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-047.json": {
+    "mtime": 1794276441.7320294,
+    "seen": 1794330696.8177657,
+    "ast_hash": "40a4d46b49b6a6ec3044afb54cff500b",
+    "semantic_hash": "40a4d46b49b6a6ec3044afb54cff500b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-048.json": {
+    "mtime": 1794276450.9633179,
+    "seen": 1794330696.8177657,
+    "ast_hash": "b53ea3d5c076225cc17fb797f9af718b",
+    "semantic_hash": "b53ea3d5c076225cc17fb797f9af718b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-049.json": {
+    "mtime": 1794276450.1396277,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a306dfefb47e549dbc6227f006d876ef",
+    "semantic_hash": "a306dfefb47e549dbc6227f006d876ef",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-050.json": {
+    "mtime": 1794276441.3122323,
+    "seen": 1794330696.8177657,
+    "ast_hash": "563c909b57e0a995c137bc716b556640",
+    "semantic_hash": "563c909b57e0a995c137bc716b556640",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-051.json": {
+    "mtime": 1794276446.3799548,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3d711648ca3806464037951cb09eb927",
+    "semantic_hash": "3d711648ca3806464037951cb09eb927",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-052.json": {
+    "mtime": 1794276449.259809,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d5916843212cebca4ca20c72d5dcb157",
+    "semantic_hash": "d5916843212cebca4ca20c72d5dcb157",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-053.json": {
+    "mtime": 1794276450.485114,
+    "seen": 1794330696.8177657,
+    "ast_hash": "6160767cd9baeb13c2de300a911976b4",
+    "semantic_hash": "6160767cd9baeb13c2de300a911976b4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-054.json": {
+    "mtime": 1794276449.3586295,
+    "seen": 1794330696.8177657,
+    "ast_hash": "34642ca49ad33681f66b7f59831060ea",
+    "semantic_hash": "34642ca49ad33681f66b7f59831060ea",
+    "ast_empty": true
+  },
+  "data/ocr/nd_152_2020/page-055.json": {
+    "mtime": 1794276450.3299499,
+    "seen": 1794330696.8177657,
+    "ast_hash": "acb45ea83b0a052b79e4cefb542b1566",
+    "semantic_hash": "acb45ea83b0a052b79e4cefb542b1566",
+    "ast_empty": true
+  },
+  "data/ocr/nd_161_2026/page-002.json": {
+    "mtime": 1794276469.4734266,
+    "seen": 1794330696.8177657,
+    "ast_hash": "e47479e9a5b70bdf103d61850b3b2193",
+    "semantic_hash": "e47479e9a5b70bdf103d61850b3b2193",
+    "ast_empty": true
+  },
+  "data/ocr/nd_161_2026/page-003.json": {
+    "mtime": 1794276472.7170205,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a0a3524596d852d2b5c8a38e5b0d160f",
+    "semantic_hash": "a0a3524596d852d2b5c8a38e5b0d160f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_161_2026/page-004.json": {
+    "mtime": 1794276471.6828158,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ca43812cf1bc2a6775f6e9b727cf49e0",
+    "semantic_hash": "ca43812cf1bc2a6775f6e9b727cf49e0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_161_2026/page-005.json": {
+    "mtime": 1794276472.5178995,
+    "seen": 1794330696.8177657,
+    "ast_hash": "017d5f5799811f11644c37e335ee72c4",
+    "semantic_hash": "017d5f5799811f11644c37e335ee72c4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_161_2026/page-006.json": {
+    "mtime": 1794276472.619997,
+    "seen": 1794330696.8177657,
+    "ast_hash": "29c96210b0b886d6b76d43dd185caab9",
+    "semantic_hash": "29c96210b0b886d6b76d43dd185caab9",
+    "ast_empty": true
+  },
+  "data/ocr/nd_161_2026/page-007.json": {
+    "mtime": 1794276463.101981,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fd29cac8c2332165a4c633d577e7590c",
+    "semantic_hash": "fd29cac8c2332165a4c633d577e7590c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-001.json": {
+    "mtime": 1794276493.8699176,
+    "seen": 1794330696.8177657,
+    "ast_hash": "700b00cf8c18488e5542a076620b9770",
+    "semantic_hash": "700b00cf8c18488e5542a076620b9770",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-002.json": {
+    "mtime": 1794276501.2134044,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d2365b61e6815df24ac4a337c41707cf",
+    "semantic_hash": "d2365b61e6815df24ac4a337c41707cf",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-003.json": {
+    "mtime": 1794276500.2278721,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5da064fa4774df1f59eafc9d1b9d3e70",
+    "semantic_hash": "5da064fa4774df1f59eafc9d1b9d3e70",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-004.json": {
+    "mtime": 1794276499.1592276,
+    "seen": 1794330696.8177657,
+    "ast_hash": "29d14e827014211bb47ebcc3cc3283e0",
+    "semantic_hash": "29d14e827014211bb47ebcc3cc3283e0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-005.json": {
+    "mtime": 1794276501.2134044,
+    "seen": 1794330696.8177657,
+    "ast_hash": "981a6fd5c85a0b61ba8a837a30fc57bf",
+    "semantic_hash": "981a6fd5c85a0b61ba8a837a30fc57bf",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-006.json": {
+    "mtime": 1794276502.8874178,
+    "seen": 1794330696.8177657,
+    "ast_hash": "67daad1fd30571388acc4afff68bd66f",
+    "semantic_hash": "67daad1fd30571388acc4afff68bd66f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-007.json": {
+    "mtime": 1794276503.6319528,
+    "seen": 1794330696.8177657,
+    "ast_hash": "01595c285d8d89bd3ba851c26050c446",
+    "semantic_hash": "01595c285d8d89bd3ba851c26050c446",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-008.json": {
+    "mtime": 1794276518.76289,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3fb3d526ece7b736905c344427658571",
+    "semantic_hash": "3fb3d526ece7b736905c344427658571",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-009.json": {
+    "mtime": 1794276518.76289,
+    "seen": 1794330696.8177657,
+    "ast_hash": "21a01e3066e11ff9692cf6bdb6a5d0c1",
+    "semantic_hash": "21a01e3066e11ff9692cf6bdb6a5d0c1",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-010.json": {
+    "mtime": 1794276520.6515405,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9fe509836594ceccf701f1777688f487",
+    "semantic_hash": "9fe509836594ceccf701f1777688f487",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-011.json": {
+    "mtime": 1794276520.1893718,
+    "seen": 1794330696.8177657,
+    "ast_hash": "8579b0c1db6d6549500c6b8c050c3447",
+    "semantic_hash": "8579b0c1db6d6549500c6b8c050c3447",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-012.json": {
+    "mtime": 1794276517.7815313,
+    "seen": 1794330696.8177657,
+    "ast_hash": "8a741f1d7ad02d51631e84b5f7cfe22f",
+    "semantic_hash": "8a741f1d7ad02d51631e84b5f7cfe22f",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-013.json": {
+    "mtime": 1794276516.52437,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3235f1b5cdd64c26c6a7b480949c361a",
+    "semantic_hash": "3235f1b5cdd64c26c6a7b480949c361a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-014.json": {
+    "mtime": 1794276532.1914616,
+    "seen": 1794330696.8177657,
+    "ast_hash": "84d76a6e9c1d5dc5a91fcafae4a215d4",
+    "semantic_hash": "84d76a6e9c1d5dc5a91fcafae4a215d4",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-015.json": {
+    "mtime": 1794276532.1222725,
+    "seen": 1794330696.8177657,
+    "ast_hash": "87f0d1242c2fb91a016c82bc09e1c230",
+    "semantic_hash": "87f0d1242c2fb91a016c82bc09e1c230",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-016.json": {
+    "mtime": 1794276532.2907355,
+    "seen": 1794330696.8177657,
+    "ast_hash": "8a10a02b2f27fd32f0771e60a25b4367",
+    "semantic_hash": "8a10a02b2f27fd32f0771e60a25b4367",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-017.json": {
+    "mtime": 1794276531.0894928,
+    "seen": 1794330696.8177657,
+    "ast_hash": "881ed2184eff415e6c3cec473d295221",
+    "semantic_hash": "881ed2184eff415e6c3cec473d295221",
+    "ast_empty": true
+  },
+  "data/ocr/nd_337_2025/page-018.json": {
+    "mtime": 1794276527.1527216,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c82e4474c8d5e07e20f2ca69c154cb5e",
+    "semantic_hash": "c82e4474c8d5e07e20f2ca69c154cb5e",
+    "ast_empty": true
+  },
+  "data/ocr/nd_38_2022/page-001.json": {
+    "mtime": 1794274898.052713,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c52d03f6ac97848fcfe950e85b55ea3a",
+    "semantic_hash": "c52d03f6ac97848fcfe950e85b55ea3a",
+    "ast_empty": true
+  },
+  "data/ocr/nd_38_2022/page-002.json": {
+    "mtime": 1794274900.9639306,
+    "seen": 1794330696.8177657,
+    "ast_hash": "db19b2fbca55534b1e52c0025295bca8",
+    "semantic_hash": "db19b2fbca55534b1e52c0025295bca8",
+    "ast_empty": true
+  },
+  "data/ocr/nd_38_2022/page-003.json": {
+    "mtime": 1794274904.463343,
+    "seen": 1794330696.8177657,
+    "ast_hash": "570b1827850eafd3516aa741f287e7b7",
+    "semantic_hash": "570b1827850eafd3516aa741f287e7b7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_38_2022/page-004.json": {
+    "mtime": 1794274895.3443935,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d7a50f599e81b3a8842d1cee96fb4c97",
+    "semantic_hash": "d7a50f599e81b3a8842d1cee96fb4c97",
+    "ast_empty": true
+  },
+  "data/ocr/nd_38_2022/page-005.json": {
+    "mtime": 1794276543.702988,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7c9544323a270c5f4170a79fcd771e98",
+    "semantic_hash": "7c9544323a270c5f4170a79fcd771e98",
+    "ast_empty": true
+  },
+  "data/ocr/nd_38_2022/page-006.json": {
+    "mtime": 1794276541.997203,
+    "seen": 1794330696.8177657,
+    "ast_hash": "470a9cbf252a589ec2cbeb37125ec2a0",
+    "semantic_hash": "470a9cbf252a589ec2cbeb37125ec2a0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_38_2022/page-007.json": {
+    "mtime": 1794276543.5254576,
+    "seen": 1794330696.8177657,
+    "ast_hash": "18d0e5d54fff289144cf846b35d976db",
+    "semantic_hash": "18d0e5d54fff289144cf846b35d976db",
+    "ast_empty": true
+  },
+  "data/ocr/nd_38_2022/page-008.json": {
+    "mtime": 1794276541.5667145,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a0ce571e42ea18b38ffabe7a2f8d1651",
+    "semantic_hash": "a0ce571e42ea18b38ffabe7a2f8d1651",
+    "ast_empty": true
+  },
+  "data/ocr/nd_74_2024/page-001.json": {
+    "mtime": 1794277432.815009,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5fd70bec6c92bef39090e7e643f89c36",
+    "semantic_hash": "5fd70bec6c92bef39090e7e643f89c36",
+    "ast_empty": true
+  },
+  "data/ocr/nd_74_2024/page-002.json": {
+    "mtime": 1794276563.46549,
+    "seen": 1794330696.8177657,
+    "ast_hash": "958bfc0c4c8f5dc6c9e8d4cdcdb1553c",
+    "semantic_hash": "958bfc0c4c8f5dc6c9e8d4cdcdb1553c",
+    "ast_empty": true
+  },
+  "data/ocr/nd_74_2024/page-003.json": {
+    "mtime": 1794276565.7350838,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3c07f5629136629b8f96b8e46d29bc5d",
+    "semantic_hash": "3c07f5629136629b8f96b8e46d29bc5d",
+    "ast_empty": true
+  },
+  "data/ocr/nd_74_2024/page-004.json": {
+    "mtime": 1794276559.9121265,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4f4667361afb4b31653693132d74c87b",
+    "semantic_hash": "4f4667361afb4b31653693132d74c87b",
+    "ast_empty": true
+  },
+  "data/ocr/nd_74_2024/page-005.json": {
+    "mtime": 1794276562.1012487,
+    "seen": 1794330696.8177657,
+    "ast_hash": "3d79491e12ddb3504ba3b862ed4894b7",
+    "semantic_hash": "3d79491e12ddb3504ba3b862ed4894b7",
+    "ast_empty": true
+  },
+  "data/ocr/nd_74_2024/page-006.json": {
+    "mtime": 1794276561.2691226,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4519bebdd79299774e8fb73b10d2f2b0",
+    "semantic_hash": "4519bebdd79299774e8fb73b10d2f2b0",
+    "ast_empty": true
+  },
+  "data/ocr/nd_74_2024/page-007.json": {
+    "mtime": 1794276562.0774565,
+    "seen": 1794330696.8177657,
+    "ast_hash": "dd90c91363b3a726f7da3eaba5bca530",
+    "semantic_hash": "dd90c91363b3a726f7da3eaba5bca530",
+    "ast_empty": true
+  },
+  "data/ocr/nd_74_2024/page-008.json": {
+    "mtime": 1794276567.6083455,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0626f6fdba6a86685d6de6f967a75735",
+    "semantic_hash": "0626f6fdba6a86685d6de6f967a75735",
+    "ast_empty": true
+  },
+  "data/ocr/nd_74_2024/page-009.json": {
+    "mtime": 1794276565.3718407,
+    "seen": 1794330696.8177657,
+    "ast_hash": "2d771f2c3ddd55fa5f8d2115f188b233",
+    "semantic_hash": "2d771f2c3ddd55fa5f8d2115f188b233",
+    "ast_empty": true
+  },
+  "data/ocr/patches/labor_code_2019_page86.json": {
+    "mtime": 1792225817.5393503,
+    "seen": 1794330696.8177657,
+    "ast_hash": "025287d78abff7f5b8995a18223d90f2",
+    "semantic_hash": "025287d78abff7f5b8995a18223d90f2",
+    "ast_empty": true
+  },
+  "data/ocr/tt_01_bld/page-001.json": {
+    "mtime": 1794276675.735013,
+    "seen": 1794330696.8177657,
+    "ast_hash": "6eaa7784ef97b84385178d0fae04160e",
+    "semantic_hash": "6eaa7784ef97b84385178d0fae04160e",
+    "ast_empty": true
+  },
+  "data/ocr/tt_01_bld/page-002.json": {
+    "mtime": 1794276674.6191661,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a6e5b1501122628ce1b9d664495cde4c",
+    "semantic_hash": "a6e5b1501122628ce1b9d664495cde4c",
+    "ast_empty": true
+  },
+  "data/ocr/tt_01_bld/page-003.json": {
+    "mtime": 1794276675.8977933,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c25a858b730b8de317808b58eabed627",
+    "semantic_hash": "c25a858b730b8de317808b58eabed627",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-001.json": {
+    "mtime": 1794276580.535271,
+    "seen": 1794330696.8177657,
+    "ast_hash": "009e4c1f5838ecbf5a5813a6fbb0f955",
+    "semantic_hash": "009e4c1f5838ecbf5a5813a6fbb0f955",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-002.json": {
+    "mtime": 1794276582.956663,
+    "seen": 1794330696.8177657,
+    "ast_hash": "044db036f49d1d193dccc5f46c9c0406",
+    "semantic_hash": "044db036f49d1d193dccc5f46c9c0406",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-003.json": {
+    "mtime": 1794276583.8593054,
+    "seen": 1794330696.8177657,
+    "ast_hash": "b04d35789f8e7662a565a936d941ebaa",
+    "semantic_hash": "b04d35789f8e7662a565a936d941ebaa",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-004.json": {
+    "mtime": 1794276586.7201395,
+    "seen": 1794330696.8177657,
+    "ast_hash": "499fcaa490db600bc53538c0adb1e070",
+    "semantic_hash": "499fcaa490db600bc53538c0adb1e070",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-005.json": {
+    "mtime": 1794276586.2458885,
+    "seen": 1794330696.8177657,
+    "ast_hash": "52900c2bb6f1f8983ecb6f8224fbed8f",
+    "semantic_hash": "52900c2bb6f1f8983ecb6f8224fbed8f",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-006.json": {
+    "mtime": 1794276582.2372243,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5634bfec8cc200d7eb5b12a2ed1e59ba",
+    "semantic_hash": "5634bfec8cc200d7eb5b12a2ed1e59ba",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-007.json": {
+    "mtime": 1794276592.5308747,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c44fdacb7e1f26942bc3edd0be40f06b",
+    "semantic_hash": "c44fdacb7e1f26942bc3edd0be40f06b",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-008.json": {
+    "mtime": 1794276593.4351823,
+    "seen": 1794330696.8177657,
+    "ast_hash": "fcdc5becd05a40e85b04b872b93712c5",
+    "semantic_hash": "fcdc5becd05a40e85b04b872b93712c5",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-009.json": {
+    "mtime": 1794276595.7380261,
+    "seen": 1794330696.8177657,
+    "ast_hash": "b97b29af8b8cd7cd56063cb7c88952ff",
+    "semantic_hash": "b97b29af8b8cd7cd56063cb7c88952ff",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-010.json": {
+    "mtime": 1794276596.2511468,
+    "seen": 1794330696.8177657,
+    "ast_hash": "5d387b4c2fc7131ee18179a986e5dd06",
+    "semantic_hash": "5d387b4c2fc7131ee18179a986e5dd06",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-011.json": {
+    "mtime": 1794276598.897858,
+    "seen": 1794330696.8177657,
+    "ast_hash": "ab3610eaae941b383d730737a0b411fd",
+    "semantic_hash": "ab3610eaae941b383d730737a0b411fd",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-012.json": {
+    "mtime": 1794276601.5963693,
+    "seen": 1794330696.8177657,
+    "ast_hash": "267beadc719c3f6a31416d79bcb1818a",
+    "semantic_hash": "267beadc719c3f6a31416d79bcb1818a",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-013.json": {
+    "mtime": 1794276604.8795195,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0b3d15c413d8e3f8b7193e47a3d8a16c",
+    "semantic_hash": "0b3d15c413d8e3f8b7193e47a3d8a16c",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-014.json": {
+    "mtime": 1794276604.0953045,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7cefe9e4d097e66aad0feda62198a21e",
+    "semantic_hash": "7cefe9e4d097e66aad0feda62198a21e",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-015.json": {
+    "mtime": 1794276611.592402,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4b0a13fd594a28db3e9176899e38e2ef",
+    "semantic_hash": "4b0a13fd594a28db3e9176899e38e2ef",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-016.json": {
+    "mtime": 1794276610.197811,
+    "seen": 1794330696.8177657,
+    "ast_hash": "cc7b4045aca3b00395af96202dc7d1f6",
+    "semantic_hash": "cc7b4045aca3b00395af96202dc7d1f6",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-017.json": {
+    "mtime": 1794276610.7428927,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a27614f092d8c3bb64d3f35f73c443f7",
+    "semantic_hash": "a27614f092d8c3bb64d3f35f73c443f7",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-018.json": {
+    "mtime": 1794276611.1054552,
+    "seen": 1794330696.8177657,
+    "ast_hash": "2b73df26f2b716367ad159af79ea293b",
+    "semantic_hash": "2b73df26f2b716367ad159af79ea293b",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-019.json": {
+    "mtime": 1794276621.2937362,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4b9c81079fe008de44c7a14e62a43acd",
+    "semantic_hash": "4b9c81079fe008de44c7a14e62a43acd",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-020.json": {
+    "mtime": 1794276615.2149878,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7cac82fb53d654df0746e204717838a4",
+    "semantic_hash": "7cac82fb53d654df0746e204717838a4",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-021.json": {
+    "mtime": 1794276619.0222096,
+    "seen": 1794330696.8177657,
+    "ast_hash": "310f048e5c4138be388bb199a8ea0d8c",
+    "semantic_hash": "310f048e5c4138be388bb199a8ea0d8c",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-022.json": {
+    "mtime": 1794276616.4960494,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4de86ec303a497ab5b74a340285f4b06",
+    "semantic_hash": "4de86ec303a497ab5b74a340285f4b06",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-023.json": {
+    "mtime": 1794276621.0029142,
+    "seen": 1794330696.8177657,
+    "ast_hash": "6dab768a7d5fab22a533d7f4aec63667",
+    "semantic_hash": "6dab768a7d5fab22a533d7f4aec63667",
+    "ast_empty": true
+  },
+  "data/ocr/tt_08_2026/page-024.json": {
+    "mtime": 1794276620.8883383,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a55eee6e31e3765d11de83d017c06a87",
+    "semantic_hash": "a55eee6e31e3765d11de83d017c06a87",
+    "ast_empty": true
+  },
+  "data/ocr/tt_18_2021/page-001.json": {
+    "mtime": 1794276645.1230676,
+    "seen": 1794330696.8177657,
+    "ast_hash": "2044e6f688bf0465502f9e9d11ecda67",
+    "semantic_hash": "2044e6f688bf0465502f9e9d11ecda67",
+    "ast_empty": true
+  },
+  "data/ocr/tt_18_2021/page-002.json": {
+    "mtime": 1794276646.3885472,
+    "seen": 1794330696.8177657,
+    "ast_hash": "32bb509927e181167d3f4c691a8281e4",
+    "semantic_hash": "32bb509927e181167d3f4c691a8281e4",
+    "ast_empty": true
+  },
+  "data/ocr/tt_18_2021/page-003.json": {
+    "mtime": 1794276646.3092887,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4588aa9ea5d9501b1aa19636304bbfb7",
+    "semantic_hash": "4588aa9ea5d9501b1aa19636304bbfb7",
+    "ast_empty": true
+  },
+  "data/ocr/tt_18_2021/page-004.json": {
+    "mtime": 1794276642.7053378,
+    "seen": 1794330696.8177657,
+    "ast_hash": "9cfede3c91fc962b61f1a62cfde44ea3",
+    "semantic_hash": "9cfede3c91fc962b61f1a62cfde44ea3",
+    "ast_empty": true
+  },
+  "data/ocr/tt_24_2022/page-001.json": {
+    "mtime": 1794276665.2949858,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c300e92570687e17287bc5edadb59596",
+    "semantic_hash": "c300e92570687e17287bc5edadb59596",
+    "ast_empty": true
+  },
+  "data/ocr/tt_24_2022/page-002.json": {
+    "mtime": 1794276666.8505332,
+    "seen": 1794330696.8177657,
+    "ast_hash": "4183fc0d7e739c9d62b809a0432723c5",
+    "semantic_hash": "4183fc0d7e739c9d62b809a0432723c5",
+    "ast_empty": true
+  },
+  "data/ocr/tt_24_2022/page-003.json": {
+    "mtime": 1794276667.1858497,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d7333e4a2efabe3b32239ebf0e873df8",
+    "semantic_hash": "d7333e4a2efabe3b32239ebf0e873df8",
+    "ast_empty": true
+  },
+  "data/ocr/tt_24_2022/page-004.json": {
+    "mtime": 1794276662.7015543,
+    "seen": 1794330696.8177657,
+    "ast_hash": "6428cacd117c145ca9a1114277661c19",
+    "semantic_hash": "6428cacd117c145ca9a1114277661c19",
+    "ast_empty": true
+  },
+  "data/ocr/tt_24_2022/page-005.json": {
+    "mtime": 1794276663.2538252,
+    "seen": 1794330696.8177657,
+    "ast_hash": "f7ab0ab5c19cd5e4f23b63c6a225e55a",
+    "semantic_hash": "f7ab0ab5c19cd5e4f23b63c6a225e55a",
+    "ast_empty": true
+  },
+  "data/ocr/tt_24_2022/page-006.json": {
+    "mtime": 1794276659.062511,
+    "seen": 1794330696.8177657,
+    "ast_hash": "599f96d3989bebd353a42c625cd93bbb",
+    "semantic_hash": "599f96d3989bebd353a42c625cd93bbb",
+    "ast_empty": true
+  },
+  "data/ocr/tt_24_2022/page-007.json": {
+    "mtime": 1794276666.652375,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c2af3526f562ba3f99e90a8a8bcdb188",
+    "semantic_hash": "c2af3526f562ba3f99e90a8a8bcdb188",
+    "ast_empty": true
+  },
+  "data/ocr/vbhn125_p85_86_ocr.json": {
+    "mtime": 1792166204.0922513,
+    "seen": 1794330696.8177657,
+    "ast_hash": "55bd84fd8d2adb98c1b5806191b831b3",
+    "semantic_hash": "55bd84fd8d2adb98c1b5806191b831b3",
+    "ast_empty": true
+  },
+  "data/processed/corpus_audit.json": {
+    "mtime": 1794277696.6691306,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7b86edf1cea0227962487fe5b2c8112b",
+    "semantic_hash": "7b86edf1cea0227962487fe5b2c8112b",
+    "ast_empty": true
+  },
+  "debug_trace.py": {
+    "mtime": 1794300440.849041,
+    "seen": 1794330696.8177657,
+    "ast_hash": "72be4494b3a1a7edba359644f32392ad",
+    "semantic_hash": "72be4494b3a1a7edba359644f32392ad"
+  },
+  "pyproject.toml": {
+    "mtime": 1794273724.2843492,
+    "seen": 1794330696.8177657,
+    "ast_hash": "bfb95c10698659b04371000156836d81",
+    "semantic_hash": "bfb95c10698659b04371000156836d81"
+  },
+  "scripts/build_colab_embeddings.py": {
+    "mtime": 1794211885.106732,
+    "seen": 1794330696.8177657,
+    "ast_hash": "a09b63adab9189b98447470320ad2f93",
+    "semantic_hash": "a09b63adab9189b98447470320ad2f93"
+  },
+  "src/legal_rag/__init__.py": {
+    "mtime": 1791354443.6990972,
+    "seen": 1794330696.8177657,
+    "ast_hash": "d3992e4366eed7c51106f9d166c4512d",
+    "semantic_hash": "d3992e4366eed7c51106f9d166c4512d"
+  },
+  "src/legal_rag/chunking/__init__.py": {
+    "mtime": 1794323249.5598454,
+    "seen": 1794330696.8177657,
+    "ast_hash": "0a9d72258fb8303bb9c77758607070e9",
+    "semantic_hash": "0a9d72258fb8303bb9c77758607070e9"
+  },
+  "src/legal_rag/chunking/base.py": {
+    "mtime": 1791354970.8310704,
+    "seen": 1794330696.8177657,
+    "ast_hash": "8b11cb6dbe3f241efb7027532a8508b3",
+    "semantic_hash": "8b11cb6dbe3f241efb7027532a8508b3"
+  },
+  "src/legal_rag/chunking/cleaner.py": {
+    "mtime": 1791359448.5308025,
+    "seen": 1794330696.8177657,
+    "ast_hash": "bdd73ee2bf77143174e8c2d56d6ed8b0",
+    "semantic_hash": "bdd73ee2bf77143174e8c2d56d6ed8b0"
+  },
+  "src/legal_rag/chunking/identity.py": {
+    "mtime": 1794305593.9978797,
+    "seen": 1794330696.8177657,
+    "ast_hash": "8f3671deee2860ebe9bf68d7046a5e02",
+    "semantic_hash": "8f3671deee2860ebe9bf68d7046a5e02"
+  },
+  "src/legal_rag/chunking/legal_aware.py": {
+    "mtime": 1794323911.5903323,
+    "seen": 1794330696.8177657,
+    "ast_hash": "7eb048d3dc81986221dac4ea288a378f",
+    "semantic_hash": "7eb048d3dc81986221dac4ea288a378f"
+  },
+  "src/legal_rag/chunking/validator.py": {
+    "mtime": 1794278153.5822513,
+    "seen": 1794330696.8177657,
+    "ast_hash": "efec6cab53eb56c92560179acf49a2dc",
+    "semantic_hash": "efec6cab53eb56c92560179acf49a2dc"
+  },
+  "src/legal_rag/cli/__init__.py": {
+    "mtime": 1791358242.4574404,
+    "seen": 1794330696.8177657,
+    "ast_hash": "c545846e49109d2eccd85bc0c83da042",
+    "semantic_hash": "c545846e49109d2eccd85bc0c83da042"
+  },
+  "src/legal_rag/cli/chunk.py": {
+    "mtime": 1794208848.3916402,
+    "seen": 1794330696.8177657,
+    "ast_hash": "283ff3969b8f9da42d2136222b9eb637",
+    "semantic_hash": "283ff3969b8f9da42d2136222b9eb637"
+  },
+  "src/legal_rag/cli/corpus.py": {
+    "mtime": 1794276925.5473156,
+    "seen": 1794330696.8197806,
+    "ast_hash": "c121ae9fdf3fbb79826e0b9cb24f347f",
+    "semantic_hash": "c121ae9fdf3fbb79826e0b9cb24f347f"
+  },
+  "src/legal_rag/cli/evaluate.py": {
+    "mtime": 1794273222.2113285,
+    "seen": 1794330696.8197806,
+    "ast_hash": "6d1d7ed54388cbce1e88c3614919b815",
+    "semantic_hash": "6d1d7ed54388cbce1e88c3614919b815"
+  },
+  "src/legal_rag/cli/generate.py": {
+    "mtime": 1792458081.397879,
+    "seen": 1794330696.8197806,
+    "ast_hash": "8c61198a53fedd1db79f1d16e59d9062",
+    "semantic_hash": "8c61198a53fedd1db79f1d16e59d9062"
+  },
+  "src/legal_rag/cli/index.py": {
+    "mtime": 1794210931.6999402,
+    "seen": 1794330696.8197806,
+    "ast_hash": "571366e3faf8921cf3bae9147499c718",
+    "semantic_hash": "571366e3faf8921cf3bae9147499c718"
+  },
+  "src/legal_rag/cli/main.py": {
+    "mtime": 1794275798.2139454,
+    "seen": 1794330696.8197806,
+    "ast_hash": "3326d93db7384b86fa3bbbea3caf9cdc",
+    "semantic_hash": "3326d93db7384b86fa3bbbea3caf9cdc"
+  },
+  "src/legal_rag/cli/parse.py": {
+    "mtime": 1794272976.7309046,
+    "seen": 1794330696.8197806,
+    "ast_hash": "f1783c0b23ff70915e1cb20a10c38f4f",
+    "semantic_hash": "f1783c0b23ff70915e1cb20a10c38f4f"
+  },
+  "src/legal_rag/cli/pipeline.py": {
+    "mtime": 1792226005.0255916,
+    "seen": 1794330696.8197806,
+    "ast_hash": "d208d40c389054af37aafbdda2d4d9ba",
+    "semantic_hash": "d208d40c389054af37aafbdda2d4d9ba"
+  },
+  "src/legal_rag/cli/qa.py": {
+    "mtime": 1794275776.6134522,
+    "seen": 1794330696.8197806,
+    "ast_hash": "7dc0dd3654c06020e3cd5d3cae0313f3",
+    "semantic_hash": "7dc0dd3654c06020e3cd5d3cae0313f3"
+  },
+  "src/legal_rag/cli/retrieve.py": {
+    "mtime": 1794210931.7050896,
+    "seen": 1794330696.8197806,
+    "ast_hash": "768dd58ce0119bdf2254c35454270e23",
+    "semantic_hash": "768dd58ce0119bdf2254c35454270e23"
+  },
+  "src/legal_rag/config.py": {
+    "mtime": 1794210931.7104247,
+    "seen": 1794330696.8197806,
+    "ast_hash": "ddffc68ab5d7329f8dc4584821a7ada1",
+    "semantic_hash": "ddffc68ab5d7329f8dc4584821a7ada1"
+  },
+  "src/legal_rag/corpus/__init__.py": {
+    "mtime": 1794273268.6692758,
+    "seen": 1794330696.8197806,
+    "ast_hash": "b745eeb2288a051d1f695579e647cea6",
+    "semantic_hash": "b745eeb2288a051d1f695579e647cea6"
+  },
+  "src/legal_rag/corpus/audit.py": {
+    "mtime": 1794276889.269045,
+    "seen": 1794330696.8197806,
+    "ast_hash": "a0b94668c66b152fa8f3ec09528c7d11",
+    "semantic_hash": "a0b94668c66b152fa8f3ec09528c7d11"
+  },
+  "src/legal_rag/corpus/build.py": {
+    "mtime": 1794276908.0460062,
+    "seen": 1794330696.8197806,
+    "ast_hash": "d1a1330579494ca8e025c3f78e061d92",
+    "semantic_hash": "d1a1330579494ca8e025c3f78e061d92"
+  },
+  "src/legal_rag/corpus/extractor.py": {
+    "mtime": 1794303815.1346488,
+    "seen": 1794330696.8197806,
+    "ast_hash": "07eebc367aa6383e7337cbe122c6373c",
+    "semantic_hash": "07eebc367aa6383e7337cbe122c6373c"
+  },
+  "src/legal_rag/corpus/ocr.py": {
+    "mtime": 1794276583.7652633,
+    "seen": 1794330696.8197806,
+    "ast_hash": "c6d8e4909add76b3f46ec0b4aa7d3896",
+    "semantic_hash": "c6d8e4909add76b3f46ec0b4aa7d3896"
+  },
+  "src/legal_rag/corpus/patches.py": {
+    "mtime": 1792225747.1697164,
+    "seen": 1794330696.8197806,
+    "ast_hash": "babc9500f6f8c96e3b5c786a5809f10d",
+    "semantic_hash": "babc9500f6f8c96e3b5c786a5809f10d"
+  },
+  "src/legal_rag/corpus/registry.py": {
+    "mtime": 1794272626.8781636,
+    "seen": 1794330696.8197806,
+    "ast_hash": "80b56ffae7b43141b9ce14312cad824d",
+    "semantic_hash": "80b56ffae7b43141b9ce14312cad824d"
+  },
+  "src/legal_rag/evaluation/__init__.py": {
+    "mtime": 1794273168.9272597,
+    "seen": 1794330696.8197806,
+    "ast_hash": "81bd76cdb3a85a445d7d642d03dc3ba1",
+    "semantic_hash": "81bd76cdb3a85a445d7d642d03dc3ba1"
+  },
+  "src/legal_rag/evaluation/coverage.py": {
+    "mtime": 1794273168.9272597,
+    "seen": 1794330696.8197806,
+    "ast_hash": "3756c21e77533f3ab96760583cd0bd0e",
+    "semantic_hash": "3756c21e77533f3ab96760583cd0bd0e"
+  },
+  "src/legal_rag/evaluation/retrieval.py": {
+    "mtime": 1794275360.8851738,
+    "seen": 1794330696.8197806,
+    "ast_hash": "7f01b772ad9ff1a59572ca10314804f6",
+    "semantic_hash": "7f01b772ad9ff1a59572ca10314804f6"
+  },
+  "src/legal_rag/parsing/__init__.py": {
+    "mtime": 1791358878.2482717,
+    "seen": 1794330696.8217924,
+    "ast_hash": "9f669ce4c2ba24c595e150793ad45081",
+    "semantic_hash": "9f669ce4c2ba24c595e150793ad45081"
+  },
+  "src/legal_rag/parsing/classifier.py": {
+    "mtime": 1794304006.6749012,
+    "seen": 1794330696.8217924,
+    "ast_hash": "e3d09ce49bc52e306b77ce92ab6ffb58",
+    "semantic_hash": "e3d09ce49bc52e306b77ce92ab6ffb58"
+  },
+  "src/legal_rag/parsing/constants.py": {
+    "mtime": 1792166746.6609612,
+    "seen": 1794330696.8217924,
+    "ast_hash": "6ea18a8da497979fcd7ed202b4c83614",
+    "semantic_hash": "6ea18a8da497979fcd7ed202b4c83614"
+  },
+  "src/legal_rag/parsing/parser.py": {
+    "mtime": 1794323222.0294147,
+    "seen": 1794330696.8217924,
+    "ast_hash": "05a70c6d089d14d9be1d8aaa31cc1719",
+    "semantic_hash": "05a70c6d089d14d9be1d8aaa31cc1719"
+  },
+  "src/legal_rag/pipeline.py": {
+    "mtime": 1794272985.532685,
+    "seen": 1794330696.8217924,
+    "ast_hash": "a3538b066521f2f98ab1598248ad4cdf",
+    "semantic_hash": "a3538b066521f2f98ab1598248ad4cdf"
+  },
+  "src/legal_rag/qa/__init__.py": {
+    "mtime": 1794273157.9374576,
+    "seen": 1794330696.8217924,
+    "ast_hash": "3e066108bea83c77321a0495ef2a25a6",
+    "semantic_hash": "3e066108bea83c77321a0495ef2a25a6"
+  },
+  "src/legal_rag/qa/map.py": {
+    "mtime": 1794275767.1039202,
+    "seen": 1794330696.8217924,
+    "ast_hash": "62dfd84f2133ae992147b75d8bda0a07",
+    "semantic_hash": "62dfd84f2133ae992147b75d8bda0a07"
+  },
+  "src/legal_rag/qa/schema.py": {
+    "mtime": 1794273157.9374576,
+    "seen": 1794330696.8217924,
+    "ast_hash": "fd0f0aa689e2acfbfe5f286ae6b65801",
+    "semantic_hash": "fd0f0aa689e2acfbfe5f286ae6b65801"
+  },
+  "src/legal_rag/retrieval/__init__.py": {
+    "mtime": 1791357817.0707028,
+    "seen": 1794330696.8217924,
+    "ast_hash": "3e7bd010f1473dde70f9a9879d9181f9",
+    "semantic_hash": "3e7bd010f1473dde70f9a9879d9181f9"
+  },
+  "src/legal_rag/retrieval/base.py": {
+    "mtime": 1791357600.9316952,
+    "seen": 1794330696.8217924,
+    "ast_hash": "422134f0d1562b6b74baef7245428df7",
+    "semantic_hash": "422134f0d1562b6b74baef7245428df7"
+  },
+  "src/legal_rag/retrieval/bm25.py": {
+    "mtime": 1791357646.7934258,
+    "seen": 1794330696.8217924,
+    "ast_hash": "9813b4b9e37567db2f98639838ff87d7",
+    "semantic_hash": "9813b4b9e37567db2f98639838ff87d7"
+  },
+  "src/legal_rag/retrieval/dense.py": {
+    "mtime": 1794221128.2941566,
+    "seen": 1794330696.8217924,
+    "ast_hash": "3ed06301337f2e50c6d0e499e781f924",
+    "semantic_hash": "3ed06301337f2e50c6d0e499e781f924"
+  },
+  "src/legal_rag/retrieval/hybrid.py": {
+    "mtime": 1791357768.7958784,
+    "seen": 1794330696.8217924,
+    "ast_hash": "c85218541ad19ff0f232251d660b5a63",
+    "semantic_hash": "c85218541ad19ff0f232251d660b5a63"
+  },
+  "src/legal_rag/retrieval/reranker.py": {
+    "mtime": 1791357800.3638563,
+    "seen": 1794330696.8217924,
+    "ast_hash": "6c74b17543bb95ced8ad41c660782230",
+    "semantic_hash": "6c74b17543bb95ced8ad41c660782230"
+  },
+  "tests/integration/test_pipeline.py": {
+    "mtime": 1791358560.8670347,
+    "seen": 1794330696.8217924,
+    "ast_hash": "e0eaa726ef50ef67c08ee3aea4799be0",
+    "semantic_hash": "e0eaa726ef50ef67c08ee3aea4799be0"
+  },
+  "tests/unit/test_audit.py": {
+    "mtime": 1794276936.068725,
+    "seen": 1794330696.8217924,
+    "ast_hash": "2d8db7456484f344dce100e0b7409f73",
+    "semantic_hash": "2d8db7456484f344dce100e0b7409f73"
+  },
+  "tests/unit/test_build.py": {
+    "mtime": 1794277363.672115,
+    "seen": 1794330696.8217924,
+    "ast_hash": "6f46f9d926d5760c6301ca286580af2c",
+    "semantic_hash": "6f46f9d926d5760c6301ca286580af2c"
+  },
+  "tests/unit/test_chunking.py": {
+    "mtime": 1794323620.3567636,
+    "seen": 1794330696.8217924,
+    "ast_hash": "8d76bd47ca3004583ab3fbc83540a060",
+    "semantic_hash": "8d76bd47ca3004583ab3fbc83540a060"
+  },
+  "tests/unit/test_evaluation.py": {
+    "mtime": 1794275812.668835,
+    "seen": 1794330696.8217924,
+    "ast_hash": "aa75ff3efafdf9612447c913d1b544f8",
+    "semantic_hash": "aa75ff3efafdf9612447c913d1b544f8"
+  },
+  "tests/unit/test_ocr.py": {
+    "mtime": 1794276616.1982975,
+    "seen": 1794330696.8217924,
+    "ast_hash": "02f3764f71aa6a467d89e9e4c3ef2c53",
+    "semantic_hash": "02f3764f71aa6a467d89e9e4c3ef2c53"
+  },
+  "tests/unit/test_parsing.py": {
+    "mtime": 1794304021.4528875,
+    "seen": 1794330696.8217924,
+    "ast_hash": "4ee27b9cf788d286066e58996a4b4c7e",
+    "semantic_hash": "4ee27b9cf788d286066e58996a4b4c7e"
+  },
+  "tests/unit/test_patches.py": {
+    "mtime": 1792225763.765651,
+    "seen": 1794330696.8217924,
+    "ast_hash": "5911f41e7250be13b2ddc1d299dfb290",
+    "semantic_hash": "5911f41e7250be13b2ddc1d299dfb290"
+  },
+  "tests/unit/test_registry.py": {
+    "mtime": 1794274142.3340497,
+    "seen": 1794330696.8217924,
+    "ast_hash": "61cb17927525181a1f720a1918ec01aa",
+    "semantic_hash": "61cb17927525181a1f720a1918ec01aa"
+  },
+  "tests/unit/test_retrieval.py": {
+    "mtime": 1794210931.723269,
+    "seen": 1794330696.8238003,
+    "ast_hash": "56a317dfde5dd4eda7c779900e5a7252",
+    "semantic_hash": "56a317dfde5dd4eda7c779900e5a7252"
+  }
+}

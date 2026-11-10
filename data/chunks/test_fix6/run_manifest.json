@@ -1,0 +1,30 @@
+{
+  "run_id": "test_fix6",
+  "strategy": "legal_aware",
+  "created_at": "2026-11-10T09:45:22+00:00",
+  "git_commit": "a6be9f6ed7a58eb4afbee17008599c5e87c9fcb4",
+  "ocr_engine": "tesseract",
+  "ocr_engine_error": null,
+  "ocr_psm": 6,
+  "dpi": 300,
+  "ocr_workers": 1,
+  "documents_requested": 1,
+  "documents_built": 1,
+  "status_counts": {
+    "ok": 1
+  },
+  "pdf_hashes": {
+    "nd_12_2022": "0634c42ea414ffa7c7b7c1e9a08349e2a1b597c31f87ab900195f91a011cdb5a"
+  },
+  "validation": {
+    "errors": 0,
+    "warnings": 72,
+    "infos": 22
+  },
+  "outputs": {
+    "all_chunks": "data\\chunks\\test_fix6\\all_legal_aware.jsonl",
+    "corpus_status": "data\\chunks\\test_fix6\\corpus_status.json",
+    "chunk_stats": "data\\chunks\\test_fix6\\chunk_stats.json",
+    "by_document": "data\\chunks\\test_fix6\\by_document"
+  }
+}

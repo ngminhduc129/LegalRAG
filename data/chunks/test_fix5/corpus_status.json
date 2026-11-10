@@ -1,0 +1,31 @@
+{
+  "run_id": "test_fix5",
+  "strategy": "legal_aware",
+  "documents": [
+    {
+      "document_id": "nd_70_2023",
+      "document_name": "Nghị định 70/2023/NĐ-CP",
+      "status": "ok",
+      "pdf": "E:\\LegalRAG\\data\\raw\\Nghị-định-70-2023-NĐ-CP.pdf",
+      "pages": 21,
+      "pages_with_text": 21,
+      "pages_ocr_required": 0,
+      "pages_ocr_used": 0,
+      "pages_ocr_empty": 0,
+      "corpus_chunks": 75,
+      "final_chunks": 75,
+      "articles_seen": 3,
+      "missing_articles": 0,
+      "appendix_chunks": 9,
+      "warnings": [
+        "Signature block: 20 lines starting on page 9",
+        "Appendix: 349 lines starting on page 10",
+        "Dropped 0 noise lines"
+      ],
+      "error": null
+    }
+  ],
+  "status_counts": {
+    "ok": 1
+  }
+}

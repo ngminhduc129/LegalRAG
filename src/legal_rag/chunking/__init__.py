@@ -1,6 +1,12 @@
 """Chunking module for Vietnamese legal documents."""
 
 from legal_rag.chunking.base import BaseChunker
+from legal_rag.chunking.identity import (
+    StructureRegistry,
+    IdentityResolver,
+    OperationDetector,
+    StructureRecord,
+)
 from legal_rag.chunking.legal_aware import (
     LegalAwareChunker,
     FixedSizeChunker,
@@ -21,6 +27,10 @@ __all__ = [
     "ParagraphChunker",
     "ArticleChunker",
     "ClauseChunker",
+    "StructureRegistry",
+    "IdentityResolver",
+    "OperationDetector",
+    "StructureRecord",
     "make_chunk",
     "save_jsonl",
     "save_csv",

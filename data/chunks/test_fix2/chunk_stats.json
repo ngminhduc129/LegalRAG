@@ -1,0 +1,24 @@
+{
+  "run_id": "test_fix2",
+  "strategy": "legal_aware",
+  "total_chunks": 798,
+  "retrieval_eligible": 798,
+  "chunk_types": {
+    "point": 490,
+    "clause": 147,
+    "clause_intro": 136,
+    "article_intro": 24,
+    "preamble": 1
+  },
+  "by_document": {
+    "nd_12_2022": 798
+  },
+  "per_document": [
+    {
+      "document_id": "nd_12_2022",
+      "status": "ok",
+      "chunks": 798,
+      "articles_seen": 64
+    }
+  ]
+}

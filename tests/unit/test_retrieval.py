@@ -169,6 +169,126 @@ class TestDenseIndex:
         with pytest.raises(ValueError, match="max_length"):
             dense_module.DenseIndex(device="cpu", max_length=0)
 
+    def test_save_raises_when_vector_count_mismatches_chunk_count(self, monkeypatch, tmp_path):
+        import numpy as np
+        import legal_rag.retrieval.dense as dense_module
+
+        class FakeSentenceTransformer:
+            def __init__(self, model_name, device):
+                self.model_name = model_name
+                self.device = device
+                self.max_seq_length = 256
+                self.tokenizer = None
+
+            def encode(self, texts, **kwargs):
+                return np.ones((len(texts), 2), dtype=np.float32)
+
+        monkeypatch.setattr(dense_module, "SentenceTransformer", FakeSentenceTransformer)
+        monkeypatch.setattr(dense_module, "SENTENCE_TRANSFORMERS_AVAILABLE", True)
+
+        index = dense_module.DenseIndex(model_name="test-model", device="cpu", max_length=256)
+        index.add_documents(
+            [{"chunk_id": "doc_1", "content": "A"}, {"chunk_id": "doc_2", "content": "B"}]
+        )
+        # Force mismatch: 3 embedding rows but 2 documents.
+        index.embeddings = np.ones((3, 2), dtype=np.float32)
+
+        path = tmp_path / "dense.pkl"
+        with pytest.raises(ValueError, match="does not match"):
+            index.save(path)
+
+    def test_add_documents_raises_when_chunk_missing_chunk_id(self, monkeypatch):
+        import legal_rag.retrieval.dense as dense_module
+
+        class FakeSentenceTransformer:
+            def __init__(self, model_name, device):
+                self.model_name = model_name
+                self.device = device
+                self.max_seq_length = 256
+                self.tokenizer = None
+
+            def encode(self, texts, **kwargs):
+                import numpy as np
+
+                return np.ones((len(texts), 2), dtype=np.float32)
+
+        monkeypatch.setattr(dense_module, "SentenceTransformer", FakeSentenceTransformer)
+        monkeypatch.setattr(dense_module, "SENTENCE_TRANSFORMERS_AVAILABLE", True)
+
+        index = dense_module.DenseIndex(model_name="test-model", device="cpu", max_length=256)
+        with pytest.raises(ValueError, match="missing a 'chunk_id'"):
+            index.add_documents([{"content": "no id"}, {"chunk_id": "doc_2", "content": "B"}])
+
+    def test_oversized_chunk_count_warns_and_counts(self, monkeypatch):
+        import numpy as np
+        import legal_rag.retrieval.dense as dense_module
+
+        class FakeTokenizer:
+            def encode(self, text, add_special_tokens=True):
+                return list(range(len(text.split())))
+
+        class FakeSentenceTransformer:
+            def __init__(self, model_name, device):
+                self.model_name = model_name
+                self.device = device
+                self.max_seq_length = 256
+                self.tokenizer = FakeTokenizer()
+
+            def encode(self, texts, **kwargs):
+                return np.ones((len(texts), 2), dtype=np.float32)
+
+        monkeypatch.setattr(dense_module, "SentenceTransformer", FakeSentenceTransformer)
+        monkeypatch.setattr(dense_module, "SENTENCE_TRANSFORMERS_AVAILABLE", True)
+
+        index = dense_module.DenseIndex(model_name="test-model", device="cpu", max_length=10)
+        chunks = [
+            {"chunk_id": "doc_1", "content": "short"},
+            {"chunk_id": "doc_2", "content": "x x x x x x x x x x x"},
+        ]
+        index.add_documents(chunks)
+        assert index.oversized_chunk_count == 1
+
+    def test_loads_index_without_vector_count_field(self, monkeypatch, tmp_path):
+        import pickle
+        import numpy as np
+        import legal_rag.retrieval.dense as dense_module
+
+        class FakeSentenceTransformer:
+            def __init__(self, model_name, device):
+                self.model_name = model_name
+                self.device = device
+                self.max_seq_length = 256
+                self.tokenizer = None
+
+            def encode(self, texts, **kwargs):
+                return np.ones((len(texts), 2), dtype=np.float32)
+
+        monkeypatch.setattr(dense_module, "SentenceTransformer", FakeSentenceTransformer)
+        monkeypatch.setattr(dense_module, "SENTENCE_TRANSFORMERS_AVAILABLE", True)
+
+        index = dense_module.DenseIndex(model_name="test-model", device="cpu", max_length=256)
+        index.add_documents([{"chunk_id": "doc_1", "content": "A"}])
+
+        # Save manually without vector_count / oversized_chunk_count to simulate an old index.
+        data = {
+            "model_name": index.model_name,
+            "device": index.device,
+            "batch_size": index.batch_size,
+            "max_length": index.max_length,
+            "documents": index.documents,
+            "doc_ids": index.doc_ids,
+            "embeddings": index.embeddings,
+            "is_built": index.is_built,
+        }
+        path = tmp_path / "old_dense.pkl"
+        with path.open("wb") as f:
+            pickle.dump(data, f)
+
+        loaded = dense_module.DenseIndex.load(path)
+        assert loaded.vector_count is None
+        assert loaded.oversized_chunk_count == 0
+        assert len(loaded.documents) == 1
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

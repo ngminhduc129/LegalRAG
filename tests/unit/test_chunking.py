@@ -127,6 +127,18 @@ class TestLegalAwareChunker:
         # Content preserved as-is from parser
         assert chunks[0]["content"] == "Line 1\nLine 2"
 
+    def test_repeated_quoted_numbering_gets_occurrence(self):
+        """Quoted amendments repeat article/clause/point numbering."""
+        corpus_chunks = [
+            _parser_chunk(article="Điều 219", article_title="Sửa đổi", chunk_type="article_intro", content="Intro"),
+            _parser_chunk(article="Điều 219", article_title="Sửa đổi", clause="1", point="a", chunk_type="point", content="First law point a"),
+            _parser_chunk(article="Điều 219", article_title="Sửa đổi", clause="1", point="a", chunk_type="point", content="Second law point a"),
+        ]
+        chunks = self.chunker.chunk(corpus_chunks)
+        points = [c for c in chunks if c["chunk_type"] == "point"]
+        assert len({c["chunk_id"] for c in points}) == 2
+        assert [c["structure_occurrence"] for c in points] == [1, 2]
+
     def test_consistent_chunk_ids(self):
         """Running chunker twice on same corpus produces same chunk_ids."""
         corpus_chunks = [

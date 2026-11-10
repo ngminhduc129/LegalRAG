@@ -158,6 +158,7 @@ def make_chunk(
         "page_start": page_start,
         "page_end": page_end,
         "parent_id": parent_id,
+        "structure_occurrence": 1,
     }
 
 
@@ -300,6 +301,9 @@ class LegalAwareChunker(BaseChunker):
                 "chunk_id": chunk_id,
                 "document_id": self.document_id,
                 "parent_id": parent_id,
+                # Quoted amendments repeat article/clause/point numbering;
+                # the occurrence makes the structure key unique.
+                "structure_occurrence": occurrence,
             })
             result_chunks.append(transformed)
 
@@ -324,6 +328,7 @@ class LegalAwareChunker(BaseChunker):
                 "chunk_id": unique_id,
                 "document_id": self.document_id,
                 "parent_id": None,
+                "structure_occurrence": occurrence,
             })
             result_chunks.append(transformed)
 

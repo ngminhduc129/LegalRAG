@@ -1,0 +1,20 @@
+{
+  "document_id": "nd_38_2022",
+  "warnings": [
+    "Signature block: 21 lines starting on page 4",
+    "Appendix: 129 lines starting on page 5",
+    "Dropped 0 noise lines"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 21,
+  "appendix_chunks": 4
+}

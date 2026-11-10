@@ -1,0 +1,19 @@
+{
+  "document_id": "tt_13_2026",
+  "warnings": [
+    "Signature block: 23 lines starting on page 5",
+    "Dropped 0 noise lines"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 23,
+  "appendix_chunks": 0
+}

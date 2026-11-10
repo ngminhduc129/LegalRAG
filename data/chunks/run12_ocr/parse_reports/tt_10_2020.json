@@ -1,0 +1,27 @@
+{
+  "document_id": "tt_10_2020",
+  "warnings": [
+    "Signature block: 17 lines starting on page 11",
+    "Appendix: 262 lines starting on page 12",
+    "Dropped 0 noise lines"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 17,
+  "appendix_chunks": 7
+}

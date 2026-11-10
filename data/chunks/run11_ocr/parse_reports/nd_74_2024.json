@@ -1,0 +1,15 @@
+{
+  "document_id": "nd_74_2024",
+  "warnings": [
+    "Dropped 2 noise lines"
+  ],
+  "dropped_lines": 2,
+  "articles_seen": [
+    4,
+    5
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 0,
+  "appendix_chunks": 0
+}

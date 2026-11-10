@@ -1,0 +1,18 @@
+{
+  "document_id": "tt_01_bld",
+  "warnings": [
+    "Signature block: 17 lines starting on page 3",
+    "Dropped 0 noise lines"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 17,
+  "appendix_chunks": 0
+}

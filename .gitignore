@@ -30,26 +30,6 @@ Thumbs.db
 .env.local
 .env.*.local
 
-# Data (versioned with DVC)
-data/raw/*.pdf
-data/processed/*.jsonl
-data/processed/*.csv
-data/processed/*.json
-data/chunks/**/*.jsonl
-data/chunks/**/*.csv
-data/chunks/**/*.json
-data/chunks/**/validation_report*.txt
-data/chunks/**/build_manifest.json
-!data/chunks/*_run06/*
-data/indexes/**/*.pkl
-data/qa/*.jsonl
-
-# Local evidence renders (regenerable from the PDF; not committed)
-data/ocr/renders/
-data/ocr/*
-!data/ocr/patches/
-!data/ocr/patches/**
-
 # Experiments (auto-generated)
 experiments/runs/
 

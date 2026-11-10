@@ -1,0 +1,172 @@
+{
+  "run_id": "run14_ocr",
+  "strategy": "legal_aware",
+  "total_chunks": 4459,
+  "retrieval_eligible": 4215,
+  "chunk_types": {
+    "point": 1959,
+    "clause": 1510,
+    "clause_intro": 533,
+    "appendix": 244,
+    "article_intro": 192,
+    "preamble": 21
+  },
+  "by_document": {
+    "labor_code_2019": 982,
+    "nd_10_2024": 398,
+    "nd_12_2022": 797,
+    "nd_135_2020": 27,
+    "nd_145_2020": 0,
+    "nd_152_2020": 175,
+    "nd_161_2026": 50,
+    "nd_283_2026": 1019,
+    "nd_337_2025": 144,
+    "nd_38_2022": 27,
+    "nd_70_2023": 66,
+    "nd_74_2024": 25,
+    "qd_582_2026": 22,
+    "tt_08_2026": 123,
+    "tt_09_2020": 71,
+    "tt_10_2020": 99,
+    "tt_11_2020": 174,
+    "tt_13_2026": 30,
+    "tt_18_2021": 53,
+    "tt_19_2021": 126,
+    "tt_24_2022": 39,
+    "tt_01_bld": 12
+  },
+  "per_document": [
+    {
+      "document_id": "labor_code_2019",
+      "status": "ok",
+      "chunks": 982,
+      "articles_seen": 220
+    },
+    {
+      "document_id": "nd_10_2024",
+      "status": "ok",
+      "chunks": 398,
+      "articles_seen": 52
+    },
+    {
+      "document_id": "nd_12_2022",
+      "status": "ok",
+      "chunks": 797,
+      "articles_seen": 65
+    },
+    {
+      "document_id": "nd_135_2020",
+      "status": "ok",
+      "chunks": 27,
+      "articles_seen": 9
+    },
+    {
+      "document_id": "nd_145_2020",
+      "status": "source_corrupt",
+      "chunks": 0,
+      "articles_seen": 0
+    },
+    {
+      "document_id": "nd_152_2020",
+      "status": "ok",
+      "chunks": 175,
+      "articles_seen": 30
+    },
+    {
+      "document_id": "nd_161_2026",
+      "status": "ok",
+      "chunks": 50,
+      "articles_seen": 7
+    },
+    {
+      "document_id": "nd_283_2026",
+      "status": "ok",
+      "chunks": 1019,
+      "articles_seen": 68
+    },
+    {
+      "document_id": "nd_337_2025",
+      "status": "ok",
+      "chunks": 144,
+      "articles_seen": 29
+    },
+    {
+      "document_id": "nd_38_2022",
+      "status": "ok",
+      "chunks": 27,
+      "articles_seen": 5
+    },
+    {
+      "document_id": "nd_70_2023",
+      "status": "ok",
+      "chunks": 66,
+      "articles_seen": 4
+    },
+    {
+      "document_id": "nd_74_2024",
+      "status": "ok",
+      "chunks": 25,
+      "articles_seen": 5
+    },
+    {
+      "document_id": "qd_582_2026",
+      "status": "ok",
+      "chunks": 22,
+      "articles_seen": 4
+    },
+    {
+      "document_id": "tt_08_2026",
+      "status": "ok",
+      "chunks": 123,
+      "articles_seen": 22
+    },
+    {
+      "document_id": "tt_09_2020",
+      "status": "ok",
+      "chunks": 71,
+      "articles_seen": 13
+    },
+    {
+      "document_id": "tt_10_2020",
+      "status": "ok",
+      "chunks": 99,
+      "articles_seen": 12
+    },
+    {
+      "document_id": "tt_11_2020",
+      "status": "ok",
+      "chunks": 174,
+      "articles_seen": 3
+    },
+    {
+      "document_id": "tt_13_2026",
+      "status": "ok",
+      "chunks": 30,
+      "articles_seen": 5
+    },
+    {
+      "document_id": "tt_18_2021",
+      "status": "ok",
+      "chunks": 53,
+      "articles_seen": 5
+    },
+    {
+      "document_id": "tt_19_2021",
+      "status": "ok",
+      "chunks": 126,
+      "articles_seen": 5
+    },
+    {
+      "document_id": "tt_24_2022",
+      "status": "ok",
+      "chunks": 39,
+      "articles_seen": 8
+    },
+    {
+      "document_id": "tt_01_bld",
+      "status": "ok",
+      "chunks": 12,
+      "articles_seen": 4
+    }
+  ]
+}

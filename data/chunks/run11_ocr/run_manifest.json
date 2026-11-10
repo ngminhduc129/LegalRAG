@@ -1,0 +1,51 @@
+{
+  "run_id": "run11_ocr",
+  "strategy": "legal_aware",
+  "created_at": "2026-11-10T02:11:16+00:00",
+  "git_commit": "de615059769fafeea3ed436663a2e03dc8df588d",
+  "ocr_engine": "tesseract",
+  "ocr_engine_error": null,
+  "dpi": 300,
+  "ocr_workers": 6,
+  "documents_requested": 22,
+  "documents_built": 21,
+  "status_counts": {
+    "ok": 21,
+    "empty": 1
+  },
+  "pdf_hashes": {
+    "labor_code_2019": "08dcc4dbef97d2aabcd3558b614006089ac7923b1a03a30c5c8d7c357bb25308",
+    "nd_10_2024": "fb754f127a80c1f5d834f0ccf161bda2fca86ce5fe07224e5f7033c56c0503b1",
+    "nd_12_2022": "0634c42ea414ffa7c7b7c1e9a08349e2a1b597c31f87ab900195f91a011cdb5a",
+    "nd_135_2020": "c91ea4fc810a33a0d5c7a96f55b4842e3f3bbf0b182aa83af7b57a5ad460fea7",
+    "nd_145_2020": "f3173ca7f322b8ad8389f761ea6721aba0cf250974f982d29b42f3d1a540f990",
+    "nd_152_2020": "54bf066ab5f8bb71a5b60925c12dac170839b583d20e96b73c23990d49d522cb",
+    "nd_161_2026": "e4ea994cf865f0aa36c04dc3c5a5b2aaa723c9dce1344ccd3d1a938f3fcfd857",
+    "nd_283_2026": "3dcb39eed85909d5ff7481b4d36f8410580d5919d865c2fff799484fc412cb72",
+    "nd_337_2025": "321da3cb90597e89ed0764a7c605a543bb5cf7592435bc18e181685394354163",
+    "nd_38_2022": "779fe71360da910243414917b0526208ec5d2464850b383b1ac5e2909abbf37a",
+    "nd_70_2023": "ad3550ed6a9ec53bdb892105b363a65ab663045b83cb62b005e84d320c2c0899",
+    "nd_74_2024": "06acaaaf878c38e8dbf81e9b4d2fceca7ed8b22e74a24790c6e0ee27370247b1",
+    "qd_582_2026": "ee16299b12827c89753d43e9d9149d7e5a59bc228b4ec7b87a8968b524171515",
+    "tt_08_2026": "4636f09c591f8902a559b49aaf9f8a3504f5eeed735e7d72a853de703bb9f3d3",
+    "tt_09_2020": "40bf3bab85cfd85426af461471e281e53493ede483e9ec0458ebf0fcb9125ecd",
+    "tt_10_2020": "524d83b91611cfef48c593c449a5ca9b92aa19a626688961f9a2bbe9b0f2ec45",
+    "tt_11_2020": "5af2811f7e9331bde4c823c9950699ecc2997d8914dd513b236e47aea4c57af3",
+    "tt_13_2026": "6ba10b898a6d56fc5cf1c3f39bcb015db82ecdb35e3c67835fcb28b47af4ae95",
+    "tt_18_2021": "764d7430891698391234626baf0b3ed0f0eae8ffba156069628da0fb5d51f246",
+    "tt_19_2021": "46c084c5ce57e6681ade64b5f0aa9400d45689146aab29d195ba6aaa457a1e42",
+    "tt_24_2022": "1a54c2aefd36ea976ec32b0e762bb0e32b871d2536228e95808b18d46624c2fa",
+    "tt_01_bld": "b5657e5dfa0e59932efe25b582d41370e8cab962cc9da92d65b4e853864f24bf"
+  },
+  "validation": {
+    "errors": 234,
+    "warnings": 499,
+    "infos": 1465
+  },
+  "outputs": {
+    "all_chunks": "data\\chunks\\run11_ocr\\all_legal_aware.jsonl",
+    "corpus_status": "data\\chunks\\run11_ocr\\corpus_status.json",
+    "chunk_stats": "data\\chunks\\run11_ocr\\chunk_stats.json",
+    "by_document": "data\\chunks\\run11_ocr\\by_document"
+  }
+}

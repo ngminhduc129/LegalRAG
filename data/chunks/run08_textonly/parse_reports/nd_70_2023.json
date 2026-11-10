@@ -1,0 +1,20 @@
+{
+  "document_id": "nd_70_2023",
+  "warnings": [
+    "Signature block: 16 lines starting on page 12",
+    "Appendix: 277 lines starting on page 13",
+    "Dropped 0 noise lines"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    23
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 16,
+  "appendix_chunks": 9
+}

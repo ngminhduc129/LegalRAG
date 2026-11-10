@@ -131,6 +131,29 @@ def test_retrieval_metrics_no_hit():
     assert metrics["mrr"] == 0.0
 
 
+def test_retrieval_metrics_split_by_article_number_mention():
+    with_number = parse_record(
+        _record(id="q1", question="Theo Điều 113, nghỉ hằng năm bao nhiêu ngày?"), 1
+    )
+    without_number = parse_record(
+        _record(id="q2", question="Nghỉ hằng năm bao nhiêu ngày?"), 2
+    )
+    retriever = DummyRetriever(
+        {
+            with_number.question: [_chunk(article="Điều 113")],
+            without_number.question: [_chunk(article="Điều 1")],
+        }
+    )
+    metrics = evaluate_retrieval(
+        [with_number, without_number], retriever, k_values=[1]
+    )["metrics"]
+    groups = metrics["by_mentions_article_number"]
+    assert groups["mentions"]["num_queries"] == 1
+    assert groups["mentions"]["hit_rate_at_k"]["1"] == 1.0
+    assert groups["no_mention"]["num_queries"] == 1
+    assert groups["no_mention"]["hit_rate_at_k"]["1"] == 0.0
+
+
 def test_load_chunks_filters_appendix(tmp_path):
     path = tmp_path / "chunks.jsonl"
     path.write_text(

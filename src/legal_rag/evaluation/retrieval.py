@@ -83,6 +83,67 @@ def _dcg(relevances: Sequence[int]) -> float:
     return sum(rel / math.log2(index + 2) for index, rel in enumerate(relevances))
 
 
+def _aggregate(
+    rows: List[Dict[str, Any]],
+    k_values: Sequence[int],
+    level: str,
+) -> Dict[str, Any]:
+    """Aggregate one group of already-retrieved queries into metrics.
+
+    ``rows`` hold the per-query relevance vector and the gold references, so
+    grouping (e.g. by ``mentions_article_number``) never re-runs retrieval and
+    the metric definition stays identical across groups.
+    """
+    n = len(rows)
+    total_refs = sum(len(row["relevant"]) for row in rows)
+    hits = {k: 0 for k in k_values}
+    ref_found = {k: 0 for k in k_values}
+    precision_sum = {k: 0.0 for k in k_values}
+    ndcg_sum = {k: 0.0 for k in k_values}
+    mrr_sum = 0.0
+
+    for row in rows:
+        relevances = row["relevances"]
+        ranked_chunks = row["ranked_chunks"]
+        first_rank = next((i + 1 for i, rel in enumerate(relevances) if rel), None)
+        if first_rank is not None:
+            mrr_sum += 1.0 / first_rank
+
+        for k in k_values:
+            top = relevances[:k]
+            if any(top):
+                hits[k] += 1
+            precision_sum[k] += sum(top) / k if k else 0.0
+            found = set()
+            for ref in row["relevant"]:
+                if any(
+                    _ref_matches_chunk(ref, chunk, level)
+                    for chunk, _ in ranked_chunks[:k]
+                ):
+                    found.add((ref.document_id, ref.article, ref.clause))
+            ref_found[k] += len(found)
+            ideal = sorted(relevances, reverse=True)[:k]
+            dcg = _dcg(top)
+            idcg = _dcg(ideal)
+            ndcg_sum[k] += (dcg / idcg) if idcg > 0 else 0.0
+
+    def _mean(value: float) -> float:
+        return round(value / n, 4) if n else 0.0
+
+    return {
+        "num_queries": n,
+        "total_gold_refs": total_refs,
+        "hit_rate_at_k": {str(k): _mean(hits[k]) for k in k_values},
+        "precision_at_k": {str(k): _mean(precision_sum[k]) for k in k_values},
+        "ndcg_at_k": {str(k): _mean(ndcg_sum[k]) for k in k_values},
+        "ref_recall_at_k": {
+            str(k): round(ref_found[k] / total_refs, 4) if total_refs else 0.0
+            for k in k_values
+        },
+        "mrr": _mean(mrr_sum),
+    }
+
+
 def evaluate_retrieval(
     records: Iterable[QARecord],
     retriever: Retriever,
@@ -100,15 +161,9 @@ def evaluate_retrieval(
         raise ValueError("no QA records to evaluate")
 
     per_query: List[Dict[str, Any]] = []
-    hits = {k: 0 for k in k_values}
-    ref_found = {k: 0 for k in k_values}
-    precision_sum = {k: 0.0 for k in k_values}
-    mrr_sum = 0.0
-    ndcg_sum = {k: 0.0 for k in k_values}
-    total_refs = 0
+    rows: List[Dict[str, Any]] = []
 
     for record in records:
-        total_refs += len(record.relevant)
         results = retriever.search(record.question, k=fetch_k)
         ranked_chunks = [(chunk, score) for _, score, chunk in results]
 
@@ -120,47 +175,43 @@ def evaluate_retrieval(
         )
         per_query.append(entry.to_dict())
 
-        relevances = [1 if is_relevant(chunk, record.relevant, level) else 0 for chunk, _ in ranked_chunks]
-        first_rank = next((i + 1 for i, rel in enumerate(relevances) if rel), None)
-        if first_rank is not None:
-            mrr_sum += 1.0 / first_rank
+        rows.append(
+            {
+                "relevances": [
+                    1 if is_relevant(chunk, record.relevant, level) else 0
+                    for chunk, _ in ranked_chunks
+                ],
+                "relevant": record.relevant,
+                "ranked_chunks": ranked_chunks,
+                "mentions_article_number": bool(record.mentions_article_number),
+            }
+        )
 
-        for k in k_values:
-            top = relevances[:k]
-            if any(top):
-                hits[k] += 1
-            precision_sum[k] += sum(top) / k if k else 0.0
-            # distinct gold references covered in top-k
-            found = set()
-            for ref in record.relevant:
-                if any(_ref_matches_chunk(ref, chunk, level) for chunk, _ in ranked_chunks[:k]):
-                    found.add((ref.document_id, ref.article, ref.clause))
-            ref_found[k] += len(found)
-            ideal = sorted(relevances, reverse=True)[:k]
-            dcg = _dcg(top)
-            idcg = _dcg(ideal)
-            ndcg_sum[k] += (dcg / idcg) if idcg > 0 else 0.0
-
-    n = len(records)
     metrics = {
-        "num_queries": n,
-        "total_gold_refs": total_refs,
         "level": level,
         "k_values": k_values,
-        "hit_rate_at_k": {str(k): round(hits[k] / n, 4) for k in k_values},
-        "precision_at_k": {str(k): round(precision_sum[k] / n, 4) for k in k_values},
-        "ndcg_at_k": {str(k): round(ndcg_sum[k] / n, 4) for k in k_values},
-        "ref_recall_at_k": {
-            str(k): round(ref_found[k] / total_refs, 4) if total_refs else 0.0
-            for k in k_values
+        **_aggregate(rows, k_values, level),
+        # Article-number mentions can be matched from metadata text rather than
+        # legal content; report both groups so the effect is visible.
+        "by_mentions_article_number": {
+            "mentions": _aggregate(
+                [row for row in rows if row["mentions_article_number"]],
+                k_values,
+                level,
+            ),
+            "no_mention": _aggregate(
+                [row for row in rows if not row["mentions_article_number"]],
+                k_values,
+                level,
+            ),
         },
-        "mrr": round(mrr_sum / n, 4),
         "definitions": {
             "hit_rate_at_k": "fraction of queries with >=1 relevant chunk in top k (article level unless level=clause)",
             "ref_recall_at_k": "distinct gold refs retrieved in top k / total gold refs",
             "precision_at_k": "relevant chunks in top k / k, averaged over queries",
             "ndcg_at_k": "binary-relevance nDCG over retrieved chunks",
             "mrr": "mean reciprocal rank of the first relevant chunk",
+            "by_mentions_article_number": "same metrics split by whether the question names an article number",
         },
     }
     return {"metrics": metrics, "per_query": per_query}

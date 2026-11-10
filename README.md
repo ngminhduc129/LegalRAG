@@ -1,4 +1,4 @@
-# Legal RAG - Vietnamese Labor Law Legal RAG System
+﻿# Legal RAG - Vietnamese Labor Law Legal RAG System
 
 A Retrieval-Augmented Generation (RAG) system for Vietnamese Labor Law (Bộ luật Lao động 2019).
 
@@ -112,18 +112,18 @@ never fall back to hard-coded Labour Code metadata.
 legal-rag corpus audit --output data/processed/corpus_audit.json
 
 # 1. Build every registry document into a fresh run directory
-legal-rag corpus build --run-id run09_ocr --ocr-engine tesseract --dpi 300
+legal-rag corpus build --run-id run10_ocr --ocr-engine tesseract --dpi 300 --ocr-workers 6
 
 # 2. Inspect statuses (ok / partial_text / ocr_required / appendix_only / ...)
-cat data/chunks/run09_ocr/corpus_status.json
+cat data/chunks/run10_ocr/corpus_status.json
 
 # 3. Gold coverage: can every test reference be found in the chunks?
 legal-rag evaluate coverage data/qa/test.jsonl \
-  --chunks data/chunks/run09_ocr/all_legal_aware.jsonl
+  --chunks data/chunks/run10_ocr/all_legal_aware.jsonl
 
 # 4. Retrieval evaluation (BM25 only works without a GPU/model download)
 legal-rag evaluate retrieval data/qa/test.jsonl \
-  --chunks data/chunks/run09_ocr/all_legal_aware.jsonl \
+  --chunks data/chunks/run10_ocr/all_legal_aware.jsonl \
   --method bm25 --k 1,3,5,10,20
 ```
 
@@ -157,7 +157,26 @@ winget install --id UB-Mannheim.TesseractOCR -e
 
 `corpus build` caches each OCR page in `data/ocr/<document_id>/page-XXX.json`
 (keyed by engine + language + DPI), so re-runs do not repeat OCR work. Use
-`--force-ocr` to ignore the cache.
+`--force-ocr` to ignore the cache and `--ocr-workers N` to OCR pages in
+parallel (each page is an independent Tesseract subprocess; 4-6 workers is a
+good default on a laptop).
+
+OCR quality matters for article numbers: check
+`data/chunks/<run_id>/parse_reports/<id>.json` for missing or duplicate
+articles after a build. A page that OCRs badly should be fixed with a page
+patch in `data/ocr/patches/` rather than by editing `data/raw/`.
+
+### QA dataset schema
+
+The frozen evaluation set is a JSONL file (`data/qa/*.jsonl` is git-ignored).
+Each line is one question with explicit gold references; see
+[`docs/qa_schema.md`](docs/qa_schema.md) for the full contract and an example.
+Gold references use the same `document_id` as `configs/corpus/documents.yaml`
+and bare article/clause numbers (`"Điều 113"` and `113` are both accepted).
+
+`evaluate coverage` must be run before any retrieval comparison: if a gold
+reference has no retrieval-eligible chunk, no retriever can return it and the
+run is invalid for that question.
 
 ### Using Config File
 

@@ -177,3 +177,58 @@ def test_coverage_report_roundtrip(tmp_path):
     report = coverage_report(qa_path, chunks_path)
     assert report["query_coverage"] == 1.0
     assert report["ref_coverage"] == 1.0
+
+
+class TestGoldMapping:
+    def test_maps_article_refs_to_chunk_ids(self):
+        from legal_rag.qa.map import map_gold_to_chunks, mapping_summary
+
+        record = parse_record(_record(), 1)
+        chunks = [
+            _chunk(article="Điều 113", clause="1", chunk_id="c1"),
+            _chunk(article="Điều 113", clause="2", chunk_id="c2"),
+            _chunk(article="Điều 1", clause="1", chunk_id="c3"),
+        ]
+        mapped = map_gold_to_chunks([record], chunks)
+        assert mapped[0].is_complete
+        assert mapped[0].gold_chunk_ids == ["c1", "c2"]
+        summary = mapping_summary(mapped)
+        assert summary["question_coverage"] == 1.0
+        assert summary["total_gold_chunk_ids"] == 2
+
+    def test_missing_ref_is_reported(self):
+        from legal_rag.qa.map import map_gold_to_chunks
+
+        record = parse_record(_record(), 1)
+        mapped = map_gold_to_chunks([record], [_chunk(article="Điều 1")])
+        assert not mapped[0].is_complete
+        assert mapped[0].gold_chunk_ids == []
+        assert mapped[0].missing_refs[0]["article"] == "113"
+
+    def test_clause_level_mapping(self):
+        from legal_rag.qa.map import map_gold_to_chunks
+
+        record = parse_record(
+            _record(
+                relevant_articles=[
+                    {"document_id": "labor_code_2019", "article": "113", "clause": "2"}
+                ]
+            ),
+            1,
+        )
+        chunks = [
+            _chunk(article="Điều 113", clause="1", chunk_id="c1"),
+            _chunk(article="Điều 113", clause="2", chunk_id="c2"),
+        ]
+        mapped = map_gold_to_chunks([record], chunks, level="clause")
+        assert mapped[0].gold_chunk_ids == ["c2"]
+        article_mapped = map_gold_to_chunks([record], chunks, level="article")[0]
+        assert article_mapped.is_complete
+        assert article_mapped.gold_chunk_ids == ["c1", "c2"]
+
+    def test_appendix_chunks_are_not_mapped(self):
+        from legal_rag.qa.map import map_gold_to_chunks
+
+        record = parse_record(_record(), 1)
+        chunks = [_chunk(article="Điều 113", retrieval_eligible=False)]
+        assert not map_gold_to_chunks([record], chunks)[0].is_complete

@@ -51,3 +51,18 @@ object:
    `metrics.by_mentions_article_number`.
 3. The same `id` must never appear twice, and the same question must not appear
    in more than one split.
+
+## Mapping gold references to chunk ids
+
+```bash
+legal-rag qa map data/qa/test.jsonl \
+  --chunks data/chunks/<run_id>/all_legal_aware.jsonl \
+  --level article --output output/qa_gold_chunks.jsonl \
+  --report output/qa_map_report.json
+```
+
+The output has one line per question with `gold_chunk_ids`, `matched_refs`,
+`missing_refs` and `is_complete`. The command exits with code 2 if any gold
+reference has no chunk, so a build cannot be declared "ready for the test set"
+while coverage is incomplete. Use `--level clause` when the annotation is at
+clause level.

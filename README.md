@@ -176,7 +176,17 @@ and bare article/clause numbers (`"Điều 113"` and `113` are both accepted).
 
 `evaluate coverage` must be run before any retrieval comparison: if a gold
 reference has no retrieval-eligible chunk, no retriever can return it and the
-run is invalid for that question.
+run is invalid for that question. `qa map` goes one step further and writes the
+concrete `gold_chunk_ids` for every question:
+
+```bash
+legal-rag qa map data/qa/test.jsonl \
+  --chunks data/chunks/<run_id>/all_legal_aware.jsonl \
+  --level article --output output/qa_gold_chunks.jsonl
+```
+
+It exits non-zero when any reference is unresolved, listing it in
+`missing_refs` instead of silently dropping it.
 
 ### Using Config File
 

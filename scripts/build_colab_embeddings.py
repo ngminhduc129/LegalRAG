@@ -127,14 +127,18 @@ def main() -> None:
 
             index.add_documents(chunks)
             index.save(output_path)
+            vector_count = int(index.embeddings.shape[0]) if index.embeddings is not None else 0
             manifest["indexes"].append({
                 "model": model_name,
                 "dataset": relative_path.as_posix(),
                 "chunk_count": len(chunks),
+                "vector_count": vector_count,
+                "oversized_chunk_count": int(index.oversized_chunk_count),
                 "chunks_sha256": sha256_file(chunks_path),
                 "index_path": output_path.relative_to(args.output_root).as_posix(),
                 "index_sha256": sha256_file(output_path),
                 "max_length": index.max_length,
+                "batch_size": index.batch_size,
             })
             del chunks
             print(f"Completed {relative_path} -> {output_path}")

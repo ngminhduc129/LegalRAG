@@ -109,6 +109,13 @@ class DenseIndex:
 
     def save(self, path: Path):
         """Save index to disk."""
+        if self.embeddings is None:
+            raise RuntimeError("Index not built. Call add_documents() before save().")
+        if self.embeddings.shape[0] != len(self.documents):
+            raise ValueError(
+                f"Embedding count ({self.embeddings.shape[0]}) does not match "
+                f"document count ({len(self.documents)}); refusing to save"
+            )
         data = {
             "model_name": self.model_name,
             "device": self.device,
@@ -118,10 +125,14 @@ class DenseIndex:
             "doc_ids": self.doc_ids,
             "embeddings": self.embeddings,
             "is_built": self.is_built,
+            "vector_count": int(self.embeddings.shape[0]),
         }
         with path.open("wb") as f:
             pickle.dump(data, f)
-        print(f"Dense index saved to {path}")
+        print(
+            f"Dense index saved to {path}: "
+            f"{self.embeddings.shape[0]} vectors for {len(self.documents)} documents"
+        )
 
     @classmethod
     def load(cls, path: Path, device: Optional[str] = None) -> "DenseIndex":

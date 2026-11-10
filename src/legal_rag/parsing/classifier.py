@@ -67,7 +67,14 @@ def match_article_heading(text: str) -> Optional[Tuple[int, str, bool]]:
 
     Returns (number, title, fuzzy) or None. fuzzy=True when ARTICLE_RE fails
     but the first token normalizes to a known variant (e.g. "Di~u", "Điu").
+
+    A heading that starts with a quotation mark is a quoted amendment of
+    another document ("Điều 4. Sử dụng người lao động nước ngoài" inside
+    "Điều 1. Sửa đổi..."), i.e. content of the enclosing article, never a new
+    article of the current document.
     """
+    if text.lstrip().startswith(('"', "“", "”", "„", "'")):
+        return None
     m = ARTICLE_RE.match(text)
     if m:
         return int(m.group(1)), m.group(2).strip(), False
@@ -152,7 +159,22 @@ def clean_line(text: str) -> str:
     text = unicodedata.normalize("NFC", text)
     text = text.replace("\u00a0", " ")
     text = text.replace("\u00ad", "")
-    return re.sub(r"[ \t]+", " ", text).strip()
+    text = re.sub(r"[ \t]+", " ", text).strip()
+    return strip_heading_noise(text)
+
+
+# OCR frequently prepends a stray symbol or a single stray letter to a real
+# heading ("| Điều 11.", "ặ Điều 33.").  Strip it only when the rest of the
+# line is an article heading with a title separator, so cross references
+# ("theo Điều 154 Bộ luật Lao động") are left untouched.
+HEADING_NOISE_RE = re.compile(
+    r"^\s*(?:\W{1,4}|(?![ởỞ])[^\W\d_])\s+(?=Điều\s+\d+\s*[\.\:])", re.IGNORECASE
+)
+
+
+def strip_heading_noise(text: str) -> str:
+    """Remove a stray OCR prefix before a real article heading."""
+    return HEADING_NOISE_RE.sub("", text, count=1)
 
 
 def is_page_number(text: str) -> bool:

@@ -154,6 +154,44 @@ class TestEdgeCases:
         assert 49 in result.articles_seen
         assert 50 in result.articles_seen
 
+    def test_strip_ocr_noise_before_heading(self):
+        from legal_rag.parsing.classifier import clean_line
+
+        assert clean_line("ặ Điều 33. Vi phạm") == "Điều 33. Vi phạm"
+        assert clean_line("| Điều 11. Trình tự") == "Điều 11. Trình tự"
+        assert clean_line("-. Điều 5. Nội dung") == "Điều 5. Nội dung"
+        # Cross references and one-letter words must not be rewritten.
+        assert clean_line("theo Điều 154 Bộ luật Lao động") == (
+            "theo Điều 154 Bộ luật Lao động"
+        )
+        assert clean_line("ở Điều 5. Trường hợp") == "ở Điều 5. Trường hợp"
+
+    def test_noisy_ocr_heading_is_parsed(self):
+        from legal_rag.parsing.classifier import clean_line
+
+        raw = [
+            ("Điều 32. Vi phạm về người nước ngoài", 1),
+            ("1. Nội dung khoản một.", 1),
+            ("ặ Điều 33. Vi phạm của tổ chức", 2),
+            ("1. Nội dung khoản một.", 2),
+        ]
+        lines = [{"text": clean_line(text), "page": page} for text, page in raw]
+        result = parse_legal_structure(lines)
+        assert 32 in result.articles_seen
+        assert 33 in result.articles_seen
+
+    def test_quoted_amendment_heading_is_not_a_new_article(self):
+        lines = [
+            {"text": "Điều 1. Sửa đổi, bổ sung", "page": 1},
+            {"text": "1. Sửa đổi Điều 4 như sau:", "page": 1},
+            {"text": "“Điều 4. Sử dụng người lao động nước ngoài", "page": 1},
+            {"text": "1. Nội dung của khoản một.", "page": 1},
+            {"text": "Điều 2. Bãi bỏ một số quy định", "page": 2},
+            {"text": "1. Nội dung của khoản một.", "page": 2},
+        ]
+        result = parse_legal_structure(lines)
+        assert result.articles_seen == [1, 2]
+
     def test_empty_lines_skipped(self):
         lines = [
             {"text": "Điều 1. Title", "page": 1},
@@ -205,6 +243,32 @@ class TestSignatureAndAppendix:
         assert appendix
         assert appendix[0]["article"] is None
         assert "Nội dung biểu mẫu." in appendix[0]["content"]
+
+    def test_distribution_list_detects_signature_before_long_appendix(self):
+        """A scanned decree: no ``./.`` before Nơi nhận and a long appendix."""
+        lines = [
+            {"text": "Điều 5. Hiệu lực và trách nhiệm thi hành", "page": 1},
+            {"text": "1. Nghị định này có hiệu lực từ ngày ký.", "page": 1},
+            {"text": "Người sử dụng lao động chịu trách nhiệm thi hành.", "page": 1},
+            {"text": "Nơi nhận: TM. CHÍNH PHỦ", "page": 1},
+            {"text": "- Ban Bí thư Trung ương Đảng;", "page": 1},
+            {"text": "- Thủ tướng, các Phó Thủ tướng Chính phủ;", "page": 1},
+            {"text": "- Các bộ, cơ quan ngang bộ;", "page": 1},
+            {"text": "- Lưu: VT, KTTH.", "page": 1},
+            {"text": "DANH MỤC ĐỊA BÀN ÁP DỤNG", "page": 2},
+            {"text": "(Kèm theo Nghị định số 74/2024/NĐ-CP)", "page": 2},
+            {"text": "1. Vùng I, gồm các địa bàn:", "page": 2},
+            {"text": "- Các quận thuộc thành phố Hà Nội;", "page": 2},
+        ]
+        result = parse_legal_structure(lines)
+        assert result.appendix_chunks >= 1
+        appendix = [c for c in result.chunks if c["chunk_type"] == "appendix"]
+        assert any("Vùng I" in c["content"] for c in appendix)
+        # The appendix table must not become a clause of the last article.
+        assert not any(
+            c["chunk_type"] == "clause" and "Vùng I" in c["content"]
+            for c in result.chunks
+        )
 
     def test_signature_end_splits_appendix_without_marker(self):
         lines = [

@@ -246,6 +246,20 @@ class LegalStructureParser:
             appendix_chunks=self.appendix_chunks,
         )
 
+    @staticmethod
+    def _has_distribution_list(lines: List[dict], index: int, window: int = 8) -> bool:
+        """True when the lines after ``index`` look like a ``Nơi nhận`` list.
+
+        A scanned decree can end a normal sentence right before ``Nơi nhận:``
+        (OCR loses the ``./.`` marker), and a long appendix can push the
+        signature block before the halfway point of the extracted lines.  The
+        bullet list that follows the marker is then the reliable signal.
+        """
+        following = [
+            item.get("text", "").strip() for item in lines[index + 1:index + 1 + window]
+        ]
+        return sum(1 for text in following if text.startswith("-")) >= 2
+
     def _find_signature_index(self, lines: List[dict]) -> Optional[int]:
         """Locate the trailing signature block without matching quoted text.
 
@@ -263,7 +277,11 @@ class LegalStructureParser:
                     is_signature_title(item) or has_signature_title_anywhere(item)
                     for item in window
                 )
-                if has_signer and (prev.endswith(("./.", "./", "/")) or near_end):
+                if has_signer and (
+                    prev.endswith(("./.", "./", "/"))
+                    or near_end
+                    or self._has_distribution_list(lines, i)
+                ):
                     return i
             if VBHN_SIGNATURE_RE.match(text) and i >= int(0.8 * len(lines)):
                 return i

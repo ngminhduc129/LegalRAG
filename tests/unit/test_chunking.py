@@ -1,6 +1,8 @@
 """Unit tests for chunking module."""
 
 import pytest
+import json
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from legal_rag.chunking.legal_aware import (
@@ -997,3 +999,55 @@ class TestStructureIdentity:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
+
+class TestLaborCode2019Benchmarks:
+    """Fixed benchmarks on rebuilt labor_code_2019 chunks.
+
+    These verify that the chunk_id↔metadata invariant holds for specific
+    known chunks after the off-by-one fix (legal_aware.py:357) and the
+    page-86 patch are applied.
+    """
+
+    JSONL_PATH = Path(__file__).resolve().parents[2] / "data" / "chunks" / "test_reg_labor" / "all_legal_aware.jsonl"
+
+    def _load_chunk(self, chunk_id: str) -> Dict[str, Any]:
+        if not self.JSONL_PATH.exists():
+            pytest.skip(f"Chunks file not found: {self.JSONL_PATH}")
+        with open(self.JSONL_PATH, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                c = json.loads(line)
+                if c.get("chunk_id") == chunk_id:
+                    return c
+        pytest.fail(f"Chunk not found: {chunk_id}")
+
+    def test_dieu_124_3_starts_with_cach_chuc(self):
+        c = self._load_chunk("labor_code_2019_điều_124_3_none_clause")
+        assert c["article"] == "Điều 124"
+        assert c["clause"] == "3"
+        assert c["point"] is None
+        assert c["content"].strip().startswith("Cách chức")
+
+    def test_dieu_124_4_starts_with_sa_thai(self):
+        c = self._load_chunk("labor_code_2019_điều_124_4_none_clause")
+        assert c["article"] == "Điều 124"
+        assert c["clause"] == "4"
+        assert c["point"] is None
+        assert c["content"].strip().startswith("Sa thải")
+
+    def test_dieu_35_2_d_point_starts_with_quay_roi(self):
+        c = self._load_chunk("labor_code_2019_điều_35_2_d_point")
+        assert c["article"] == "Điều 35"
+        assert c["clause"] == "2"
+        assert c["point"] == "d"
+        assert c["content"].strip().startswith("Bị quấy rối tình dục")
+
+    def test_dieu_115_1_a_point_starts_with_ket_hon(self):
+        c = self._load_chunk("labor_code_2019_điều_115_1_a_point")
+        assert c["article"] == "Điều 115"
+        assert c["clause"] == "1"
+        assert c["point"] == "a"
+        assert c["content"].strip().startswith("Kết hôn: nghỉ 03 ngày")

@@ -244,12 +244,16 @@ def build_document(
         parse_result = parse_legal_structure(lines, document)
 
         # Page quality checks on raw text layer (alongside empty_pages)
-        quality_warnings = check_pdf_page_quality(document.pdf)
-        parse_result.page_quality_warnings = quality_warnings
-        for w in quality_warnings:
-            parse_result.warnings.append(
-                f"PAGE_QUALITY page {w['page']}: " + "; ".join(w["reasons"])
-            )
+        # Quality check failures must not fail the build.
+        try:
+            quality_warnings = check_pdf_page_quality(document.pdf)
+            parse_result.page_quality_warnings = quality_warnings
+            for w in quality_warnings:
+                parse_result.warnings.append(
+                    f"PAGE_QUALITY page {w['page']}: " + "; ".join(w["reasons"])
+                )
+        except Exception:
+            pass
     except Exception as exc:
         result.status = "parse_failed"
         result.error = f"{type(exc).__name__}: {exc}"

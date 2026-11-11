@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import traceback
@@ -30,6 +31,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 from legal_rag.chunking.legal_aware import (
     FixedSizeChunker,
     LegalAwareChunker,
+    _safe_id_part,
     save_jsonl,
 )
 from legal_rag.chunking.validator import validate_chunks
@@ -183,6 +185,49 @@ def _resolve_ocr_pages(
     return pages, len(pages), None
 
 
+def validate_chunk_id_invariant(
+    final_chunks: List[Dict[str, Any]],
+    strategy: str,
+    document_id: str,
+) -> List[Dict[str, Any]]:
+    """Validate that every chunk's chunk_id matches its metadata.
+
+    Only applies to ``legal_aware`` strategy, which encodes article/clause/point
+    in chunk_id.  Other strategies use sequential IDs (para_N, article_N, etc.)
+    that do not encode metadata, so they are skipped.
+
+    Returns a list of violation dicts (empty if all chunks are valid).
+    """
+    if strategy != "legal_aware":
+        return []
+
+    violations: List[Dict[str, Any]] = []
+    for c in final_chunks:
+        cid = c.get("chunk_id", "")
+        cid_clean = re.sub(r"__occ\d+$", "", cid)
+
+        expected = (
+            f"{document_id}_"
+            f"{_safe_id_part(c.get('article'))}_"
+            f"{_safe_id_part(c.get('clause'))}_"
+            f"{_safe_id_part(c.get('point'))}_"
+            f"{c.get('chunk_type')}"
+        )
+
+        if cid_clean != expected:
+            violations.append({
+                "chunk_id": cid,
+                "expected": expected,
+                "article": c.get("article"),
+                "clause": c.get("clause"),
+                "point": c.get("point"),
+                "chunk_type": c.get("chunk_type"),
+                "content_preview": c.get("content", "")[:80],
+            })
+
+    return violations
+
+
 def build_document(
     document: DocumentMeta,
     output_dir: Path,
@@ -278,6 +323,22 @@ def build_document(
         result.status = "parse_failed"
         result.error = f"chunking failed: {type(exc).__name__}: {exc}"
         result.warnings.append(traceback.format_exc(limit=3))
+        return result, []
+
+    # Build-time validation: chunk_id must encode the chunk's own metadata.
+    # Fails the build with 5 examples if any chunk violates the invariant.
+    id_violations = validate_chunk_id_invariant(final_chunks, strategy, document.document_id)
+    if id_violations:
+        examples = "; ".join(
+            f"{v['chunk_id']} expected {v['expected']} (content: {v['content_preview']!r})"
+            for v in id_violations[:5]
+        )
+        result.status = "parse_failed"
+        result.error = (
+            f"chunk_id↔metadata invariant violated for {len(id_violations)} chunk(s). "
+            f"First 5: {examples}"
+        )
+        result.warnings.append(result.error)
         return result, []
 
     for chunk in final_chunks:

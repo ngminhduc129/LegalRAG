@@ -176,6 +176,7 @@ class ParseResult:
     appendix_chunks: int = 0
     review_lines: List[Dict[str, Any]] = field(default_factory=list)
     empty_pages: List[int] = field(default_factory=list)
+    page_quality_warnings: List[Dict[str, Any]] = field(default_factory=list)
 
 
 def join_text(parts: List[str]) -> str:

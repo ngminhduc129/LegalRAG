@@ -34,7 +34,7 @@ from legal_rag.chunking.legal_aware import (
 )
 from legal_rag.chunking.validator import validate_chunks
 from legal_rag.corpus.audit import audit_pdf
-from legal_rag.corpus.extractor import extract_pdf_lines
+from legal_rag.corpus.extractor import extract_pdf_lines, check_pdf_page_quality
 from legal_rag.corpus.ocr import (
     DEFAULT_DPI,
     OcrEngine,
@@ -242,6 +242,14 @@ def build_document(
         patches = load_patches(list(patch_paths or []), document_id=document.document_id)
         lines, _ = apply_page_patches(lines, patches)
         parse_result = parse_legal_structure(lines, document)
+
+        # Page quality checks on raw text layer (alongside empty_pages)
+        quality_warnings = check_pdf_page_quality(document.pdf)
+        parse_result.page_quality_warnings = quality_warnings
+        for w in quality_warnings:
+            parse_result.warnings.append(
+                f"PAGE_QUALITY page {w['page']}: " + "; ".join(w["reasons"])
+            )
     except Exception as exc:
         result.status = "parse_failed"
         result.error = f"{type(exc).__name__}: {exc}"
@@ -304,6 +312,7 @@ def build_document(
                 "duplicate_article_numbers": parse_result.duplicate_article_numbers,
                 "signature_lines": parse_result.signature_lines,
                 "appendix_chunks": parse_result.appendix_chunks,
+                "page_quality_warnings": parse_result.page_quality_warnings,
             },
             ensure_ascii=False,
             indent=2,
@@ -459,6 +468,11 @@ def run_corpus_build(
             if validation
             else None
         ),
+        "page_quality": {
+            result.document_id: result.warnings
+            for result in results
+            if any("PAGE_QUALITY" in w for w in result.warnings)
+        },
         "outputs": {
             "all_chunks": str(all_chunks_path),
             "corpus_status": str(status_path),

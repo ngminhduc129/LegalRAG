@@ -311,5 +311,40 @@ class TestSignatureAndAppendix:
         assert clean_line(decomposed) == "Điều 1. Phạm vi"
 
 
+class TestPageQuality:
+    def test_clean_page_not_flagged(self):
+        from legal_rag.corpus.extractor import check_page_quality
+        clean_text = "Điều 1. Phạm vi điều chỉnh. Bộ luật Lao động quy định tiêu chuẩn lao động."
+        assert check_page_quality(clean_text, 1) is None
+
+    def test_strange_chars_flagged(self):
+        from legal_rag.corpus.extractor import check_page_quality
+        bad_text = "lao d{>ng ma Ban tr9ng tai lao d(>ng khong duqc thanh l~p {}<>~£|^"
+        result = check_page_quality(bad_text, 86)
+        assert result is not None
+        assert result["page"] == 86
+        assert any("strange_chars" in r for r in result["reasons"])
+
+    def test_mixed_alphanum_flagged(self):
+        from legal_rag.corpus.extractor import check_page_quality
+        # Many mixed words like "tr9ng", "d{>ng"
+        bad_text = "tr9ng d{>ng Ban tr9ng tai khong duqc thanh l~p x8n g9i qua9n ly"
+        result = check_page_quality(bad_text, 86)
+        assert result is not None
+        assert any("mixed_alphanum" in r for r in result["reasons"])
+
+    def test_no_vi_diacritic_flagged(self):
+        from legal_rag.corpus.extractor import check_page_quality
+        bad_text = "LAO DONG LAO DONG LAO DONG LAO DONG LAO DONG LAO DONG LAO DONG LAO DONG LAO DONG LAO DONG"
+        result = check_page_quality(bad_text, 86)
+        assert result is not None
+        assert any("vi_diacritic" in r for r in result["reasons"])
+
+    def test_empty_text_not_flagged(self):
+        from legal_rag.corpus.extractor import check_page_quality
+        assert check_page_quality("", 1) is None
+        assert check_page_quality("   ", 1) is None
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

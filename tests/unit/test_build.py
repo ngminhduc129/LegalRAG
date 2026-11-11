@@ -170,3 +170,48 @@ def test_extract_warns_and_records_empty_page(tmp_path, capsys):
     captured = capsys.readouterr()
     assert "[WARN] page 2 of mixed.pdf has no text layer" in captured.out
     assert "mixed.pdf" in captured.out
+
+
+def _pdf_with_garbage_page(path):
+    """PDF with page 1 clean, page 2 full of strange/garbage characters."""
+    doc = fitz.open()
+    page1 = doc.new_page()
+    page1.insert_text((30, 40), "Điều 1. Phạm vi điều chỉnh.")
+    page2 = doc.new_page()
+    page2.insert_text((30, 40), "lao d{>ng ma Ban tr9ng tai {}<>~£|^ khong duqc")
+    doc.save(path)
+    doc.close()
+    return path
+
+
+def test_build_records_page_quality_warnings(tmp_path, monkeypatch):
+    """build_document should record page quality warnings alongside empty_pages."""
+    pdf = _pdf_with_garbage_page(tmp_path / "garbage.pdf")
+    document = DocumentMeta(
+        document_id="doc",
+        document_name="Test document",
+        document_number="1/2020/ND-CP",
+        pdf=pdf,
+        doc_type="Nghi dinh",
+    )
+
+    monkeypatch.setattr(build_module, "audit_pdf", lambda *a, **k: _audit(document, pages=2, with_text=2))
+    monkeypatch.setattr(build_module, "extract_pdf_lines", lambda *a, **k: [
+        {"text": "Điều 1. Phạm vi điều chỉnh.", "page": 1},
+        {"text": "1. Nội dung.", "page": 1},
+    ])
+
+    result, chunks = build_document(document, tmp_path / "by_document")
+
+    # Page 2 should be flagged for quality issues
+    quality_warnings = [w for w in result.warnings if "PAGE_QUALITY" in w]
+    assert len(quality_warnings) >= 1, f"Expected PAGE_QUALITY warnings, got: {result.warnings}"
+    assert any("page 2" in w for w in quality_warnings)
+
+    # Parse report should include page_quality_warnings
+    report_path = tmp_path / "by_document" / ".." / "parse_reports" / "doc.json"
+    if report_path.exists():
+        import json
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        assert "page_quality_warnings" in report
+        assert len(report["page_quality_warnings"]) >= 1

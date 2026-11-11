@@ -12,6 +12,92 @@ from legal_rag.corpus.registry import DocumentMeta, resolve_document
 from legal_rag.parsing.classifier import clean_line, is_page_number
 
 
+# Page quality thresholds (derived from statistical analysis of clean pages)
+# Strange chars: {}<>~£|^ ratio; Mixed words: letters+digits like "tr9ng";
+# Vi diacritic: ratio of Vietnamese-accented letters among all letters.
+PAGE_QUALITY_THRESHOLDS: Dict[str, float] = {
+    "strange_max": 0.005,      # flag if > 0.5% strange characters
+    "mixed_max": 0.015,        # flag if > 1.5% mixed alphanumeric words
+    "vi_diacritic_min": 0.05,  # flag if < 5.0% Vietnamese diacritic letters
+}
+
+STRANGE_CHARS = set("{}<>~£|^")
+MIXED_ALPHANUM_RE = __import__("re").compile(r"\b\w*\d\w*\b", __import__("re").UNICODE)
+VI_DIACRITIC_CHARS = set("àáâãèéêìíòóôõùúýăđâêôơưÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝĂĐÂÊÔƠƯ")
+
+
+def check_page_quality(text: str, page_num: int,
+                       thresholds: Optional[Dict[str, float]] = None) -> Optional[Dict[str, Any]]:
+    """Check text quality of a single PDF page.
+
+    Returns a warning dict if the page is flagged, None if clean.
+    """
+    th = thresholds or PAGE_QUALITY_THRESHOLDS
+    if not text or not text.strip():
+        return None
+
+    total_chars = len(text)
+    if total_chars == 0:
+        return None
+
+    # (a) Strange character ratio
+    strange_count = sum(1 for ch in text if ch in STRANGE_CHARS)
+    strange_ratio = strange_count / total_chars
+
+    # (b) Mixed alphanumeric word ratio (letters + digits in same word)
+    words = text.split()
+    mixed_words = [
+        w for w in words
+        if MIXED_ALPHANUM_RE.search(w)
+        and any(c.isalpha() for c in w)
+        and any(c.isdigit() for c in w)
+    ]
+    mixed_ratio = len(mixed_words) / len(words) if words else 0.0
+
+    # (c) Vietnamese diacritic letter ratio
+    letters = [ch for ch in text if ch.isalpha()]
+    total_letters = len(letters)
+    vi_diacritic_count = sum(1 for ch in letters if ch in VI_DIACRITIC_CHARS)
+    vi_diacritic_ratio = vi_diacritic_count / total_letters if total_letters > 0 else 0.0
+
+    reasons: List[str] = []
+    if strange_ratio > th["strange_max"]:
+        reasons.append(f"strange_chars={strange_ratio*100:.2f}%")
+    if mixed_ratio > th["mixed_max"]:
+        reasons.append(f"mixed_alphanum={mixed_ratio*100:.2f}%")
+    if vi_diacritic_ratio < th["vi_diacritic_min"] and total_letters > 0:
+        reasons.append(f"vi_diacritic={vi_diacritic_ratio*100:.2f}%")
+
+    if not reasons:
+        return None
+
+    return {
+        "page": page_num,
+        "reasons": reasons,
+        "strange_ratio": round(strange_ratio, 4),
+        "mixed_ratio": round(mixed_ratio, 4),
+        "vi_diacritic_ratio": round(vi_diacritic_ratio, 4),
+        "total_chars": total_chars,
+    }
+
+
+def check_pdf_page_quality(pdf_path: Path,
+                           thresholds: Optional[Dict[str, float]] = None) -> List[Dict[str, Any]]:
+    """Check text quality of every page in a PDF.
+
+    Returns a list of warning dicts for flagged pages.
+    """
+    warnings: List[Dict[str, Any]] = []
+    with fitz.open(pdf_path) as pdf:
+        for page_index, page in enumerate(pdf):
+            page_num = page_index + 1
+            page_text = page.get_text("text", sort=True)
+            warning = check_page_quality(page_text, page_num, thresholds)
+            if warning:
+                warnings.append(warning)
+    return warnings
+
+
 def _page_lines(text: str, page_num: int, source: str) -> List[Dict[str, Any]]:
     lines: List[Dict[str, Any]] = []
     for raw_line in text.splitlines():
@@ -96,6 +182,15 @@ def parse_corpus(
     from legal_rag.parsing.parser import parse_legal_structure, ParseResult
     result = parse_legal_structure(lines, meta)
     result.empty_pages = empty_pages
+
+    # Page quality checks on raw text layer (alongside empty_pages)
+    quality_warnings = check_pdf_page_quality(pdf_path)
+    result.page_quality_warnings = quality_warnings
+    for w in quality_warnings:
+        result.warnings.append(
+            f"PAGE_QUALITY page {w['page']}: " + "; ".join(w["reasons"])
+        )
+
     return result
 
 

@@ -279,3 +279,46 @@ def test_build_fails_on_chunk_id_invariant_violation(tmp_path, monkeypatch):
 
     assert result.status == "parse_failed"
     assert "chunk_id↔metadata" in result.error or "invariant" in result.error.lower()
+
+
+def test_validate_chunk_id_invariant_skips_appendix():
+    """validate_chunk_id_invariant must skip appendix chunks.
+
+    Appendix chunks use their own ID scheme (document_id_appendix_<title>)
+    that does not encode article/clause/point, so they must not be flagged
+    as violations.
+    """
+    from legal_rag.corpus.build import validate_chunk_id_invariant
+
+    chunks = [
+        {
+            "chunk_id": "doc_appendix_phụ_lục_01",
+            "article": None,
+            "clause": None,
+            "point": None,
+            "chunk_type": "appendix",
+            "content": "Phụ lục 01",
+        },
+        {
+            "chunk_id": "doc_appendix_phụ_lục_02",
+            "article": None,
+            "clause": None,
+            "point": None,
+            "chunk_type": "appendix",
+            "content": "Phụ lục 02",
+        },
+        {
+            "chunk_id": "doc_điều_1_none_none_article_intro",
+            "article": "Điều 1",
+            "clause": None,
+            "point": None,
+            "chunk_type": "article_intro",
+            "content": "Nội dung Điều 1.",
+        },
+    ]
+
+    violations = validate_chunk_id_invariant(chunks, "legal_aware", "doc")
+
+    # Only the non-appendix chunk (article_intro) should be checked.
+    # Its chunk_id matches metadata, so zero violations expected.
+    assert len(violations) == 0, f"Expected 0 violations, got {len(violations)}: {violations}"

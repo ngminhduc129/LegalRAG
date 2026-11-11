@@ -203,6 +203,10 @@ def validate_chunk_id_invariant(
 
     violations: List[Dict[str, Any]] = []
     for c in final_chunks:
+        # Appendix chunks have their own ID scheme (document_id_appendix_<title>)
+        # that does not encode article/clause/point, so they are exempt.
+        if c.get("chunk_type") == "appendix":
+            continue
         cid = c.get("chunk_id", "")
         cid_clean = re.sub(r"__occ\d+$", "", cid)
 

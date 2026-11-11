@@ -130,6 +130,7 @@ def _pdf_with_text(path, text="Van ban co text layer."):
     return path
 
 
+@pytest.mark.slow
 def test_extract_prefers_ocr_for_pages_selected_for_ocr(tmp_path):
     pdf = _pdf_with_text(tmp_path / "scan.pdf", "Co quan phat hanh: Van phong")
     lines = extract_pdf_lines(
@@ -139,6 +140,7 @@ def test_extract_prefers_ocr_for_pages_selected_for_ocr(tmp_path):
     assert lines[0]["text_source"] == "ocr"
 
 
+@pytest.mark.slow
 def test_extract_keeps_text_layer_when_page_not_ocr(tmp_path):
     pdf = _pdf_with_text(tmp_path / "digital.pdf")
     lines = extract_pdf_lines(pdf, ocr_pages={})
@@ -156,6 +158,7 @@ def _pdf_with_empty_page(path):
     return path
 
 
+@pytest.mark.slow
 def test_extract_warns_and_records_empty_page(tmp_path, capsys):
     pdf = _pdf_with_empty_page(tmp_path / "mixed.pdf")
     empty: list[int] = []
@@ -184,6 +187,7 @@ def _pdf_with_garbage_page(path):
     return path
 
 
+@pytest.mark.slow
 def test_build_records_page_quality_warnings(tmp_path, monkeypatch):
     """build_document should record page quality warnings alongside empty_pages."""
     pdf = _pdf_with_garbage_page(tmp_path / "garbage.pdf")

@@ -215,3 +215,63 @@ def test_build_records_page_quality_warnings(tmp_path, monkeypatch):
         report = json.loads(report_path.read_text(encoding="utf-8"))
         assert "page_quality_warnings" in report
         assert len(report["page_quality_warnings"]) >= 1
+
+
+def test_build_fails_on_chunk_id_invariant_violation(tmp_path, monkeypatch):
+    """build_document must fail when chunk_id↔metadata invariant is violated."""
+    pdf = _pdf_with_garbage_page(tmp_path / "garbage.pdf")
+    document = DocumentMeta(
+        document_id="doc",
+        document_name="Test document",
+        document_number="1/2020/ND-CP",
+        pdf=pdf,
+        doc_type="Nghi dinh",
+    )
+
+    monkeypatch.setattr(build_module, "audit_pdf", lambda *a, **k: _audit(document, pages=1, with_text=1))
+    monkeypatch.setattr(build_module, "extract_pdf_lines", lambda *a, **k: [
+        {"text": "Điều 1. Phạm vi điều chỉnh.", "page": 1},
+    ])
+
+    # Mock parse_legal_structure to return corpus chunks with structure IDs
+    from legal_rag.parsing.parser import ParseResult
+    corpus_chunks = [
+        {
+            "document_name": "Test document",
+            "document_number": "1/2020/ND-CP",
+            "chapter": None,
+            "chapter_title": None,
+            "section": None,
+            "section_title": None,
+            "article": "Điều 1",
+            "article_title": None,
+            "clause": None,
+            "point": None,
+            "chunk_type": "article_intro",
+            "content": "Phạm vi điều chỉnh.",
+            "page_start": 1,
+            "page_end": 1,
+            "structure_instance_id": "si1",
+            "parent_instance_id": None,
+            "structure_role": "main",
+            "operation_id": None,
+        }
+    ]
+    monkeypatch.setattr(build_module, "parse_legal_structure", lambda lines, doc: ParseResult(chunks=corpus_chunks))
+
+    from legal_rag.chunking.legal_aware import LegalAwareChunker
+    original_chunk = LegalAwareChunker.chunk
+
+    def bad_chunk(self, corpus_chunks):
+        result = original_chunk(self, corpus_chunks)
+        # Corrupt the first chunk's ID so it doesn't match its metadata
+        if result:
+            result[0]["chunk_id"] = "doc_điều_99_none_none_article_intro"
+        return result
+
+    monkeypatch.setattr(LegalAwareChunker, "chunk", bad_chunk)
+
+    result, chunks = build_document(document, tmp_path / "by_document")
+
+    assert result.status == "parse_failed"
+    assert "chunk_id↔metadata" in result.error or "invariant" in result.error.lower()

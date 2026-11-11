@@ -2,6 +2,7 @@
 
 import pytest
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -1051,3 +1052,92 @@ class TestLaborCode2019Benchmarks:
         assert c["clause"] == "1"
         assert c["point"] == "a"
         assert c["content"].strip().startswith("Kết hôn: nghỉ 03 ngày")
+
+
+class TestChunkIdMetadataInvariant:
+    """Invariant: every output chunk's chunk_id encodes its own metadata.
+
+    For EVERY chunk, (article, clause, point, chunk_type) parsed from chunk_id
+    (stripping __occN suffix) must equal the chunk's own metadata fields.
+    Tested with 0, 1, and 2 preamble chunks to catch off-by-one shifts.
+    """
+
+    def _make_corpus_chunk(self, chunk_type, article, clause, point, content, page=1):
+        return {
+            "document_name": "Bộ luật Lao động",
+            "document_number": "125/VBHN-VPQH",
+            "chapter": None,
+            "chapter_title": None,
+            "section": None,
+            "section_title": None,
+            "article": article,
+            "article_title": None,
+            "clause": clause,
+            "point": point,
+            "chunk_type": chunk_type,
+            "content": content,
+            "page_start": page,
+            "page_end": page,
+        }
+
+    def _expected_chunk_id(self, article, clause, point, chunk_type):
+        return (
+            f"labor_code_2019_"
+            f"{_safe_id_part(article)}_"
+            f"{_safe_id_part(clause)}_"
+            f"{_safe_id_part(point)}_"
+            f"{chunk_type}"
+        )
+
+    def _strip_occ(self, chunk_id):
+        return re.sub(r"__occ\d+$", "", chunk_id)
+
+    def _build_with_preambles(self, num_preambles):
+        chunker = LegalAwareChunker(document_id="labor_code_2019")
+        corpus_chunks = []
+
+        # Preamble chunks (no article)
+        for i in range(num_preambles):
+            corpus_chunks.append(self._make_corpus_chunk(
+                "article_intro", None, None, None,
+                f"Preamble content {i + 1}.", page=1
+            ))
+
+        # Articles with clauses/points
+        articles = [
+            ("Điều 1", None, None, "article_intro", "Nội dung Điều 1."),
+            ("Điều 1", "1", None, "clause", "Khoản 1 của Điều 1."),
+            ("Điều 1", "1", "a", "point", "Điểm a của Khoản 1."),
+            ("Điều 1", "1", "b", "point", "Điểm b của Khoản 1."),
+            ("Điều 1", "2", None, "clause", "Khoản 2 của Điều 1."),
+            ("Điều 2", None, None, "article_intro", "Nội dung Điều 2."),
+            ("Điều 2", "1", None, "clause", "Khoản 1 của Điều 2."),
+            ("Điều 2", "1", "a", "point", "Điểm a của Khoản 1 Điều 2."),
+        ]
+        for article, clause, point, ctype, content in articles:
+            corpus_chunks.append(self._make_corpus_chunk(
+                ctype, article, clause, point, content, page=1
+            ))
+
+        return chunker.chunk(corpus_chunks)
+
+    def _check_invariant(self, result):
+        violations = []
+        for c in result:
+            cid_clean = self._strip_occ(c.get("chunk_id", ""))
+            expected = self._expected_chunk_id(
+                c.get("article"), c.get("clause"),
+                c.get("point"), c.get("chunk_type"),
+            )
+            if cid_clean != expected:
+                violations.append((c.get("chunk_id"), expected, c.get("content", "")[:60]))
+        return violations
+
+    @pytest.mark.parametrize("num_preambles", [0, 1, 2])
+    def test_id_metadata_invariant_with_preambles(self, num_preambles):
+        result = self._build_with_preambles(num_preambles)
+        violations = self._check_invariant(result)
+        assert len(violations) == 0, (
+            f"Invariant violated for {len(violations)} chunk(s) with "
+            f"{num_preambles} preamble(s): {violations[:5]}"
+        )

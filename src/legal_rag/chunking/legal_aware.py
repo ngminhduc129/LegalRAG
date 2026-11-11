@@ -354,7 +354,9 @@ class LegalAwareChunker(BaseChunker):
         resolver = IdentityResolver(registry)
         for index, chunk in enumerate(article_chunks):
             chunk_type = chunk.get("chunk_type", "unknown")
-            chunk_id = chunk_ids_by_index[index]
+            # article_chunks is body_chunks[first_article_idx:], so the index
+            # into chunk_ids_by_index must be offset by first_article_idx.
+            chunk_id = chunk_ids_by_index[first_article_idx + index]
             instance_id = chunk.get("structure_instance_id")
 
             # Resolve chunk-level parent_id from parent_instance_id, never from

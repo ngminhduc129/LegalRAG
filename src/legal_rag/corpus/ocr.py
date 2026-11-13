@@ -4,24 +4,29 @@ OCR is an optional dependency.  The module never pretends OCR succeeded: if no
 engine is installed it raises :class:`OcrUnavailable` so the batch build can
 mark the document ``ocr_required`` instead of silently emitting empty chunks.
 
-Page results are cached as ``<cache_root>/<document_id>/page-XXX.json`` so a
-re-run does not pay the OCR cost twice.  The cache key includes engine, language
-and DPI; a different configuration is a different cache entry.
+Page results are cached as
+``<cache_root>/<document_id>/<config_hash>/page-XXX.json``.  ``config_hash``
+covers engine, language, DPI and engine-specific settings (e.g. Tesseract
+``psm``), so a different configuration is a different cache entry.  The PDF
+content hash is stored in each page file and must match, so a replaced PDF
+invalidates its cached pages.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+import os
+import threading
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Protocol, Sequence
 
 import fitz  # PyMuPDF
 
 DEFAULT_DPI = 300
-CACHE_ROOT = Path("data/ocr")
 REPO_ROOT = Path(__file__).resolve().parents[3]
+CACHE_ROOT = REPO_ROOT / "data" / "ocr"
 DEFAULT_TESSDATA_DIR = REPO_ROOT / "data" / "ocr" / "tessdata"
 
 
@@ -41,6 +46,29 @@ class OcrEngine(Protocol):
         """Return recognized text lines for one rendered page image."""
 
 
+# ---------------------------------------------------------------------------
+# Language code handling
+# ---------------------------------------------------------------------------
+
+_TESSERACT_LANGS = {"vi": "vie", "en": "eng"}
+_OTHER_LANGS = {"vie": "vi", "eng": "en"}
+
+
+def _normalize_lang(engine_name: str, lang: Optional[str]) -> Optional[str]:
+    """Map ``vi``/``vie`` style codes to what each engine expects."""
+    if not lang:
+        return None
+    mapping = _TESSERACT_LANGS if engine_name == "tesseract" else _OTHER_LANGS
+    if engine_name == "tesseract":
+        return "+".join(mapping.get(part, part) for part in lang.split("+"))
+    return mapping.get(lang, lang)
+
+
+# ---------------------------------------------------------------------------
+# Engines
+# ---------------------------------------------------------------------------
+
+
 @dataclass
 class TesseractEngine:
     lang: str = "vie"
@@ -58,7 +86,6 @@ class TesseractEngine:
                 "and install the Tesseract binary with the `vie` language data"
             ) from exc
 
-        import os
         import shutil
 
         cmd = self.tesseract_cmd or os.environ.get("TESSERACT_CMD")
@@ -78,22 +105,42 @@ class TesseractEngine:
             )
         pytesseract.pytesseract.tesseract_cmd = str(cmd)
 
-        data_dir = self.tessdata_dir
-        if data_dir is None:
-            env_dir = os.environ.get("TESSDATA_DIR")
-            data_dir = Path(env_dir) if env_dir else DEFAULT_TESSDATA_DIR
-        if self.lang != "eng" and data_dir is not None:
-            if not (Path(data_dir) / f"{self.lang}.traineddata").exists():
+        langs = [part for part in self.lang.split("+") if part]
+
+        def _missing(directory: Path) -> List[str]:
+            return [
+                part
+                for part in langs
+                if not (directory / f"{part}.traineddata").exists()
+            ]
+
+        # Explicit setting (argument or env) must be valid; the repo default is
+        # only used when it actually has the needed language data, otherwise we
+        # fall back to the system Tesseract installation.
+        explicit = self.tessdata_dir
+        if explicit is None and os.environ.get("TESSDATA_DIR"):
+            explicit = Path(os.environ["TESSDATA_DIR"])
+
+        data_dir: Optional[Path] = None
+        if explicit is not None:
+            data_dir = Path(explicit)
+            missing = _missing(data_dir)
+            if missing:
                 raise OcrUnavailable(
-                    f"missing {self.lang}.traineddata in {data_dir}; download it "
-                    "from https://github.com/tesseract-ocr/tessdata_best"
+                    f"missing {', '.join(m + '.traineddata' for m in missing)} "
+                    f"in {data_dir}; download from "
+                    "https://github.com/tesseract-ocr/tessdata_best"
                 )
-        self._tessdata_dir = Path(data_dir) if data_dir is not None else None
+        elif DEFAULT_TESSDATA_DIR.is_dir() and not _missing(DEFAULT_TESSDATA_DIR):
+            data_dir = DEFAULT_TESSDATA_DIR
+
+        self._tessdata_dir = data_dir
         self._config = f"--psm {self.psm}"
-        if self._tessdata_dir is not None:
+        if data_dir is not None:
             # Tesseract reads TESSDATA_PREFIX; passing --tessdata-dir with
-            # quotes through pytesseract breaks on Windows paths.
-            os.environ["TESSDATA_PREFIX"] = str(self._tessdata_dir)
+            # quotes through pytesseract breaks on Windows paths.  Note: this
+            # is a process-wide side effect.
+            os.environ["TESSDATA_PREFIX"] = str(data_dir)
 
     def cache_params(self) -> Dict[str, object]:
         """Engine settings that change the OCR output for a page."""
@@ -119,6 +166,9 @@ class EasyOcrEngine:
     lang: str = "vi"
     name: str = "easyocr"
     gpu: bool = False
+    _lock: threading.Lock = field(
+        default_factory=threading.Lock, init=False, repr=False, compare=False
+    )
 
     def __post_init__(self) -> None:
         try:
@@ -129,14 +179,18 @@ class EasyOcrEngine:
             ) from exc
         self._reader = None
 
-    def _get_reader(self):
-        if self._reader is None:
-            import easyocr
+    def cache_params(self) -> Dict[str, object]:
+        return {"gpu": self.gpu}
 
-            self._reader = easyocr.Reader(
-                [self.lang], gpu=self.gpu, verbose=False
-            )
-        return self._reader
+    def _get_reader(self):
+        with self._lock:
+            if self._reader is None:
+                import easyocr
+
+                self._reader = easyocr.Reader(
+                    [self.lang], gpu=self.gpu, verbose=False
+                )
+            return self._reader
 
     def ocr_image(self, png_bytes: bytes) -> List[str]:
         import io
@@ -151,8 +205,17 @@ class EasyOcrEngine:
 
 @dataclass
 class PaddleEngine:
+    """PaddleOCR adapter supporting both the 2.x and 3.x APIs.
+
+    The 3.x branch could not be exercised against a real install; verify it on
+    your pinned version before relying on it.
+    """
+
     lang: str = "vi"
     name: str = "paddleocr"
+    _lock: threading.Lock = field(
+        default_factory=threading.Lock, init=False, repr=False, compare=False
+    )
 
     def __post_init__(self) -> None:
         try:
@@ -162,13 +225,40 @@ class PaddleEngine:
                 "paddleocr is not installed; run `pip install paddleocr paddlepaddle`"
             ) from exc
         self._ocr = None
+        self._new_api = False
 
     def _engine(self):
-        if self._ocr is None:
-            from paddleocr import PaddleOCR
+        with self._lock:
+            if self._ocr is None:
+                from paddleocr import PaddleOCR
 
-            self._ocr = PaddleOCR(lang=self.lang, use_angle_cls=True, show_log=False)
-        return self._ocr
+                try:  # PaddleOCR 2.x
+                    self._ocr = PaddleOCR(
+                        lang=self.lang, use_angle_cls=True, show_log=False
+                    )
+                    self._new_api = False
+                except (TypeError, ValueError):  # PaddleOCR 3.x
+                    self._ocr = PaddleOCR(
+                        lang=self.lang, use_textline_orientation=True
+                    )
+                    self._new_api = True
+            return self._ocr
+
+    @staticmethod
+    def _texts_from_v3(result) -> List[str]:
+        lines: List[str] = []
+        for item in result or []:
+            data = item
+            if not isinstance(data, dict) and hasattr(data, "res"):
+                data = data.res
+            texts = None
+            if isinstance(data, dict):
+                texts = data.get("rec_texts")
+            elif hasattr(data, "get"):
+                texts = data.get("rec_texts")
+            for text in texts or []:
+                lines.append(str(text))
+        return lines
 
     def ocr_image(self, png_bytes: bytes) -> List[str]:
         import io
@@ -177,22 +267,30 @@ class PaddleEngine:
         from PIL import Image
 
         image = np.array(Image.open(io.BytesIO(png_bytes)).convert("RGB"))
-        result = self._engine().ocr(image, cls=True)
+        engine = self._engine()
         lines: List[str] = []
-        for page in result or []:
-            for item in page or []:
-                # PaddleOCR returns [box, (text, confidence)]
-                if isinstance(item, (list, tuple)) and len(item) >= 2:
-                    payload = item[1]
-                    if isinstance(payload, (list, tuple)) and payload:
-                        lines.append(str(payload[0]))
-                    else:
-                        lines.append(str(payload))
+        if self._new_api:
+            lines = self._texts_from_v3(engine.predict(image))
+        else:
+            result = engine.ocr(image, cls=True)
+            for page in result or []:
+                for item in page or []:
+                    # PaddleOCR 2.x returns [box, (text, confidence)]
+                    if isinstance(item, (list, tuple)) and len(item) >= 2:
+                        payload = item[1]
+                        if isinstance(payload, (list, tuple)) and payload:
+                            lines.append(str(payload[0]))
+                        else:
+                            lines.append(str(payload))
         return [line for line in lines if line.strip()]
 
 
 def get_engine(name: str = "auto", lang: Optional[str] = None) -> OcrEngine:
-    """Instantiate an OCR engine or raise :class:`OcrUnavailable`."""
+    """Instantiate an OCR engine or raise :class:`OcrUnavailable`.
+
+    ``lang`` may be given as ``vi`` or ``vie``; it is mapped to the code each
+    engine expects (Tesseract also accepts ``vie+eng``).
+    """
     if name == "auto":
         for candidate in ("tesseract", "easyocr", "paddleocr"):
             try:
@@ -204,14 +302,19 @@ def get_engine(name: str = "auto", lang: Optional[str] = None) -> OcrEngine:
             "or paddleocr"
         )
     if name == "tesseract":
-        return TesseractEngine(lang=lang or "vie")
+        return TesseractEngine(lang=_normalize_lang(name, lang) or "vie")
     if name == "easyocr":
-        return EasyOcrEngine(lang=lang or "vi")
+        return EasyOcrEngine(lang=_normalize_lang(name, lang) or "vi")
     if name == "paddleocr":
-        return PaddleEngine(lang=lang or "vi")
+        return PaddleEngine(lang=_normalize_lang(name, lang) or "vi")
     raise ValueError(
         f"unknown OCR engine: {name!r} (expected tesseract/easyocr/paddleocr/auto)"
     )
+
+
+# ---------------------------------------------------------------------------
+# Rendering and cache
+# ---------------------------------------------------------------------------
 
 
 def render_page(pdf_path: Path | str, page: int, dpi: int = DEFAULT_DPI) -> bytes:
@@ -219,33 +322,8 @@ def render_page(pdf_path: Path | str, page: int, dpi: int = DEFAULT_DPI) -> byte
     with fitz.open(pdf_path) as pdf:
         if page < 1 or page > pdf.page_count:
             raise OcrError(f"page {page} out of range 1..{pdf.page_count}")
-        pixmap = pdf[page - 1].get_pixmap(dpi=dpi)
+        pixmap = pdf[page - 1].get_pixmap(dpi=dpi, alpha=False)
         return pixmap.tobytes("png")
-
-
-def _cache_path(cache_root: Path, document_id: str, page: int, engine: OcrEngine, dpi: int) -> Path:
-    return Path(cache_root) / document_id / f"page-{page:03d}.json"
-
-
-def _cache_params(
-    engine: OcrEngine, dpi: int, pdf_sha256: Optional[str] = None
-) -> Dict[str, object]:
-    """Everything that must match for a cached page to be reusable."""
-    params: Dict[str, object] = {
-        "engine": engine.name,
-        "lang": engine.lang,
-        "dpi": dpi,
-    }
-    extra = getattr(engine, "cache_params", None)
-    if callable(extra):
-        params.update(extra())
-        # The identity fields always win over engine-reported values.
-        params["engine"] = engine.name
-        params["lang"] = engine.lang
-        params["dpi"] = dpi
-    if pdf_sha256:
-        params["pdf_sha256"] = pdf_sha256
-    return params
 
 
 def pdf_fingerprint(pdf_path: Path | str) -> str:
@@ -257,26 +335,56 @@ def pdf_fingerprint(pdf_path: Path | str) -> str:
     return digest.hexdigest()[:16]
 
 
+def _config_params(engine: OcrEngine, dpi: int) -> Dict[str, object]:
+    """OCR settings that define a cache entry (independent of the PDF)."""
+    params: Dict[str, object] = {}
+    extra = getattr(engine, "cache_params", None)
+    if callable(extra):
+        params.update(extra())
+    # The identity fields always win over engine-reported values.
+    params["engine"] = engine.name
+    params["lang"] = engine.lang
+    params["dpi"] = dpi
+    return params
+
+
 def _config_hash(params: Dict[str, object]) -> str:
     raw = json.dumps(params, sort_keys=True, ensure_ascii=False).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()[:12]
 
 
-def _cache_matches(payload: Dict[str, object], params: Dict[str, object]) -> bool:
-    """True when a cached page was produced with the same OCR settings.
+def _cache_dir(cache_root: Path, document_id: str, config_hash: str) -> Path:
+    return Path(cache_root) / document_id / config_hash
 
-    Entries written before an engine reported a setting (e.g. ``psm``) are
-    accepted: those settings were constants of the code that produced them, so
-    a missing field is not a different configuration.
-    """
+
+def _cache_path(cache_dir: Path, page: int) -> Path:
+    return cache_dir / f"page-{page:03d}.json"
+
+
+def _cache_matches(payload: Dict[str, object], params: Dict[str, object]) -> bool:
+    """True when a cached page was produced with exactly these settings."""
     for key, value in params.items():
-        if key not in payload:
-            if key in {"psm", "pdf_sha256"}:
-                continue
-            return False
-        if payload[key] != value:
+        if key not in payload or payload[key] != value:
             return False
     return True
+
+
+def _atomic_write_json(path: Path, payload: Dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(
+        f"{path.name}.{os.getpid()}.{threading.get_ident()}.tmp"
+    )
+    try:
+        tmp.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        tmp.replace(path)
+    finally:
+        if tmp.exists():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
 
 
 def ocr_page(
@@ -291,17 +399,31 @@ def ocr_page(
 ) -> Dict[str, object]:
     """OCR one page with an on-disk cache keyed by the OCR configuration."""
     document_id = document_id or Path(pdf_path).stem
-    cache_file = _cache_path(Path(cache_root), document_id, page, engine, dpi)
-    params = _cache_params(engine, dpi, pdf_sha256 or pdf_fingerprint(pdf_path))
-    config_hash = _config_hash(params)
+    config = _config_params(engine, dpi)
+    config_hash = _config_hash(config)
+    params = {**config, "pdf_sha256": pdf_sha256 or pdf_fingerprint(pdf_path)}
+    cache_file = _cache_path(
+        _cache_dir(Path(cache_root), document_id, config_hash), page
+    )
 
     if cache_file.exists() and not force:
-        cached = json.loads(cache_file.read_text(encoding="utf-8"))
-        if _cache_matches(cached, params):
+        try:
+            cached = json.loads(cache_file.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            cached = None  # corrupt or partial file: re-run OCR
+        if isinstance(cached, dict) and _cache_matches(cached, params):
             return cached
 
     png = render_page(pdf_path, page, dpi=dpi)
-    lines = engine.ocr_image(png)
+    try:
+        lines = engine.ocr_image(png)
+    except (OcrError, OcrUnavailable):
+        raise
+    except Exception as exc:
+        raise OcrError(
+            f"{engine.name} failed on {document_id} page {page}: {exc}"
+        ) from exc
+
     payload: Dict[str, object] = {
         "document_id": document_id,
         "page": page,
@@ -310,10 +432,7 @@ def ocr_page(
         "lines": lines,
         "text": "\n".join(lines),
     }
-    cache_file.parent.mkdir(parents=True, exist_ok=True)
-    cache_file.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    _atomic_write_json(cache_file, payload)
     return payload
 
 
@@ -322,10 +441,18 @@ def load_cached_pages(
     document_id: str,
     engine: OcrEngine,
     dpi: int = DEFAULT_DPI,
+    pdf_path: Optional[Path | str] = None,
 ) -> Dict[int, List[str]]:
-    """Load every cached page for a document/config pair."""
-    params = _cache_params(engine, dpi)
-    directory = Path(cache_root) / document_id
+    """Load every cached page for a document/config pair.
+
+    Pass ``pdf_path`` to also reject pages cached from a different version of
+    the PDF.
+    """
+    config = _config_params(engine, dpi)
+    params = dict(config)
+    if pdf_path is not None:
+        params["pdf_sha256"] = pdf_fingerprint(pdf_path)
+    directory = _cache_dir(Path(cache_root), document_id, _config_hash(config))
     pages: Dict[int, List[str]] = {}
     if not directory.exists():
         return pages
@@ -334,7 +461,7 @@ def load_cached_pages(
             payload = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
-        if not _cache_matches(payload, params):
+        if not isinstance(payload, dict) or not _cache_matches(payload, params):
             continue
         page = payload.get("page")
         lines = payload.get("lines")
@@ -355,15 +482,16 @@ def ocr_document(
 ) -> Dict[int, List[str]]:
     """OCR selected pages (default: every page) and return page -> lines.
 
-    ``workers`` > 1 runs pages in parallel threads.  Each page is an
-    independent Tesseract subprocess, so the GIL is not a bottleneck; the
-    per-process OpenMP thread count is pinned to 1 to avoid oversubscription.
+    ``workers`` > 1 runs pages in parallel threads.  Each Tesseract page is an
+    independent subprocess, so the GIL is not a bottleneck; the per-process
+    OpenMP thread count is pinned to 1 to avoid oversubscription.  EasyOCR and
+    PaddleOCR share one in-process model, so prefer ``workers=1`` for them.
     """
     document_id = document_id or Path(pdf_path).stem
     with fitz.open(pdf_path) as pdf:
         page_count = pdf.page_count
     selected: Sequence[int] = (
-        list(pages) if pages is not None else list(range(1, page_count + 1))
+        list(dict.fromkeys(pages)) if pages is not None else list(range(1, page_count + 1))
     )
     pdf_sha256 = pdf_fingerprint(pdf_path)
 
@@ -382,7 +510,6 @@ def ocr_document(
 
     result: Dict[int, List[str]] = {}
     if workers and workers > 1:
-        import os
         from concurrent.futures import ThreadPoolExecutor
 
         os.environ.setdefault("OMP_THREAD_LIMIT", "1")

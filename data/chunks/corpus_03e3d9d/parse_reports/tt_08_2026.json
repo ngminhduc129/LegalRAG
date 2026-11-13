@@ -1,0 +1,38 @@
+{
+  "document_id": "tt_08_2026",
+  "warnings": [
+    "Signature block: 10 lines starting on page 19",
+    "Appendix: 133 lines starting on page 20",
+    "Dropped 3 noise lines"
+  ],
+  "dropped_lines": 3,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [
+    3
+  ],
+  "signature_lines": 10,
+  "appendix_chunks": 3,
+  "page_quality_warnings": []
+}

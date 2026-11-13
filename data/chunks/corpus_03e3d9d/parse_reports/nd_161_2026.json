@@ -1,0 +1,24 @@
+{
+  "document_id": "nd_161_2026",
+  "warnings": [
+    "Signature block: 18 lines starting on page 7",
+    "Dropped 0 noise lines"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [
+    1
+  ],
+  "signature_lines": 18,
+  "appendix_chunks": 0,
+  "page_quality_warnings": []
+}

@@ -1,0 +1,37 @@
+{
+  "run_id": "rebuild_fixed_800",
+  "strategy": "fixed_800",
+  "created_at": "2026-11-11T07:06:28+00:00",
+  "git_commit": "4ad41ea44fe10ae5eb04c1372431bf2747381886",
+  "ocr_engine": "tesseract",
+  "ocr_engine_error": null,
+  "ocr_psm": 6,
+  "dpi": 300,
+  "ocr_workers": 1,
+  "documents_requested": 1,
+  "documents_built": 1,
+  "status_counts": {
+    "ok": 1
+  },
+  "pdf_hashes": {
+    "labor_code_2019": "08dcc4dbef97d2aabcd3558b614006089ac7923b1a03a30c5c8d7c357bb25308"
+  },
+  "validation": {
+    "errors": 0,
+    "warnings": 44,
+    "infos": 0
+  },
+  "page_quality": {
+    "labor_code_2019": [
+      "Dropped 0 noise lines",
+      "Stripped folio from chapter title: 'ĐIỀU KHOẢN THI HÀNH3' -> 'ĐIỀU KHOẢN THI HÀNH'",
+      "PAGE_QUALITY page 86: strange_chars=2.11%; mixed_alphanum=3.16%; vi_diacritic=0.00%"
+    ]
+  },
+  "outputs": {
+    "all_chunks": "out\\final_rebuild\\rebuild_fixed_800\\all_fixed_800.jsonl",
+    "corpus_status": "out\\final_rebuild\\rebuild_fixed_800\\corpus_status.json",
+    "chunk_stats": "out\\final_rebuild\\rebuild_fixed_800\\chunk_stats.json",
+    "by_document": "out\\final_rebuild\\rebuild_fixed_800\\by_document"
+  }
+}

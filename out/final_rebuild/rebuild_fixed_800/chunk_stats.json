@@ -1,0 +1,20 @@
+{
+  "run_id": "rebuild_fixed_800",
+  "strategy": "fixed_800",
+  "total_chunks": 51,
+  "retrieval_eligible": 51,
+  "chunk_types": {
+    "fixed_size": 51
+  },
+  "by_document": {
+    "labor_code_2019": 51
+  },
+  "per_document": [
+    {
+      "document_id": "labor_code_2019",
+      "status": "ok",
+      "chunks": 51,
+      "articles_seen": 220
+    }
+  ]
+}

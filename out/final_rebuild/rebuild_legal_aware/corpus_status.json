@@ -1,0 +1,31 @@
+{
+  "run_id": "rebuild_legal_aware",
+  "strategy": "legal_aware",
+  "documents": [
+    {
+      "document_id": "labor_code_2019",
+      "document_name": "Bộ luật Lao động",
+      "status": "ok",
+      "pdf": "E:\\LegalRAG\\data\\raw\\Văn-bản-hợp-nhất-125-VBHN-VPQH.pdf",
+      "pages": 86,
+      "pages_with_text": 86,
+      "pages_ocr_required": 0,
+      "pages_ocr_used": 0,
+      "pages_ocr_empty": 0,
+      "corpus_chunks": 983,
+      "final_chunks": 983,
+      "articles_seen": 220,
+      "missing_articles": 0,
+      "appendix_chunks": 0,
+      "warnings": [
+        "Dropped 0 noise lines",
+        "Stripped folio from chapter title: 'ĐIỀU KHOẢN THI HÀNH3' -> 'ĐIỀU KHOẢN THI HÀNH'",
+        "PAGE_QUALITY page 86: strange_chars=2.11%; mixed_alphanum=3.16%; vi_diacritic=0.00%"
+      ],
+      "error": null
+    }
+  ],
+  "status_counts": {
+    "ok": 1
+  }
+}

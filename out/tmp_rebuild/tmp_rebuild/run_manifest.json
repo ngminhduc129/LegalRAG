@@ -1,0 +1,30 @@
+{
+  "run_id": "tmp_rebuild",
+  "strategy": "legal_aware",
+  "created_at": "2026-11-11T06:15:54+00:00",
+  "git_commit": "c3f1426aef9812a1d42a0ecd90be0d9a9b0842a0",
+  "ocr_engine": "tesseract",
+  "ocr_engine_error": null,
+  "ocr_psm": 6,
+  "dpi": 300,
+  "ocr_workers": 1,
+  "documents_requested": 1,
+  "documents_built": 1,
+  "status_counts": {
+    "ok": 1
+  },
+  "pdf_hashes": {
+    "labor_code_2019": "08dcc4dbef97d2aabcd3558b614006089ac7923b1a03a30c5c8d7c357bb25308"
+  },
+  "validation": {
+    "errors": 0,
+    "warnings": 4,
+    "infos": 19
+  },
+  "outputs": {
+    "all_chunks": "out\\tmp_rebuild\\tmp_rebuild\\all_legal_aware.jsonl",
+    "corpus_status": "out\\tmp_rebuild\\tmp_rebuild\\corpus_status.json",
+    "chunk_stats": "out\\tmp_rebuild\\tmp_rebuild\\chunk_stats.json",
+    "by_document": "out\\tmp_rebuild\\tmp_rebuild\\by_document"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "document_id": "qd_582_2026",
+  "warnings": [
+    "Signature block: 9 lines starting on page 2",
+    "Appendix: 310 lines starting on page 3",
+    "Dropped 0 noise lines",
+    "PAGE_QUALITY page 1: mixed_alphanum=2.87%"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 9,
+  "appendix_chunks": 11,
+  "page_quality_warnings": [
+    {
+      "page": 1,
+      "reasons": [
+        "mixed_alphanum=2.87%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0287,
+      "vi_diacritic_ratio": 0.1158,
+      "total_chars": 2053
+    }
+  ]
+}

@@ -36,6 +36,12 @@ experiments/runs/
 # Local analysis output (audits, mappings; regenerable)
 output/
 
+# Gold QA annotation work (git-ignored per docs/qa_schema.md)
+data/qa/*.jsonl
+
+# OCR page cache (regenerable)
+data/ocr/
+
 # Logs
 *.log
 logs/

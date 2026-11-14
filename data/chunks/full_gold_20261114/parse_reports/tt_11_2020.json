@@ -1,0 +1,218 @@
+{
+  "document_id": "tt_11_2020",
+  "warnings": [
+    "Signature block: 19 lines starting on page 3",
+    "Appendix: 1401 lines starting on page 4",
+    "Dropped 0 noise lines",
+    "PAGE_QUALITY page 2: mixed_alphanum=1.84%",
+    "PAGE_QUALITY page 4: mixed_alphanum=1.82%",
+    "PAGE_QUALITY page 12: mixed_alphanum=2.40%",
+    "PAGE_QUALITY page 13: mixed_alphanum=1.78%",
+    "PAGE_QUALITY page 15: mixed_alphanum=2.38%",
+    "PAGE_QUALITY page 20: mixed_alphanum=2.23%",
+    "PAGE_QUALITY page 21: mixed_alphanum=5.13%",
+    "PAGE_QUALITY page 22: mixed_alphanum=2.18%",
+    "PAGE_QUALITY page 23: mixed_alphanum=3.82%",
+    "PAGE_QUALITY page 24: mixed_alphanum=2.10%",
+    "PAGE_QUALITY page 25: mixed_alphanum=1.55%",
+    "PAGE_QUALITY page 47: mixed_alphanum=2.43%",
+    "PAGE_QUALITY page 49: mixed_alphanum=1.85%",
+    "PAGE_QUALITY page 54: mixed_alphanum=2.70%",
+    "PAGE_QUALITY page 62: mixed_alphanum=1.82%",
+    "PAGE_QUALITY page 94: mixed_alphanum=1.88%",
+    "PAGE_QUALITY page 95: mixed_alphanum=1.75%",
+    "PAGE_QUALITY page 114: mixed_alphanum=2.63%"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 19,
+  "appendix_chunks": 159,
+  "page_quality_warnings": [
+    {
+      "page": 2,
+      "reasons": [
+        "mixed_alphanum=1.84%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0184,
+      "vi_diacritic_ratio": 0.1172,
+      "total_chars": 2158
+    },
+    {
+      "page": 4,
+      "reasons": [
+        "mixed_alphanum=1.82%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0182,
+      "vi_diacritic_ratio": 0.117,
+      "total_chars": 9697
+    },
+    {
+      "page": 12,
+      "reasons": [
+        "mixed_alphanum=2.40%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.024,
+      "vi_diacritic_ratio": 0.1304,
+      "total_chars": 16947
+    },
+    {
+      "page": 13,
+      "reasons": [
+        "mixed_alphanum=1.78%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0178,
+      "vi_diacritic_ratio": 0.1194,
+      "total_chars": 20694
+    },
+    {
+      "page": 15,
+      "reasons": [
+        "mixed_alphanum=2.38%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0238,
+      "vi_diacritic_ratio": 0.1255,
+      "total_chars": 17075
+    },
+    {
+      "page": 20,
+      "reasons": [
+        "mixed_alphanum=2.23%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0223,
+      "vi_diacritic_ratio": 0.1323,
+      "total_chars": 16194
+    },
+    {
+      "page": 21,
+      "reasons": [
+        "mixed_alphanum=5.13%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0513,
+      "vi_diacritic_ratio": 0.1178,
+      "total_chars": 21409
+    },
+    {
+      "page": 22,
+      "reasons": [
+        "mixed_alphanum=2.18%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0218,
+      "vi_diacritic_ratio": 0.129,
+      "total_chars": 24247
+    },
+    {
+      "page": 23,
+      "reasons": [
+        "mixed_alphanum=3.82%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0382,
+      "vi_diacritic_ratio": 0.1265,
+      "total_chars": 19833
+    },
+    {
+      "page": 24,
+      "reasons": [
+        "mixed_alphanum=2.10%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.021,
+      "vi_diacritic_ratio": 0.1197,
+      "total_chars": 15617
+    },
+    {
+      "page": 25,
+      "reasons": [
+        "mixed_alphanum=1.55%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0155,
+      "vi_diacritic_ratio": 0.1169,
+      "total_chars": 16427
+    },
+    {
+      "page": 47,
+      "reasons": [
+        "mixed_alphanum=2.43%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0243,
+      "vi_diacritic_ratio": 0.1159,
+      "total_chars": 14978
+    },
+    {
+      "page": 49,
+      "reasons": [
+        "mixed_alphanum=1.85%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0185,
+      "vi_diacritic_ratio": 0.1241,
+      "total_chars": 14387
+    },
+    {
+      "page": 54,
+      "reasons": [
+        "mixed_alphanum=2.70%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.027,
+      "vi_diacritic_ratio": 0.1191,
+      "total_chars": 19589
+    },
+    {
+      "page": 62,
+      "reasons": [
+        "mixed_alphanum=1.82%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0182,
+      "vi_diacritic_ratio": 0.1183,
+      "total_chars": 15174
+    },
+    {
+      "page": 94,
+      "reasons": [
+        "mixed_alphanum=1.88%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0188,
+      "vi_diacritic_ratio": 0.1161,
+      "total_chars": 20508
+    },
+    {
+      "page": 95,
+      "reasons": [
+        "mixed_alphanum=1.75%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0175,
+      "vi_diacritic_ratio": 0.1208,
+      "total_chars": 19560
+    },
+    {
+      "page": 114,
+      "reasons": [
+        "mixed_alphanum=2.63%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0263,
+      "vi_diacritic_ratio": 0.1246,
+      "total_chars": 1394
+    }
+  ]
+}

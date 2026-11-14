@@ -1,0 +1,32 @@
+{
+  "document_id": "tt_13_2026",
+  "warnings": [
+    "Signature block: 23 lines starting on page 5",
+    "Dropped 0 noise lines",
+    "PAGE_QUALITY page 1: mixed_alphanum=2.01%"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 23,
+  "appendix_chunks": 0,
+  "page_quality_warnings": [
+    {
+      "page": 1,
+      "reasons": [
+        "mixed_alphanum=2.01%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0201,
+      "vi_diacritic_ratio": 0.1418,
+      "total_chars": 2243
+    }
+  ]
+}

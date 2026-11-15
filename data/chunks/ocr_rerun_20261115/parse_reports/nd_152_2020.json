@@ -1,0 +1,48 @@
+{
+  "document_id": "nd_152_2020",
+  "warnings": [
+    "Signature block: 24 lines starting on page 26",
+    "Appendix: 799 lines starting on page 27",
+    "Dropped 11 noise lines"
+  ],
+  "dropped_lines": 11,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    29,
+    30
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [
+    2,
+    4
+  ],
+  "signature_lines": 24,
+  "appendix_chunks": 20,
+  "page_quality_warnings": []
+}

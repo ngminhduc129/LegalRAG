@@ -1,0 +1,64 @@
+{
+  "document_id": "nd_70_2023",
+  "warnings": [
+    "Signature block: 20 lines starting on page 9",
+    "Appendix: 349 lines starting on page 10",
+    "Dropped 0 noise lines",
+    "PAGE_QUALITY page 6: mixed_alphanum=3.85%",
+    "PAGE_QUALITY page 7: mixed_alphanum=2.37%",
+    "PAGE_QUALITY page 8: mixed_alphanum=2.68%",
+    "PAGE_QUALITY page 10: mixed_alphanum=5.98%"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 20,
+  "appendix_chunks": 9,
+  "page_quality_warnings": [
+    {
+      "page": 6,
+      "reasons": [
+        "mixed_alphanum=3.85%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0385,
+      "vi_diacritic_ratio": 0.1149,
+      "total_chars": 2345
+    },
+    {
+      "page": 7,
+      "reasons": [
+        "mixed_alphanum=2.37%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0237,
+      "vi_diacritic_ratio": 0.0852,
+      "total_chars": 2377
+    },
+    {
+      "page": 8,
+      "reasons": [
+        "mixed_alphanum=2.68%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0268,
+      "vi_diacritic_ratio": 0.1193,
+      "total_chars": 2000
+    },
+    {
+      "page": 10,
+      "reasons": [
+        "mixed_alphanum=5.98%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0598,
+      "vi_diacritic_ratio": 0.1418,
+      "total_chars": 748
+    }
+  ]
+}

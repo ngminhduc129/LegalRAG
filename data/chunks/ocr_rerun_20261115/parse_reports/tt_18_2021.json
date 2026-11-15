@@ -1,0 +1,32 @@
+{
+  "document_id": "tt_18_2021",
+  "warnings": [
+    "Appendix without signature: 179 lines starting on page 14",
+    "Dropped 2 noise lines",
+    "PAGE_QUALITY page 5: mixed_alphanum=1.86%"
+  ],
+  "dropped_lines": 2,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 0,
+  "appendix_chunks": 6,
+  "page_quality_warnings": [
+    {
+      "page": 5,
+      "reasons": [
+        "mixed_alphanum=1.86%"
+      ],
+      "strange_ratio": 0.0,
+      "mixed_ratio": 0.0186,
+      "vi_diacritic_ratio": 0.1188,
+      "total_chars": 2545
+    }
+  ]
+}

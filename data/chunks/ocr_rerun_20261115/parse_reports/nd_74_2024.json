@@ -1,0 +1,21 @@
+{
+  "document_id": "nd_74_2024",
+  "warnings": [
+    "Signature block: 21 lines starting on page 4",
+    "Appendix: 132 lines starting on page 5",
+    "Dropped 1 noise lines"
+  ],
+  "dropped_lines": 1,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 21,
+  "appendix_chunks": 4,
+  "page_quality_warnings": []
+}

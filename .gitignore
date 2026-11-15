@@ -36,8 +36,6 @@ experiments/runs/
 # Local analysis output (audits, mappings; regenerable)
 output/
 
-# OCR page cache (regenerable)
-data/ocr/
 
 # Logs
 *.log

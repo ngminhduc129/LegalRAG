@@ -1,0 +1,30 @@
+{
+  "document_id": "nd_152_2020",
+  "warnings": [
+    "Signature block: 347 lines starting on page 30",
+    "Dropped 0 noise lines"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    8,
+    12,
+    16,
+    20,
+    21,
+    23,
+    25,
+    30
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [
+    2
+  ],
+  "signature_lines": 347,
+  "appendix_chunks": 0,
+  "page_quality_warnings": []
+}

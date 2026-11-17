@@ -1,0 +1,32 @@
+{
+  "document_id": "nd_337_2025",
+  "warnings": [
+    "Signature block: 8 lines starting on page 18",
+    "Dropped 0 noise lines"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    10,
+    12,
+    14,
+    15,
+    17,
+    21,
+    23,
+    25,
+    27,
+    29,
+    46
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 8,
+  "appendix_chunks": 0,
+  "page_quality_warnings": []
+}

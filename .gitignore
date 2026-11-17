@@ -66,3 +66,6 @@ dmypy.json
 
 # Local config overrides
 configs/local.yaml
+
+# OCR model weights (large, downloadable; regenerate via script)
+data/ocr/vietocr/*.pth

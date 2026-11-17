@@ -1,0 +1,16 @@
+{
+  "document_id": "tt_08_2026",
+  "warnings": [
+    "Dropped 0 noise lines"
+  ],
+  "dropped_lines": 0,
+  "articles_seen": [
+    21,
+    23
+  ],
+  "missing_articles": [],
+  "duplicate_article_numbers": [],
+  "signature_lines": 0,
+  "appendix_chunks": 0,
+  "page_quality_warnings": []
+}

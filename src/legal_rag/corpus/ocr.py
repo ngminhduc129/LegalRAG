@@ -15,19 +15,54 @@ invalidates its cached pages.
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
 import threading
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Protocol, Sequence
+from typing import Any, Dict, Iterable, List, Optional, Protocol, Sequence
 
 import fitz  # PyMuPDF
+import numpy as np
+import yaml
+from PIL import Image
 
 DEFAULT_DPI = 300
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CACHE_ROOT = REPO_ROOT / "data" / "ocr"
 DEFAULT_TESSDATA_DIR = REPO_ROOT / "data" / "ocr" / "tessdata"
+
+# ---------------------------------------------------------------------------
+# VietOCR (mô hình Transformer huấn luyện cho tiếng Việt)
+# ---------------------------------------------------------------------------
+DEFAULT_VIETOCR_DIR = REPO_ROOT / "data" / "ocr" / "vietocr"
+DEFAULT_VIETOCR_CONFIG = DEFAULT_VIETOCR_DIR / "base.yml"
+DEFAULT_VIETOCR_WEIGHTS = DEFAULT_VIETOCR_DIR / "vgg_transformer.pth"
+DEFAULT_VIETOCR_SPEC = DEFAULT_VIETOCR_DIR / "vgg-transformer.yml"
+
+
+def _apply_pkg_resources_shim() -> None:
+    """Cho gdown (dùng bên trong vietocr) import được pkg_resources trên setuptools>=80."""
+    import sys
+    import types
+
+    if "pkg_resources" in sys.modules:
+        return
+    mod = types.ModuleType("pkg_resources")
+
+    class _Dist:
+        version = "0.0.0"
+
+        def requires(self):
+            return []
+
+    def get_distribution(name):
+        return _Dist()
+
+    mod.get_distribution = get_distribution
+    mod.working_set = []
+    sys.modules["pkg_resources"] = mod
 
 
 class OcrUnavailable(RuntimeError):
@@ -285,6 +320,103 @@ class PaddleEngine:
         return [line for line in lines if line.strip()]
 
 
+@dataclass
+class VietOcrEngine:
+    """VietOCR adapter — nhận dạng tiếng Việt cấp dòng văn bản.
+
+    VietOCR (Transformer) thường chính xác hơn Tesseract về dấu tiếng Việt,
+    nhưng chỉ nhận dạng từng dòng văn bản.  Engine này tự phân đoạn một trang
+    thành các dòng qua hình chiếu ngang (horizontal projection) rồi chạy
+    Predictor trên từng dòng, trả về danh sách các dòng đã nhận dạng.
+    """
+
+    lang: str = "vi"
+    name: str = "vietocr"
+    weights: Optional[Path] = None
+    config: Optional[Path] = None
+    device: str = "cpu"
+    _predictor: Any = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        _apply_pkg_resources_shim()
+        import vietocr.tool.predictor as pred
+
+        weight_path = self.weights or DEFAULT_VIETOCR_WEIGHTS
+        config_path = self.config or DEFAULT_VIETOCR_CONFIG
+        if not weight_path.exists():
+            raise OcrUnavailable(
+                f"VietOCR weights not found at {weight_path}. "
+                "Tải vgg_transformer.pth từ https://vocr.vn/data/vietocr/vgg_transformer.pth"
+            )
+        if not config_path.exists():
+            raise OcrUnavailable(f"VietOCR config not found at {config_path}")
+
+        base = yaml.safe_load(open(config_path, encoding="utf-8"))
+        # vgg-transformer.yml chỉ ghi đè backbone/cnn/weights, còn thiếu các key
+        # còn lại nên hợp nhất base.yml trước rồi áp spec sau.
+        if DEFAULT_VIETOCR_SPEC.exists():
+            spec = yaml.safe_load(open(DEFAULT_VIETOCR_SPEC, encoding="utf-8"))
+            base.update(spec)
+        base["device"] = self.device
+        base["weights"] = str(weight_path)
+        base.setdefault("predictor", {})
+        base["predictor"]["beamsearch"] = False
+
+        self._predictor = pred.Predictor(base)
+
+    def cache_params(self) -> Dict[str, object]:
+        weight_path = self.weights or DEFAULT_VIETOCR_WEIGHTS
+        digest = hashlib.sha256()
+        if weight_path.exists():
+            with weight_path.open("rb") as handle:
+                for block in iter(lambda: handle.read(1 << 20), b""):
+                    digest.update(block)
+        return {"weights": f"{weight_path.name}:{digest.hexdigest()[:16]}"}
+
+    def ocr_image(self, png_bytes: bytes) -> List[str]:
+        image = Image.open(io.BytesIO(png_bytes)).convert("L")
+        crops = self._segment_lines(image)
+        results: List[str] = []
+        for crop in crops:
+            text = self._predictor.predict(crop.convert("RGB"))
+            if text.strip():
+                results.append(text)
+        return results
+
+    @staticmethod
+    def _segment_lines(
+        pil_image: Image.Image, min_height: int = 8, pad: int = 4
+    ):
+        """Chia ảnh thành các dòng theo hình chiếu ngang (horizontal projection)."""
+        arr = np.array(pil_image.convert("L"))
+        binary = (arr < 128).astype(np.uint8)
+        proj = binary.sum(axis=1)
+        text_rows = proj > 0
+        boxes = []
+        in_line = False
+        start = 0
+        for i, is_text in enumerate(text_rows):
+            if is_text and not in_line:
+                start = i
+                in_line = True
+            elif not is_text and in_line:
+                if i - start >= min_height:
+                    boxes.append((start, i))
+                in_line = False
+        if in_line:
+            boxes.append((start, len(text_rows)))
+        h = arr.shape[0]
+        crops = []
+        for (top, bottom) in boxes:
+            t = max(0, top - pad)
+            b = min(h, bottom + pad)
+            if b - t < min_height:
+                continue
+            crop = pil_image.crop((0, t, pil_image.width, b)).convert("RGB")
+            crops.append(crop)
+        return crops
+
+
 def get_engine(name: str = "auto", lang: Optional[str] = None) -> OcrEngine:
     """Instantiate an OCR engine or raise :class:`OcrUnavailable`.
 
@@ -307,8 +439,11 @@ def get_engine(name: str = "auto", lang: Optional[str] = None) -> OcrEngine:
         return EasyOcrEngine(lang=_normalize_lang(name, lang) or "vi")
     if name == "paddleocr":
         return PaddleEngine(lang=_normalize_lang(name, lang) or "vi")
+    if name == "vietocr":
+        return VietOcrEngine(lang=_normalize_lang(name, lang) or "vi")
     raise ValueError(
-        f"unknown OCR engine: {name!r} (expected tesseract/easyocr/paddleocr/auto)"
+        f"unknown OCR engine: {name!r} "
+        "(expected tesseract/easyocr/paddleocr/vietocr/auto)"
     )
 
 

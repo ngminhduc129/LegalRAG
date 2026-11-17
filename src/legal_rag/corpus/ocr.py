@@ -28,6 +28,8 @@ import numpy as np
 import yaml
 from PIL import Image
 
+from .vietocr_post import postprocess_lines
+
 DEFAULT_DPI = 300
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CACHE_ROOT = REPO_ROOT / "data" / "ocr"
@@ -381,7 +383,7 @@ class VietOcrEngine:
             text = self._predictor.predict(crop.convert("RGB"))
             if text.strip():
                 results.append(text)
-        return results
+        return postprocess_lines(results)
 
     @staticmethod
     def _segment_lines(

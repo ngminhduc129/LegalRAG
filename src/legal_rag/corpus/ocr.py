@@ -244,12 +244,20 @@ class EasyOcrEngine:
 class PaddleEngine:
     """PaddleOCR adapter supporting both the 2.x and 3.x APIs.
 
-    The 3.x branch could not be exercised against a real install; verify it on
-    your pinned version before relying on it.
+    PaddleOCR 2.x (``paddlepaddle==2.6.x``) is the battle-tested combination on
+    Windows CPU and uses ``engine.ocr(image, cls=True)``.  PaddleOCR 3.x uses
+    ``engine.predict(image)`` and is kept as a fallback branch.
+
+    Lines are returned in reading order: boxes are grouped by vertical
+    proximity (same text line), each group is sorted left-to-right, then groups
+    are emitted top-to-bottom.
     """
 
     lang: str = "vi"
     name: str = "paddleocr"
+    use_angle_cls: bool = True
+    min_confidence: float = 0.0
+    line_group_px: int = 20
     _lock: threading.Lock = field(
         default_factory=threading.Lock, init=False, repr=False, compare=False
     )
@@ -259,7 +267,8 @@ class PaddleEngine:
             from paddleocr import PaddleOCR  # noqa: F401
         except ImportError as exc:  # pragma: no cover - env dependent
             raise OcrUnavailable(
-                "paddleocr is not installed; run `pip install paddleocr paddlepaddle`"
+                "paddleocr is not installed; run "
+                "`pip install paddlepaddle==2.6.2 paddleocr==2.10.0`"
             ) from exc
         self._ocr = None
         self._new_api = False
@@ -271,12 +280,17 @@ class PaddleEngine:
 
                 try:  # PaddleOCR 2.x
                     self._ocr = PaddleOCR(
-                        lang=self.lang, use_angle_cls=True, show_log=False
+                        lang=self.lang,
+                        use_angle_cls=self.use_angle_cls,
+                        show_log=False,
                     )
                     self._new_api = False
                 except (TypeError, ValueError):  # PaddleOCR 3.x
                     self._ocr = PaddleOCR(
-                        lang=self.lang, use_textline_orientation=True
+                        lang=self.lang,
+                        use_doc_orientation_classify=False,
+                        use_doc_unwarping=False,
+                        use_textline_orientation=True,
                     )
                     self._new_api = True
             return self._ocr
@@ -297,6 +311,57 @@ class PaddleEngine:
                 lines.append(str(text))
         return lines
 
+    @staticmethod
+    def _box_centers(box) -> tuple[float, float]:
+        """Trả về (y_center, x_min) của một box 4 điểm."""
+        xs = [float(p[0]) for p in box]
+        ys = [float(p[1]) for p in box]
+        return (sum(ys) / 4.0, min(xs))
+
+    @staticmethod
+    def _sort_reading_order(
+        items: list[tuple[list, tuple[str, float]]],
+        line_group_px: int,
+    ) -> list[str]:
+        """Sắp xếp theo thứ tự đọc: nhóm cùng dòng (y gần nhau), trong nhóm x từ
+        trái sang phải, sau đó các nhóm từ trên xuống dưới."""
+        if not items:
+            return []
+        enriched = []
+        for box, payload in items:
+            if not isinstance(payload, (list, tuple)) or not payload:
+                continue
+            text = str(payload[0])
+            score = float(payload[1]) if len(payload) > 1 else 1.0
+            y_center, x_min = PaddleEngine._box_centers(box)
+            enriched.append((y_center, x_min, text, score))
+        enriched.sort(key=lambda t: t[0])
+
+        groups: list[list[tuple[float, str, float]]] = []
+        for y_center, x_min, text, score in enriched:
+            placed = False
+            for group in groups:
+                if abs(y_center - group[0][0]) <= line_group_px:
+                    group.append((x_min, text, score))
+                    placed = True
+                    break
+            if not placed:
+                groups.append([(x_min, text, score)])
+
+        lines: list[str] = []
+        for group in groups:
+            group.sort(key=lambda t: t[0])
+            lines.extend(text for _, text, _ in group)
+        return lines
+
+    def cache_params(self) -> Dict[str, object]:
+        return {
+            "engine": "paddleocr",
+            "lang": self.lang,
+            "use_angle_cls": self.use_angle_cls,
+            "min_confidence": self.min_confidence,
+        }
+
     def ocr_image(self, png_bytes: bytes) -> List[str]:
         import io
 
@@ -305,20 +370,58 @@ class PaddleEngine:
 
         image = np.array(Image.open(io.BytesIO(png_bytes)).convert("RGB"))
         engine = self._engine()
-        lines: List[str] = []
+        raw_items: list[tuple[list, tuple[str, float]]] = []
         if self._new_api:
-            lines = self._texts_from_v3(engine.predict(image))
+            result = engine.predict(image)
+            for item in result or []:
+                data = item
+                if not isinstance(data, dict) and hasattr(item, "res"):
+                    data = item.res
+                texts = None
+                boxes = None
+                scores = None
+                if isinstance(data, dict):
+                    texts = data.get("rec_texts")
+                    boxes = data.get("rec_polys") or data.get("det_polys")
+                    scores = data.get("rec_scores")
+                elif hasattr(data, "get"):
+                    texts = data.get("rec_texts")
+                    boxes = data.get("rec_polys") or data.get("det_polys")
+                    scores = data.get("rec_scores")
+                if texts:
+                    for i, text in enumerate(texts):
+                        box = boxes[i] if boxes and i < len(boxes) else [[0, 0]] * 4
+                        score = (
+                            float(scores[i]) if scores and i < len(scores) else 1.0
+                        )
+                        raw_items.append((box, (text, score)))
         else:
             result = engine.ocr(image, cls=True)
             for page in result or []:
                 for item in page or []:
-                    # PaddleOCR 2.x returns [box, (text, confidence)]
                     if isinstance(item, (list, tuple)) and len(item) >= 2:
+                        box = item[0]
                         payload = item[1]
                         if isinstance(payload, (list, tuple)) and payload:
-                            lines.append(str(payload[0]))
-                        else:
-                            lines.append(str(payload))
+                            raw_items.append(
+                                (
+                                    box,
+                                    (
+                                        str(payload[0]),
+                                        float(payload[1])
+                                        if len(payload) > 1
+                                        else 1.0,
+                                    ),
+                                )
+                            )
+
+        # Lọc theo ngưỡng confidence, sau đó sắp xếp theo thứ tự đọc.
+        filtered = [
+            (box, (text, score))
+            for box, (text, score) in raw_items
+            if score >= self.min_confidence
+        ]
+        lines = self._sort_reading_order(filtered, self.line_group_px)
         return [line for line in lines if line.strip()]
 
 
